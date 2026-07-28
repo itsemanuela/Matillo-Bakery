@@ -43,7 +43,7 @@ function MyNavbar() {
               Home
             </Nav.Link>
             <Nav.Link href="#prodotti" className="text-white fw-semibold">
-              Prodotti
+              Shop
             </Nav.Link>
             <Nav.Link href="#ricette" className="text-white fw-semibold">
               Ricette
