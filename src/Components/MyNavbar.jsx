@@ -1,8 +1,10 @@
 import Container from "react-bootstrap/Container";
 import Navbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
+import { useNavigate } from "react-router-dom";
 
 function MyNavbar() {
+  const navigate = useNavigate();
   return (
     <Navbar
       expand="lg"
@@ -39,19 +41,39 @@ function MyNavbar() {
 
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="ms-auto gap-3 py-2" style={{ paddingLeft: "140px" }}>
-            <Nav.Link href="#home" className="text-white fw-semibold">
+            <Nav.Link
+              onClick={() => navigate("/")}
+              className="text-white"
+              style={{ cursor: "pointer" }}
+            >
               Home
             </Nav.Link>
-            <Nav.Link href="#prodotti" className="text-white fw-semibold">
+            <Nav.Link
+              onClick={() => navigate("/prodotti")}
+              className="text-white"
+              style={{ cursor: "pointer" }}
+            >
               Shop
             </Nav.Link>
-            <Nav.Link href="#ricette" className="text-white fw-semibold">
+            <Nav.Link
+              onClick={() => navigate("/ricette")}
+              className="text-white"
+              style={{ cursor: "pointer" }}
+            >
               Ricette
             </Nav.Link>
-            <Nav.Link href="#catering" className="text-white fw-semibold">
+            <Nav.Link
+              onClick={() => navigate("/catering")}
+              className="text-white"
+              style={{ cursor: "pointer" }}
+            >
               Catering
             </Nav.Link>
-            <Nav.Link href="#prodotti" className="text-white fw-semibold">
+            <Nav.Link
+              onClick={() => navigate("/laboratori")}
+              className="text-white"
+              style={{ cursor: "pointer" }}
+            >
               Laboratori
             </Nav.Link>
           </Nav>
