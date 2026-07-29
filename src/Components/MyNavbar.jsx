@@ -57,7 +57,7 @@ function MyNavbar() {
               Home
             </Nav.Link>
             <Nav.Link
-              onClick={() => navigate("/prodotti")}
+              onClick={() => navigate("/shop")}
               className="text-white fw-semibold"
               style={{
                 cursor: "pointer",

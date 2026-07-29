@@ -4,6 +4,7 @@ import Hero from "./Components/Hero";
 import AboutSection from "./Components/AboutSection";
 import MyFooter from "./Components/MyFooter";
 import MyNavbar from "./Components/MyNavbar";
+import MyShop from "./Components/MyShop";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
             </>
           }
         />
+        <Route path="/shop" element={<MyShop />} />
       </Routes>
 
       <MyFooter />
