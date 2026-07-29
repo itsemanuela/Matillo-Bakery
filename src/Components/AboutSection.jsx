@@ -74,7 +74,7 @@ function AboutSection() {
             <div className="shadow-lg rounded overflow-hidden border border-warning border-opacity-25">
               <Carousel
                 fade
-                interval={5000}
+                interval={3000}
                 pause="hover"
                 indicators={true}
                 controls={true}

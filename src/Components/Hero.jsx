@@ -11,8 +11,7 @@ function Hero() {
   return (
     <>
       <style>
-        {`
-          /* Impostazione di default (Desktop): immagine spostata a sinistra e in basso */
+        {` 
           .hero-section {
             background: linear-gradient(90deg, rgba(28, 22, 19, 0.3) 0%, rgba(28, 22, 19, 0.85) 45%, rgba(28, 22, 19, 0.95) 100%), url(${heroImg}) -25% -15% / cover no-repeat;
           }
@@ -68,7 +67,7 @@ function Hero() {
                 <Button
                   variant="outline-light"
                   size="lg"
-                  onClick={() => navigate("/prodotti")}
+                  onClick={() => navigate("/shop")}
                   className="px-4 py-2 shadow-sm fw-semibold"
                 >
                   Scopri i Prodotti
