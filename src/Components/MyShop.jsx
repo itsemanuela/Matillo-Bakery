@@ -7,7 +7,6 @@ import Card from "react-bootstrap/Card";
 import Badge from "react-bootstrap/Badge";
 
 import fetteBiscottateImg from "../assets/20210118_MAT_Presentazione concept_page-0008.jpg";
-//import tortanoVideo from "../assets/lavorazione/20210402162217_PEPP7304.MP4";
 
 function Shop() {
   const [selectedCategory, setSelectedCategory] = useState("tutti");
@@ -86,15 +85,21 @@ function Shop() {
   return (
     <div
       style={{
-        backgroundColor: "#1c1613",
+        backgroundColor: "#221915",
         color: "#f8f9fa",
         minHeight: "100vh",
-        paddingTop: "120px",
-        paddingBottom: "80px",
+        paddingTop: "130px",
+        paddingBottom: "90px",
       }}
     >
       <Container>
         <div className="text-center mb-5">
+          <span
+            className="text-warning text-uppercase tracking-widest fw-semibold small d-block mb-2"
+            style={{ letterSpacing: "2px" }}
+          >
+            Eccellenze Artigianali dal 1943
+          </span>
           <h1
             className="display-4 fw-bold mb-3 text-white"
             style={{ fontFamily: "'Roboto Serif', serif" }}
@@ -110,11 +115,15 @@ function Shop() {
           </p>
         </div>
 
+        {/* --- BESTSELLER IN EVIDENZA -> fette o casatillo--- */}
         <div
           className="p-4 p-lg-5 mb-5 rounded shadow-lg position-relative overflow-hidden"
           style={{
-            backgroundColor: "#2a221d",
+            backgroundColor: "rgba(45, 35, 30, 0.65)",
+            backdropFilter: "blur(12px)",
+            WebkitBackdropFilter: "blur(12px)",
             border: "1px solid rgba(212, 175, 55, 0.3)",
+            boxShadow: "0 20px 40px rgba(0,0,0,0.5)",
           }}
         >
           <Row className="align-items-center">
@@ -122,30 +131,33 @@ function Shop() {
               <Badge
                 bg="warning"
                 text="dark"
-                className="mb-3 px-3 py-2 fw-bold text-uppercase"
+                className="mb-3 px-3 py-2 fw-bold text-uppercase shadow-sm"
               >
-                Il Nostro Bestseller
+                <i className="bi bi-star-fill me-1"></i> Il Nostro Bestseller
               </Badge>
               <h2
                 className="fw-bold mb-3 text-white"
-                style={{ fontFamily: "'Roboto Serif', serif" }}
+                style={{
+                  fontFamily: "'Roboto Serif', serif",
+                  fontSize: "2.2rem",
+                }}
               >
                 Fette Biscottate Artigianali
               </h2>
               <p
-                className="text-light mb-4"
-                style={{ fontSize: "1.1rem", lineHeight: "1.6" }}
+                className="text-light opacity-90 mb-4"
+                style={{ fontSize: "1.1rem", lineHeight: "1.7" }}
               >
                 Le inconfondibili fette biscottate del Forno Matillo: croccanti,
                 fragranti e dorate alla perfezione. L'accompagnamento ideale per
-                iniziare la giornata con la genuinità della tradizione del 1943.
+                iniziare la giornata con la genuinità della tradizione.
               </p>
               <div className="d-flex align-items-center gap-4">
-                <span className="fs-3 fw-bold text-warning">€ 6,50</span>
+                <span className="fs-2 fw-bold text-warning">€ 6,50</span>
                 <Button
                   variant="warning"
                   size="lg"
-                  className="px-4 fw-semibold text-dark shadow-sm"
+                  className="px-4 fw-semibold text-dark shadow"
                   onClick={() => alert("Aggiunto al carrello!")}
                 >
                   Acquista Bestseller
@@ -156,17 +168,19 @@ function Shop() {
               <img
                 src={fetteBiscottateImg}
                 alt="Fette Biscottate Artigianali Matillo"
-                className="img-fluid rounded shadow"
+                className="img-fluid rounded shadow-sm"
                 style={{
                   maxHeight: "320px",
                   objectFit: "cover",
                   width: "100%",
+                  border: "1px solid rgba(255,255,255,0.1)",
                 }}
               />
             </Col>
           </Row>
         </div>
 
+        {/* --- FILTRI CATEGORIE --- */}
         <div className="d-flex justify-content-center gap-2 gap-md-3 mb-5 flex-wrap">
           {[
             { key: "tutti", label: "Tutti i Prodotti" },
@@ -179,8 +193,10 @@ function Shop() {
               variant={
                 selectedCategory === cat.key ? "warning" : "outline-light"
               }
-              className={`px-4 py-2 fw-semibold ${
-                selectedCategory === cat.key ? "text-dark" : "text-light"
+              className={`px-4 py-2 fw-semibold shadow-sm ${
+                selectedCategory === cat.key
+                  ? "text-dark"
+                  : "text-light border-opacity-25"
               }`}
               onClick={() => setSelectedCategory(cat.key)}
             >
@@ -189,18 +205,33 @@ function Shop() {
           ))}
         </div>
 
+        {/* ---   (Glassmorphism Cards) --- */}
         <Row className="g-4 mb-5">
           {filteredProducts.map((product) => (
             <Col md={6} lg={4} key={product.id}>
               <Card
-                className="h-100 shadow border-0 text-white"
+                className="h-100 border-0 text-white"
                 style={{
-                  backgroundColor: "#241d18",
-                  borderRadius: "12px",
+                  backgroundColor: "rgba(45, 35, 30, 0.55)",
+                  backdropFilter: "blur(10px)",
+                  WebkitBackdropFilter: "blur(10px)",
+                  borderRadius: "16px",
                   overflow: "hidden",
+                  border: "1px solid rgba(212, 175, 55, 0.2) !important",
+                  boxShadow: "0 10px 30px rgba(0,0,0,0.3)",
+                  transition:
+                    "transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = "translateY(-6px)";
+                  e.currentTarget.style.borderColor = "rgba(212, 175, 55, 0.6)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.borderColor = "rgba(212, 175, 55, 0.2)";
                 }}
               >
-                <div style={{ height: "220px", overflow: "hidden" }}>
+                <div style={{ height: "230px", overflow: "hidden" }}>
                   <Card.Img
                     variant="top"
                     src={product.image}
@@ -208,28 +239,40 @@ function Shop() {
                     style={{
                       height: "100%",
                       objectFit: "cover",
-                      transition: "transform 0.3s ease",
+                      transition: "transform 0.5s ease",
                     }}
+                    onMouseEnter={(e) =>
+                      (e.currentTarget.style.transform = "scale(1.06)")
+                    }
+                    onMouseLeave={(e) =>
+                      (e.currentTarget.style.transform = "scale(1)")
+                    }
                   />
                 </div>
                 <Card.Body className="d-flex flex-column p-4">
                   <Card.Title
                     className="fw-bold mb-2 text-white"
-                    style={{ fontFamily: "'Roboto Serif', serif" }}
+                    style={{
+                      fontFamily: "'Roboto Serif', serif",
+                      fontSize: "1.3rem",
+                    }}
                   >
                     {product.name}
                   </Card.Title>
-                  <Card.Text className="text-light opacity-75 small mb-4 flex-grow-1">
+                  <Card.Text
+                    className="text-light opacity-75 small mb-4 flex-grow-1"
+                    style={{ lineHeight: "1.5" }}
+                  >
                     {product.description}
                   </Card.Text>
-                  <div className="d-flex align-items-center justify-content-between mt-auto">
+                  <div className="d-flex align-items-center justify-content-between mt-auto pt-3 border-top border-secondary border-opacity-25">
                     <span className="fs-5 fw-bold text-warning">
                       {product.price}
                     </span>
                     <Button
-                      variant="outline-warning"
+                      variant="warning"
                       size="sm"
-                      className="px-3 fw-semibold text-white"
+                      className="px-3 py-2 fw-semibold text-dark shadow-sm"
                       onClick={() =>
                         alert(`${product.name} aggiunto al carrello!`)
                       }
@@ -242,42 +285,6 @@ function Shop() {
             </Col>
           ))}
         </Row>
-
-        <div
-          className="mt-5 p-4 p-lg-5 rounded text-center shadow-lg"
-          style={{
-            backgroundColor: "#2a221d",
-            border: "1px solid rgba(255, 255, 255, 0.05)",
-          }}
-        >
-          <h3
-            className="fw-bold mb-3 text-white"
-            style={{ fontFamily: "'Roboto Serif', serif" }}
-          >
-            L'arte dell'intreccio: Il nostro Tortano
-          </h3>
-          <p
-            className="text-light opacity-75 mb-4 mx-auto"
-            style={{ maxWidth: "700px" }}
-          >
-            Guarda come le mani sapienti dei nostri fornai intrecciano
-            lentamente l'impasto secondo la ricetta originale di famiglia. Ogni
-            pezzo è un'opera d'arte artigianale.
-          </p>
-          <div
-            className="ratio ratio-16x9 mx-auto rounded overflow-hidden shadow"
-            style={{ maxWidth: "800px", maxHeight: "450px" }}
-          >
-            <video
-              //src={tortanoVideo}
-              autoPlay
-              loop
-              muted
-              playsInline
-              className="w-100 h-100 object-fit-cover"
-            />
-          </div>
-        </div>
       </Container>
     </div>
   );
