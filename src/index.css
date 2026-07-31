@@ -5,15 +5,18 @@
   margin: 0;
   padding: 0;
 }
-  .hero-banner {
-  background-image:   linear-gradient(
-      rgba(0, 0, 0, 0.3), 
-      rgba(0, 0, 0, 0.3)
-    ),   url('./assets/20210118_MAT_Presentazione concept_page-0012.jpg');
+ .hero-banner {
+  background-image: 
+    linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.2) 0%,
+      rgba(0, 0, 0, 0.4) 60%,
+      #A96D59 100%
+    ), 
+    url('./assets/20210118_MAT_Presentazione concept_page-0012.jpg');
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
- 
   height: 100vh; 
   width: 100%;
 }
@@ -37,4 +40,110 @@
   font-size:23px;
   background-color: #EED972 !important;
   color: #221915 !important;
+}
+
+
+.bg-custom-shop {
+  background-color: #834F41 !important;
+  color: #ffffff !important; 
+  
+}
+ 
+footer, .custom-footer {
+  background-color: #2c1d18 !important;
+  border-top: 2px solid #EED972 !important;
+}
+
+  
+.checkout-page-wrapper {
+  background-color:  #834F41 !important;  
+  color: #f8f9fa;
+  min-height: 100vh;
+  padding-top: 140px;
+  padding-bottom: 90px;
+}
+
+.checkout-container {
+  max-width: 1000px;
+}
+ 
+.checkout-subtitle {
+  color: #EED972;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  font-weight: 600;
+  font-size: 0.8rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.checkout-main-title {
+  font-family: 'Roboto Serif', serif;
+  color: #ffffff;
+  letter-spacing: -0.5px;
+}
+
+.checkout-gold-title {
+  font-family: 'Roboto Serif', serif;
+  color: #EED972;
+}
+
+.checkout-gold-text {
+  color: #EED972;
+}
+
+.checkout-text-muted {
+  color: #d9ccbc;
+}
+
+ 
+.checkout-box {
+  background-color:   #AF705C !important;
+  border-radius: 20px !important;
+  border: 1px solid rgba(238, 217, 114, 0.15) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25) !important;
+}
+
+ 
+.checkout-input {
+  background-color: #EFD7AA !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(238, 217, 114, 0.2) !important;
+  border-radius: 10px !important;
+  padding: 0.75rem 1rem !important;
+}
+
+.checkout-input:focus {
+  background-color: #2a1f18 !important;
+  color: #ffffff !important;
+  border-color: #EED972 !important;
+  box-shadow: 0 0 0 0.2rem rgba(238, 217, 114, 0.2) !important;
+}
+
+ 
+.checkout-btn-gold {
+  background-color: #EED972 !important;
+  color: #1a120b !important;
+  border-radius: 10px !important;
+  font-weight: 600;
+  transition: all 0.2s ease-in-out;
+}
+
+.checkout-btn-gold:hover {
+  background-color: #f3e28c !important;
+  color: #1a120b !important;
+  transform: translateY(-1px);
+}
+
+ 
+.checkout-sticky {
+  position: sticky;
+  top: 110px;
+}
+
+ 
+.checkout-cart-list {
+  max-height: 300px;
+  overflow-y: auto;
+  padding-right: 5px;
 }

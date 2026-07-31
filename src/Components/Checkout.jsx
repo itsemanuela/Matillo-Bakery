@@ -34,13 +34,11 @@ function Checkout() {
 
   const handleCheckoutSubmit = (e) => {
     e.preventDefault();
-
     const ordineCompleto = {
       ...shippingData,
       prodotti: cart,
       totale: totalPrice,
     };
-
     console.log("Invio ordine al backend:", ordineCompleto);
     alert(
       "Ordine completato con successo! Grazie per aver scelto Antico Forno Matillo.",
@@ -56,29 +54,11 @@ function Checkout() {
   };
 
   return (
-    <div
-      style={{
-        backgroundColor: "#221915",
-        color: "#f8f9fa",
-        minHeight: "100vh",
-        paddingTop: "130px",
-        paddingBottom: "90px",
-      }}
-    >
-      <Container style={{ maxWidth: "900px" }}>
+    <div className="checkout-page-wrapper">
+      <Container className="checkout-container">
         <div className="text-center mb-5">
-          <span
-            className="text-warning text-uppercase tracking-widest fw-semibold small d-block mb-2"
-            style={{ letterSpacing: "2px" }}
-          >
-            Antico Forno Matillo 1943
-          </span>
-          <h1
-            className="display-4 fw-bold mb-3 text-white"
-            style={{ fontFamily: "'Roboto Serif', serif" }}
-          >
-            Checkout
-          </h1>
+          <span className="checkout-subtitle">Antico Forno Matillo 1943</span>
+          <h1 className="checkout-main-title">Checkout</h1>
           <p className="text-light opacity-75">
             Verifica il tuo carrello e completa i dati per la spedizione.
           </p>
@@ -86,24 +66,16 @@ function Checkout() {
 
         <Row className="g-4">
           <Col lg={7}>
-            <div
-              className="p-3 mb-4 rounded shadow-sm d-flex justify-content-between align-items-center gap-2"
-              style={{
-                backgroundColor: "rgba(45, 35, 30, 0.65)",
-                backdropFilter: "blur(10px)",
-                border: "1px solid rgba(212, 175, 55, 0.2)",
-              }}
-            >
+            <div className="checkout-box p-4 mb-4 shadow-sm d-flex justify-content-between align-items-center gap-2">
               <div>
                 <h6 className="mb-0 text-white fw-bold">Hai già un account?</h6>
-                <small className="text-light opacity-75">
+                <small className="checkout-text-muted">
                   Accedi per velocizzare il pagamento.
                 </small>
               </div>
               <Button
-                variant="outline-warning"
                 size="sm"
-                className="fw-semibold px-3"
+                className="checkout-btn-gold fw-semibold px-3 border-0"
                 onClick={() => setShowLoginBox(!showLoginBox)}
               >
                 {showLoginBox ? "Chiudi" : "Accedi"}
@@ -111,19 +83,9 @@ function Checkout() {
             </div>
 
             {showLoginBox && (
-              <Card
-                className="border-0 text-white mb-4 shadow-lg"
-                style={{
-                  backgroundColor: "rgba(34, 25, 21, 0.95)",
-                  border: "1px solid rgba(212, 175, 55, 0.4)",
-                  borderRadius: "16px",
-                }}
-              >
+              <Card className="checkout-box border-0 text-white mb-4 shadow-lg">
                 <Card.Body className="p-4">
-                  <h5
-                    className="fw-bold mb-3 text-warning"
-                    style={{ fontFamily: "'Roboto Serif', serif" }}
-                  >
+                  <h5 className="checkout-gold-title fw-bold mb-3">
                     Accedi al tuo profilo
                   </h5>
                   <Form onSubmit={handleLoginSubmit}>
@@ -139,11 +101,7 @@ function Checkout() {
                             value={loginData.email}
                             onChange={handleLoginChange}
                             required
-                            style={{
-                              backgroundColor: "#221915",
-                              color: "#fff",
-                              borderColor: "rgba(212,175,55,0.3)",
-                            }}
+                            className="checkout-input"
                           />
                         </Form.Group>
                       </Col>
@@ -158,20 +116,15 @@ function Checkout() {
                             value={loginData.password}
                             onChange={handleLoginChange}
                             required
-                            style={{
-                              backgroundColor: "#221915",
-                              color: "#fff",
-                              borderColor: "rgba(212,175,55,0.3)",
-                            }}
+                            className="checkout-input"
                           />
                         </Form.Group>
                       </Col>
                       <Col xs={12} className="text-end mt-3">
                         <Button
                           type="submit"
-                          variant="warning"
                           size="sm"
-                          className="fw-semibold text-dark px-4"
+                          className="checkout-btn-gold fw-semibold px-4 border-0"
                         >
                           Entra
                         </Button>
@@ -182,20 +135,9 @@ function Checkout() {
               </Card>
             )}
 
-            <Card
-              className="border-0 text-white shadow-lg"
-              style={{
-                backgroundColor: "rgba(45, 35, 30, 0.55)",
-                backdropFilter: "blur(10px)",
-                borderRadius: "16px",
-                border: "1px solid rgba(212, 175, 55, 0.2)",
-              }}
-            >
+            <Card className="checkout-box border-0 text-white shadow-lg">
               <Card.Body className="p-4">
-                <h4
-                  className="fw-bold mb-4 text-white"
-                  style={{ fontFamily: "'Roboto Serif', serif" }}
-                >
+                <h4 className="checkout-main-title fs-3 fw-bold mb-4">
                   Indirizzo di Spedizione
                 </h4>
 
@@ -212,11 +154,7 @@ function Checkout() {
                           value={shippingData.nome}
                           onChange={handleShippingChange}
                           required
-                          style={{
-                            backgroundColor: "#221915",
-                            color: "#fff",
-                            borderColor: "rgba(212,175,55,0.3)",
-                          }}
+                          className="checkout-input"
                         />
                       </Form.Group>
                     </Col>
@@ -231,11 +169,7 @@ function Checkout() {
                           value={shippingData.cognome}
                           onChange={handleShippingChange}
                           required
-                          style={{
-                            backgroundColor: "#221915",
-                            color: "#fff",
-                            borderColor: "rgba(212,175,55,0.3)",
-                          }}
+                          className="checkout-input"
                         />
                       </Form.Group>
                     </Col>
@@ -251,11 +185,7 @@ function Checkout() {
                       value={shippingData.email}
                       onChange={handleShippingChange}
                       required
-                      style={{
-                        backgroundColor: "#221915",
-                        color: "#fff",
-                        borderColor: "rgba(212,175,55,0.3)",
-                      }}
+                      className="checkout-input"
                     />
                   </Form.Group>
 
@@ -270,11 +200,7 @@ function Checkout() {
                       value={shippingData.indirizzo}
                       onChange={handleShippingChange}
                       required
-                      style={{
-                        backgroundColor: "#221915",
-                        color: "#fff",
-                        borderColor: "rgba(212,175,55,0.3)",
-                      }}
+                      className="checkout-input"
                     />
                   </Form.Group>
 
@@ -290,11 +216,7 @@ function Checkout() {
                           value={shippingData.citta}
                           onChange={handleShippingChange}
                           required
-                          style={{
-                            backgroundColor: "#221915",
-                            color: "#fff",
-                            borderColor: "rgba(212,175,55,0.3)",
-                          }}
+                          className="checkout-input"
                         />
                       </Form.Group>
                     </Col>
@@ -309,11 +231,7 @@ function Checkout() {
                           value={shippingData.cap}
                           onChange={handleShippingChange}
                           required
-                          style={{
-                            backgroundColor: "#221915",
-                            color: "#fff",
-                            borderColor: "rgba(212,175,55,0.3)",
-                          }}
+                          className="checkout-input"
                         />
                       </Form.Group>
                     </Col>
@@ -327,11 +245,7 @@ function Checkout() {
                           name="telefono"
                           value={shippingData.telefono}
                           onChange={handleShippingChange}
-                          style={{
-                            backgroundColor: "#221915",
-                            color: "#fff",
-                            borderColor: "rgba(212,175,55,0.3)",
-                          }}
+                          className="checkout-input"
                         />
                       </Form.Group>
                     </Col>
@@ -339,9 +253,8 @@ function Checkout() {
 
                   <Button
                     type="submit"
-                    variant="warning"
                     size="lg"
-                    className="w-100 py-3 fw-bold text-dark shadow"
+                    className="checkout-btn-gold w-100 py-3 fw-bold shadow border-0"
                   >
                     Conferma e Paga
                   </Button>
@@ -351,21 +264,9 @@ function Checkout() {
           </Col>
 
           <Col lg={5}>
-            <Card
-              className="border-0 text-white shadow-lg sticky-top"
-              style={{
-                backgroundColor: "rgba(45, 35, 30, 0.65)",
-                backdropFilter: "blur(10px)",
-                borderRadius: "16px",
-                border: "1px solid rgba(212, 175, 55, 0.3)",
-                top: "100px",
-              }}
-            >
+            <Card className="checkout-box checkout-sticky border-0 text-white shadow-lg">
               <Card.Body className="p-4">
-                <h4
-                  className="fw-bold mb-3 text-warning"
-                  style={{ fontFamily: "'Roboto Serif', serif" }}
-                >
+                <h4 className="checkout-gold-title fw-bold mb-3">
                   Riepilogo Ordine
                 </h4>
 
@@ -375,17 +276,14 @@ function Checkout() {
                     prodotti.
                   </p>
                 ) : (
-                  <div
-                    className="mb-3"
-                    style={{ maxHeight: "300px", overflowY: "auto" }}
-                  >
+                  <div className="checkout-cart-list mb-3">
                     {cart.map((item, index) => (
                       <div
                         key={index}
                         className="d-flex justify-content-between align-items-center py-2 border-bottom border-secondary border-opacity-25"
                       >
                         <span className="small text-light">{item.name}</span>
-                        <span className="small text-warning fw-semibold">
+                        <span className="checkout-gold-text small fw-semibold">
                           {item.price}
                         </span>
                       </div>
@@ -395,7 +293,7 @@ function Checkout() {
 
                 <div className="pt-3 border-top border-secondary border-opacity-25 d-flex justify-content-between align-items-center fs-5 fw-bold">
                   <span>Totale:</span>
-                  <span className="text-warning">€ {totalPrice}</span>
+                  <span className="checkout-gold-text">€ {totalPrice}</span>
                 </div>
               </Card.Body>
             </Card>

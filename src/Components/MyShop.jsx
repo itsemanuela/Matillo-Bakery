@@ -111,6 +111,7 @@ function Shop() {
 
   return (
     <div
+      className="bg-custom-shop"
       style={{
         backgroundColor: "#221915",
         color: "#f8f9fa",
@@ -120,7 +121,6 @@ function Shop() {
         position: "relative",
       }}
     >
-      {/* --- PANNELLO LATERALE CARRELLO (OFFCANVAS) --- */}
       <Offcanvas
         show={showCart}
         onHide={handleCloseCart}
@@ -195,7 +195,6 @@ function Shop() {
         </Offcanvas.Body>
       </Offcanvas>
 
-      {/* --- BARRA INFERIORE A COMPARSA --- */}
       {cart.length > 0 && (
         <div
           style={{

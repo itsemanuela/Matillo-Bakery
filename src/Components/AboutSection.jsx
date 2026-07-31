@@ -29,7 +29,7 @@ function AboutSection() {
   return (
     <section
       className="py-5"
-      style={{ backgroundColor: "#241d18", color: "#f7f4ef" }}
+      style={{ backgroundColor: "#834F41", color: "#3d2c24" }}
     >
       <Container className="py-5">
         <Row className="align-items-center g-5">
