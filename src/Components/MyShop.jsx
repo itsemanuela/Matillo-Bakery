@@ -125,24 +125,21 @@ function Shop() {
         show={showCart}
         onHide={handleCloseCart}
         placement="end"
-        style={{ backgroundColor: "#2d231e", color: "#fff" }}
+        className="cart-offcanvas"
       >
         <Offcanvas.Header
           closeButton
           closeVariant="white"
           className="border-bottom border-secondary border-opacity-25"
         >
-          <Offcanvas.Title
-            className="fw-bold"
-            style={{ fontFamily: "'Roboto Serif', serif" }}
-          >
+          <Offcanvas.Title className="cart-title fw-bold">
             Il tuo Carrello artigianale
           </Offcanvas.Title>
         </Offcanvas.Header>
-        <Offcanvas.Body className="d-flex flex-column">
+        <Offcanvas.Body className="d-flex flex-column cart-body">
           {cart.length === 0 ? (
             <div className="text-center my-auto text-light opacity-75">
-              <p className="fs-1 mb-3" style={{ color: "#EED972" }}>
+              <p className="fs-1 mb-3 cart-gold-text">
                 <i className="bi bi-bag"></i>
               </p>
               <p className="fs-5 mb-1">Il carrello è vuoto.</p>
@@ -152,21 +149,21 @@ function Shop() {
             </div>
           ) : (
             <>
-              <div className="flex-grow-1 overflow-auto">
+              <div className="flex-grow-1 overflow-auto cart-items-container">
                 {cart.map((item, index) => (
                   <div
                     key={index}
                     className="d-flex justify-content-between align-items-center py-3 border-bottom border-secondary border-opacity-25"
                   >
                     <div>
-                      <h6 className="mb-0 fw-bold">{item.name}</h6>
-                      <small style={{ color: "#EED972" }}>{item.price}</small>
+                      <h6 className="mb-0 fw-bold text-white">{item.name}</h6>
+                      <small className="cart-gold-text">{item.price}</small>
                     </div>
                     <Button
                       variant="outline-danger"
                       size="sm"
                       onClick={() => removeFromCart(index)}
-                      style={{ fontSize: "0.8rem", padding: "2px 8px" }}
+                      className="cart-remove-btn"
                     >
                       Rimuovi
                     </Button>
@@ -175,13 +172,12 @@ function Shop() {
               </div>
 
               <div className="pt-3 border-top border-secondary border-opacity-25 mt-auto">
-                <div className="d-flex justify-content-between fs-5 fw-bold mb-3">
+                <div className="d-flex justify-content-between fs-5 fw-bold mb-3 text-white">
                   <span>Totale:</span>
-                  <span style={{ color: "#EED972" }}>€ {totalPrice}</span>
+                  <span className="cart-gold-text">€ {totalPrice}</span>
                 </div>
                 <Button
-                  className="w-100 py-3 fw-bold shadow border-0"
-                  style={{ backgroundColor: "#EED972", color: "#221915" }}
+                  className="cart-btn-gold w-100 py-3 fw-bold shadow border-0"
                   onClick={() => {
                     handleCloseCart();
                     navigate("/checkout", { state: { cart, totalPrice } });
@@ -194,6 +190,46 @@ function Shop() {
           )}
         </Offcanvas.Body>
       </Offcanvas>
+
+      {cart.length > 0 && (
+        <div className="cart-sticky-bar">
+          <div className="d-flex align-items-center gap-3">
+            <span className="fs-4 cart-gold-text">
+              <i className="bi bi-cart3"></i>
+            </span>
+            <div>
+              <span className="text-white fw-bold me-2">
+                {cart.length} {cart.length === 1 ? "prodotto" : "prodotti"} nel
+                carrello
+              </span>
+              <span className="text-light opacity-75 small">
+                (Totale: € {totalPrice})
+              </span>
+            </div>
+          </div>
+
+          <div className="d-flex gap-3">
+            <Button
+              variant="outline-light"
+              size="sm"
+              onClick={handleShowCart}
+              className="px-4 fw-semibold"
+            >
+              Visualizza Carrello
+            </Button>
+            <Button
+              size="sm"
+              onClick={() => {
+                handleCloseCart();
+                navigate("/checkout", { state: { cart, totalPrice } });
+              }}
+              className="px-4 fw-bold shadow-sm border-0 cart-btn-gold"
+            >
+              Procedi al Checkout
+            </Button>
+          </div>
+        </div>
+      )}
 
       {cart.length > 0 && (
         <div

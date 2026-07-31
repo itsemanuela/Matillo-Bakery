@@ -65,7 +65,7 @@ function Checkout() {
         </div>
 
         <Row className="g-4">
-          <Col lg={7}>
+          <Col lg={7} className="order-2 order-lg-1">
             <div className="checkout-box p-4 mb-4 shadow-sm d-flex justify-content-between align-items-center gap-2">
               <div>
                 <h6 className="mb-0 text-white fw-bold">Hai già un account?</h6>
@@ -263,7 +263,7 @@ function Checkout() {
             </Card>
           </Col>
 
-          <Col lg={5}>
+          <Col lg={5} className="order-1 order-lg-2">
             <Card className="checkout-box checkout-sticky border-0 text-white shadow-lg">
               <Card.Body className="p-4">
                 <h4 className="checkout-gold-title fw-bold mb-3">

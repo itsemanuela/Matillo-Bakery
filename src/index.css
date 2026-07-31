@@ -147,3 +147,64 @@ footer, .custom-footer {
   overflow-y: auto;
   padding-right: 5px;
 }
+
+/*carrello*/
+ 
+.cart-offcanvas {
+  background-color: #4B332B !important;
+  color: #ffffff !important;
+  border-left: 1px solid rgba(238, 217, 114, 0.15) !important;
+}
+
+.cart-body {
+  background-color:  #4B332B !important;
+}
+
+.cart-title {
+  font-family: 'Roboto Serif', serif;
+  color: #EED972 !important;
+}
+
+.cart-gold-text {
+  color: #EED972 !important;
+}
+
+.cart-items-container {
+  max-height: 55vh;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+.cart-remove-btn {
+  font-size: 0.8rem;
+  padding: 2px 8px;
+}
+
+ 
+.cart-btn-gold {
+  background-color: #EED972 !important;
+  color:  #4B332B !important;
+  border-radius: 10px !important;
+  transition: all 0.2s ease-in-out;
+}
+
+.cart-btn-gold:hover {
+  background-color: #f3e28c !important;
+  color:  #4B332B !important;
+}
+ 
+.cart-sticky-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color:  #4B332B(26, 18, 11, 0.95);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid rgba(238, 217, 114, 0.4);
+  padding: 15px 30px;
+  z-index: 1000;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 -10px 30px  #4B332B(0, 0, 0, 0.5);
+}
