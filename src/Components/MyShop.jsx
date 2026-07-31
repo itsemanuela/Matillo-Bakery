@@ -121,6 +121,32 @@ function Shop() {
         position: "relative",
       }}
     >
+      <style>{`
+        .product-card {
+          background-color: rgba(255, 255, 255, 0.045) !important;
+          backdrop-filter: blur(18px);
+          -webkit-backdrop-filter: blur(18px);
+          border-radius: 20px;
+          overflow: hidden;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+          transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+        }
+        .product-card:hover {
+          transform: translateY(-6px);
+          box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+          border-color: rgba(238, 217, 114, 0.35);
+        }
+        .category-btn { transition: transform 0.2s ease; }
+        .category-btn:hover { transform: translateY(-2px); }
+        .add-btn, .bestseller-btn {
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .add-btn:hover, .bestseller-btn:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 20px rgba(238, 217, 114, 0.35);
+        }
+      `}</style>
       <Offcanvas
         show={showCart}
         onHide={handleCloseCart}
@@ -192,61 +218,22 @@ function Shop() {
       </Offcanvas>
 
       {cart.length > 0 && (
-        <div className="cart-sticky-bar">
-          <div className="d-flex align-items-center gap-3">
-            <span className="fs-4 cart-gold-text">
-              <i className="bi bi-cart3"></i>
-            </span>
-            <div>
-              <span className="text-white fw-bold me-2">
-                {cart.length} {cart.length === 1 ? "prodotto" : "prodotti"} nel
-                carrello
-              </span>
-              <span className="text-light opacity-75 small">
-                (Totale: € {totalPrice})
-              </span>
-            </div>
-          </div>
-
-          <div className="d-flex gap-3">
-            <Button
-              variant="outline-light"
-              size="sm"
-              onClick={handleShowCart}
-              className="px-4 fw-semibold"
-            >
-              Visualizza Carrello
-            </Button>
-            <Button
-              size="sm"
-              onClick={() => {
-                handleCloseCart();
-                navigate("/checkout", { state: { cart, totalPrice } });
-              }}
-              className="px-4 fw-bold shadow-sm border-0 cart-btn-gold"
-            >
-              Procedi al Checkout
-            </Button>
-          </div>
-        </div>
-      )}
-
-      {cart.length > 0 && (
         <div
           style={{
             position: "fixed",
             bottom: "0",
             left: "0",
             right: "0",
-            backgroundColor: "rgba(34, 25, 21, 0.95)",
-            backdropFilter: "blur(10px)",
-            borderTop: "1px solid rgba(238, 217, 114, 0.4)",
+            backgroundColor: "rgba(34, 25, 21, 0.85)",
+            backdropFilter: "blur(20px)",
+            WebkitBackdropFilter: "blur(20px)",
+            borderTop: "1px solid rgba(238, 217, 114, 0.25)",
             padding: "15px 30px",
             zIndex: 1000,
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            boxShadow: "0 -10px 30px rgba(0,0,0,0.5)",
+            boxShadow: "0 -10px 40px rgba(0,0,0,0.4)",
           }}
         >
           <div className="d-flex align-items-center gap-3">
@@ -270,6 +257,7 @@ function Shop() {
               size="sm"
               onClick={handleShowCart}
               className="px-4 fw-semibold"
+              style={{ borderRadius: "10px" }}
             >
               Visualizza Carrello
             </Button>
@@ -280,7 +268,11 @@ function Shop() {
                 navigate("/checkout", { state: { cart, totalPrice } });
               }}
               className="px-4 fw-bold shadow-sm border-0"
-              style={{ backgroundColor: "#EED972", color: "#221915" }}
+              style={{
+                backgroundColor: "#EED972",
+                color: "#221915",
+                borderRadius: "10px",
+              }}
             >
               Procedi al Checkout
             </Button>
@@ -311,21 +303,42 @@ function Shop() {
           </p>
         </div>
 
+        {/* BESTSELLER CARD — vetro elegante con filo dorato superiore */}
         <div
-          className="p-4 p-lg-5 mb-5 rounded shadow-lg position-relative overflow-hidden"
+          className="p-4 p-lg-5 mb-5 position-relative overflow-hidden"
           style={{
-            backgroundColor: "rgba(45, 35, 30, 0.65)",
-            backdropFilter: "blur(12px)",
-            WebkitBackdropFilter: "blur(12px)",
-            border: "1px solid rgba(238, 217, 114, 0.3)",
+            backgroundColor: "rgba(255, 255, 255, 0.045)",
+            backdropFilter: "blur(24px)",
+            WebkitBackdropFilter: "blur(24px)",
+            border: "1px solid rgba(255, 255, 255, 0.1)",
+            borderRadius: "24px",
+            boxShadow:
+              "0 20px 60px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.08)",
           }}
         >
+          <div
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              height: "2px",
+              background:
+                "linear-gradient(90deg, transparent, #EED972, transparent)",
+            }}
+          />
           <Row className="align-items-center">
             <Col lg={6} className="mb-4 mb-lg-0">
               <Badge
                 id="bestseller"
-                className="mb-3 px-3 py-2 fw-bold text-uppercase shadow-sm border-0"
-                style={{ backgroundColor: "#EED972", color: "#221915" }}
+                className="mb-3 px-3 py-2 fw-semibold text-uppercase border"
+                style={{
+                  backgroundColor: "rgba(238, 217, 114, 0.12)",
+                  color: "#EED972",
+                  border: "1px solid rgba(238, 217, 114, 0.4)",
+                  letterSpacing: "1px",
+                  borderRadius: "8px",
+                }}
               >
                 <i className="bi bi-star-fill me-1"></i> Il Nostro Bestseller
               </Badge>
@@ -351,8 +364,12 @@ function Shop() {
                 </span>
                 <Button
                   size="lg"
-                  className="px-4 fw-semibold shadow border-0"
-                  style={{ backgroundColor: "#EED972", color: "#221915" }}
+                  className="px-4 fw-semibold border-0 bestseller-btn"
+                  style={{
+                    backgroundColor: "#EED972",
+                    color: "#221915",
+                    borderRadius: "12px",
+                  }}
                   onClick={() =>
                     addToCart({
                       id: 99,
@@ -367,17 +384,26 @@ function Shop() {
               </div>
             </Col>
             <Col lg={6} className="text-center">
-              <img
-                src={fetteBiscottateImg}
-                alt="Fette Biscottate Artigianali Matillo"
-                className="img-fluid rounded shadow-sm"
+              <div
                 style={{
-                  maxHeight: "320px",
-                  objectFit: "cover",
-                  width: "100%",
+                  borderRadius: "18px",
+                  overflow: "hidden",
                   border: "1px solid rgba(255,255,255,0.1)",
+                  boxShadow: "0 15px 40px rgba(0,0,0,0.3)",
                 }}
-              />
+              >
+                <img
+                  src={fetteBiscottateImg}
+                  alt="Fette Biscottate Artigianali Matillo"
+                  className="img-fluid"
+                  style={{
+                    maxHeight: "320px",
+                    objectFit: "cover",
+                    width: "100%",
+                    display: "block",
+                  }}
+                />
+              </div>
             </Col>
           </Row>
         </div>
@@ -392,16 +418,17 @@ function Shop() {
             <Button
               key={cat.key}
               variant={selectedCategory === cat.key ? "" : "outline-light"}
-              className={`px-4 py-2 fw-semibold shadow-sm ${
+              className={`px-4 py-2 fw-semibold shadow-sm category-btn ${
                 selectedCategory === cat.key
                   ? "border-0"
                   : "text-light border-opacity-25"
               }`}
-              style={
-                selectedCategory === cat.key
+              style={{
+                borderRadius: "10px",
+                ...(selectedCategory === cat.key
                   ? { backgroundColor: "#EED972", color: "#221915" }
-                  : {}
-              }
+                  : {}),
+              }}
               onClick={() => setSelectedCategory(cat.key)}
             >
               {cat.label}
@@ -409,27 +436,35 @@ function Shop() {
           ))}
         </div>
 
+        {/* GRIGLIA PRODOTTI — card vetrate con hover elegante */}
         <Row className="g-4 mb-5">
           {filteredProducts.map((product) => (
             <Col md={6} lg={4} key={product.id}>
-              <Card
-                className="h-100 border-0 text-white"
-                style={{
-                  backgroundColor: "rgba(45, 35, 30, 0.55)",
-                  backdropFilter: "blur(10px)",
-                  WebkitBackdropFilter: "blur(10px)",
-                  borderRadius: "16px",
-                  overflow: "hidden",
-                  border: "1px solid rgba(238, 217, 114, 0.2)",
-                  boxShadow: "0 10px 30px rgba(0,0,0,0.3)",
-                }}
-              >
-                <div style={{ height: "230px", overflow: "hidden" }}>
+              <Card className="h-100 border-0 text-white product-card">
+                <div
+                  style={{
+                    height: "230px",
+                    overflow: "hidden",
+                    position: "relative",
+                  }}
+                >
                   <Card.Img
                     variant="top"
                     src={product.image}
                     alt={product.name}
                     style={{ height: "100%", objectFit: "cover" }}
+                  />
+                  <div
+                    style={{
+                      position: "absolute",
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      height: "50px",
+                      background:
+                        "linear-gradient(to top, rgba(20,15,12,0.25), transparent)",
+                      pointerEvents: "none",
+                    }}
                   />
                 </div>
                 <Card.Body className="d-flex flex-column p-4">
@@ -448,8 +483,12 @@ function Shop() {
                     </span>
                     <Button
                       size="sm"
-                      className="px-3 py-2 fw-semibold shadow-sm border-0"
-                      style={{ backgroundColor: "#EED972", color: "#221915" }}
+                      className="px-3 py-2 fw-semibold border-0 add-btn"
+                      style={{
+                        backgroundColor: "#EED972",
+                        color: "#221915",
+                        borderRadius: "8px",
+                      }}
                       onClick={() => addToCart(product)}
                     >
                       Aggiungi
