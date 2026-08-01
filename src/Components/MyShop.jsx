@@ -4,12 +4,12 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
-import Badge from "react-bootstrap/Badge";
+
 import Offcanvas from "react-bootstrap/Offcanvas";
 import Spinner from "react-bootstrap/Spinner";
 import { useNavigate } from "react-router-dom";
 
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = "http://localhost:3001/api";
 
 const PLACEHOLDER_IMG =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%23241d18'/%3E%3Ctext x='50%25' y='50%25' font-family='sans-serif' font-size='18' fill='%23EED972' text-anchor='middle' dy='.3em'%3EFoto in arrivo%3C/text%3E%3C/svg%3E";
@@ -310,18 +310,19 @@ function Shop() {
                 />
                 <Row className="align-items-center">
                   <Col lg={6} className="mb-4 mb-lg-0">
-                    <Badge
-                      className="mb-3 px-3 py-2 fw-semibold text-uppercase border"
+                    <span
+                      className="mb-3 px-3 py-2 fw-semibold text-uppercase d-inline-block"
                       style={{
                         backgroundColor: "rgba(238, 217, 114, 0.12)",
                         color: "#EED972",
                         border: "1px solid rgba(238, 217, 114, 0.4)",
                         letterSpacing: "1px",
                         borderRadius: "8px",
+                        fontSize: "0.8rem",
                       }}
                     >
                       <i className="bi bi-star-fill me-1"></i> In Evidenza
-                    </Badge>
+                    </span>
                     <h2
                       className="fw-bold mb-3 text-white"
                       style={{
