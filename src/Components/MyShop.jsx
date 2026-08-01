@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -6,91 +6,43 @@ import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import Badge from "react-bootstrap/Badge";
 import Offcanvas from "react-bootstrap/Offcanvas";
+import Spinner from "react-bootstrap/Spinner";
 import { useNavigate } from "react-router-dom";
 
-import fetteBiscottateImg from "../assets/20210118_MAT_Presentazione concept_page-0008.jpg";
+const API_URL = import.meta.env.VITE_API_URL;
+
+const PLACEHOLDER_IMG =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%23241d18'/%3E%3Ctext x='50%25' y='50%25' font-family='sans-serif' font-size='18' fill='%23EED972' text-anchor='middle' dy='.3em'%3EFoto in arrivo%3C/text%3E%3C/svg%3E";
 
 function Shop() {
-  const [selectedCategory, setSelectedCategory] = useState("tutti");
+  const [selectedCategory, setSelectedCategory] = useState("TUTTI");
   const [cart, setCart] = useState([]);
   const [showCart, setShowCart] = useState(false);
+  const [prodotti, setProdotti] = useState([]);
+  const [caricamento, setCaricamento] = useState(true);
+  const [errore, setErrore] = useState(null);
   const navigate = useNavigate();
 
   const handleCloseCart = () => setShowCart(false);
   const handleShowCart = () => setShowCart(true);
 
-  const products = [
-    {
-      id: 1,
-      name: "Crostata Artigianale",
-      category: "dolci",
-      description:
-        "Fatta in casa con pasta frolla burrosa e confettura extra di frutta di stagione.",
-      price: "€ 14,00",
-      rawPrice: 14.0,
-      image: fetteBiscottateImg,
-    },
-    {
-      id: 2,
-      name: "Brioches Soffici",
-      category: "dolci",
-      description:
-        "Soffice impasto lievitato naturalmente, profumato alla vaniglia e agrumi.",
-      price: "€ 2,50",
-      rawPrice: 2.5,
-      image: fetteBiscottateImg,
-    },
-    {
-      id: 3,
-      name: "Zeppole Tradizionali",
-      category: "dolci",
-      description:
-        "Friabili fuori e morbide dentro, guarnite con crema pasticcera e amarene.",
-      price: "€ 3,00",
-      rawPrice: 3.0,
-      image: fetteBiscottateImg,
-    },
-    {
-      id: 4,
-      name: "Pizza in Teglia alla Romana",
-      category: "pizze",
-      description:
-        "Alta idratazione, alveolatura perfetta, croccante e condita con pomodoro e basilico.",
-      price: "€ 4,50",
-      rawPrice: 4.5,
-      image: fetteBiscottateImg,
-    },
-    {
-      id: 5,
-      name: "Focaccia Genovese Classica",
-      category: "pizze",
-      description:
-        "Morbida, alta, condita con olio extravergine d'oliva e fior di sale.",
-      price: "€ 3,80",
-      rawPrice: 3.8,
-      image: fetteBiscottateImg,
-    },
-    {
-      id: 6,
-      name: "Pagnotta di Grano Duro",
-      category: "pane",
-      description:
-        "Lievitazione naturale con pasta madre, crosta croccante e mollica dorata.",
-      price: "€ 4,00",
-      rawPrice: 4.0,
-      image: fetteBiscottateImg,
-    },
-    {
-      id: 7,
-      name: "Pane ai Cereali e Semi",
-      category: "pane",
-      description:
-        "Ricco di semi misti e farine macinate a pietra, rustico e nutriente.",
-      price: "€ 4,50",
-      rawPrice: 4.5,
-      image: fetteBiscottateImg,
-    },
-  ];
+  useEffect(() => {
+    fetch(`${API_URL}/prodotti`)
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("Errore nel caricamento dei prodotti");
+        }
+        return res.json();
+      })
+      .then((data) => {
+        setProdotti(data);
+        setCaricamento(false);
+      })
+      .catch((err) => {
+        setErrore(err.message);
+        setCaricamento(false);
+      });
+  }, []);
 
   const addToCart = (product) => {
     setCart([...cart, product]);
@@ -101,13 +53,15 @@ function Shop() {
   };
 
   const totalPrice = cart
-    .reduce((sum, item) => sum + item.rawPrice, 0)
+    .reduce((sum, item) => sum + item.prezzo, 0)
     .toFixed(2);
 
   const filteredProducts =
-    selectedCategory === "tutti"
-      ? products
-      : products.filter((p) => p.category === selectedCategory);
+    selectedCategory === "TUTTI"
+      ? prodotti
+      : prodotti.filter((p) => p.categoria === selectedCategory);
+
+  const bestseller = prodotti.find((p) => p.disponibile) || prodotti[0];
 
   return (
     <div
@@ -146,7 +100,12 @@ function Shop() {
           transform: translateY(-2px);
           box-shadow: 0 8px 20px rgba(238, 217, 114, 0.35);
         }
+        .add-btn:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
       `}</style>
+
       <Offcanvas
         show={showCart}
         onHide={handleCloseCart}
@@ -182,8 +141,10 @@ function Shop() {
                     className="d-flex justify-content-between align-items-center py-3 border-bottom border-secondary border-opacity-25"
                   >
                     <div>
-                      <h6 className="mb-0 fw-bold text-white">{item.name}</h6>
-                      <small className="cart-gold-text">{item.price}</small>
+                      <h6 className="mb-0 fw-bold text-white">{item.nome}</h6>
+                      <small className="cart-gold-text">
+                        € {item.prezzo.toFixed(2)}
+                      </small>
                     </div>
                     <Button
                       variant="outline-danger"
@@ -303,202 +264,247 @@ function Shop() {
           </p>
         </div>
 
-        {/* BESTSELLER CARD — vetro elegante con filo dorato superiore */}
-        <div
-          className="p-4 p-lg-5 mb-5 position-relative overflow-hidden"
-          style={{
-            backgroundColor: "rgba(255, 255, 255, 0.045)",
-            backdropFilter: "blur(24px)",
-            WebkitBackdropFilter: "blur(24px)",
-            border: "1px solid rgba(255, 255, 255, 0.1)",
-            borderRadius: "24px",
-            boxShadow:
-              "0 20px 60px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.08)",
-          }}
-        >
-          <div
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              height: "2px",
-              background:
-                "linear-gradient(90deg, transparent, #EED972, transparent)",
-            }}
-          />
-          <Row className="align-items-center">
-            <Col lg={6} className="mb-4 mb-lg-0">
-              <Badge
-                id="bestseller"
-                className="mb-3 px-3 py-2 fw-semibold text-uppercase border"
-                style={{
-                  backgroundColor: "rgba(238, 217, 114, 0.12)",
-                  color: "#EED972",
-                  border: "1px solid rgba(238, 217, 114, 0.4)",
-                  letterSpacing: "1px",
-                  borderRadius: "8px",
-                }}
-              >
-                <i className="bi bi-star-fill me-1"></i> Il Nostro Bestseller
-              </Badge>
-              <h2
-                className="fw-bold mb-3 text-white"
-                style={{
-                  fontFamily: "'Roboto Serif', serif",
-                  fontSize: "2.2rem",
-                }}
-              >
-                Fette Biscottate Artigianali
-              </h2>
-              <p
-                className="text-light opacity-90 mb-4"
-                style={{ fontSize: "1.1rem", lineHeight: "1.7" }}
-              >
-                Le inconfondibili fette biscottate del Forno Matillo: croccanti,
-                fragranti e dorate alla perfezione.
-              </p>
-              <div className="d-flex align-items-center gap-4">
-                <span className="fs-2 fw-bold" style={{ color: "#EED972" }}>
-                  € 6,50
-                </span>
-                <Button
-                  size="lg"
-                  className="px-4 fw-semibold border-0 bestseller-btn"
-                  style={{
-                    backgroundColor: "#EED972",
-                    color: "#221915",
-                    borderRadius: "12px",
-                  }}
-                  onClick={() =>
-                    addToCart({
-                      id: 99,
-                      name: "Fette Biscottate Artigianali",
-                      price: "€ 6,50",
-                      rawPrice: 6.5,
-                    })
-                  }
-                >
-                  Acquista Bestseller
-                </Button>
-              </div>
-            </Col>
-            <Col lg={6} className="text-center">
+        {/* Stato di caricamento */}
+        {caricamento && (
+          <div className="text-center py-5">
+            <Spinner animation="border" style={{ color: "#EED972" }} />
+            <p className="text-light opacity-75 mt-3">Carico i prodotti...</p>
+          </div>
+        )}
+
+        {/* Stato di errore */}
+        {errore && (
+          <div className="text-center py-5">
+            <p className="text-light">
+              Non riesco a caricare i prodotti al momento. Riprova più tardi.
+            </p>
+          </div>
+        )}
+
+        {!caricamento && !errore && (
+          <>
+            {/* BESTSELLER — primo prodotto disponibile */}
+            {bestseller && (
               <div
+                className="p-4 p-lg-5 mb-5 position-relative overflow-hidden"
                 style={{
-                  borderRadius: "18px",
-                  overflow: "hidden",
-                  border: "1px solid rgba(255,255,255,0.1)",
-                  boxShadow: "0 15px 40px rgba(0,0,0,0.3)",
+                  backgroundColor: "rgba(255, 255, 255, 0.045)",
+                  backdropFilter: "blur(24px)",
+                  WebkitBackdropFilter: "blur(24px)",
+                  border: "1px solid rgba(255, 255, 255, 0.1)",
+                  borderRadius: "24px",
+                  boxShadow:
+                    "0 20px 60px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.08)",
                 }}
               >
-                <img
-                  src={fetteBiscottateImg}
-                  alt="Fette Biscottate Artigianali Matillo"
-                  className="img-fluid"
-                  style={{
-                    maxHeight: "320px",
-                    objectFit: "cover",
-                    width: "100%",
-                    display: "block",
-                  }}
-                />
-              </div>
-            </Col>
-          </Row>
-        </div>
-
-        <div className="d-flex justify-content-center gap-2 gap-md-3 mb-5 flex-wrap">
-          {[
-            { key: "tutti", label: "Tutti i Prodotti" },
-            { key: "pane", label: "Pane Fresco" },
-            { key: "dolci", label: "Dolci & Forno" },
-            { key: "pizze", label: "Pizze & Focacce" },
-          ].map((cat) => (
-            <Button
-              key={cat.key}
-              variant={selectedCategory === cat.key ? "" : "outline-light"}
-              className={`px-4 py-2 fw-semibold shadow-sm category-btn ${
-                selectedCategory === cat.key
-                  ? "border-0"
-                  : "text-light border-opacity-25"
-              }`}
-              style={{
-                borderRadius: "10px",
-                ...(selectedCategory === cat.key
-                  ? { backgroundColor: "#EED972", color: "#221915" }
-                  : {}),
-              }}
-              onClick={() => setSelectedCategory(cat.key)}
-            >
-              {cat.label}
-            </Button>
-          ))}
-        </div>
-
-        {/* GRIGLIA PRODOTTI — card vetrate con hover elegante */}
-        <Row className="g-4 mb-5">
-          {filteredProducts.map((product) => (
-            <Col md={6} lg={4} key={product.id}>
-              <Card className="h-100 border-0 text-white product-card">
                 <div
                   style={{
-                    height: "230px",
-                    overflow: "hidden",
-                    position: "relative",
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: "2px",
+                    background:
+                      "linear-gradient(90deg, transparent, #EED972, transparent)",
                   }}
-                >
-                  <Card.Img
-                    variant="top"
-                    src={product.image}
-                    alt={product.name}
-                    style={{ height: "100%", objectFit: "cover" }}
-                  />
-                  <div
-                    style={{
-                      position: "absolute",
-                      bottom: 0,
-                      left: 0,
-                      right: 0,
-                      height: "50px",
-                      background:
-                        "linear-gradient(to top, rgba(20,15,12,0.25), transparent)",
-                      pointerEvents: "none",
-                    }}
-                  />
-                </div>
-                <Card.Body className="d-flex flex-column p-4">
-                  <Card.Title
-                    className="fw-bold mb-2 text-white"
-                    style={{ fontSize: "1.3rem" }}
-                  >
-                    {product.name}
-                  </Card.Title>
-                  <Card.Text className="text-light opacity-75 small mb-4 flex-grow-1">
-                    {product.description}
-                  </Card.Text>
-                  <div className="d-flex align-items-center justify-content-between mt-auto pt-3 border-top border-secondary border-opacity-25">
-                    <span className="fs-5 fw-bold" style={{ color: "#EED972" }}>
-                      {product.price}
-                    </span>
-                    <Button
-                      size="sm"
-                      className="px-3 py-2 fw-semibold border-0 add-btn"
+                />
+                <Row className="align-items-center">
+                  <Col lg={6} className="mb-4 mb-lg-0">
+                    <Badge
+                      className="mb-3 px-3 py-2 fw-semibold text-uppercase border"
                       style={{
-                        backgroundColor: "#EED972",
-                        color: "#221915",
+                        backgroundColor: "rgba(238, 217, 114, 0.12)",
+                        color: "#EED972",
+                        border: "1px solid rgba(238, 217, 114, 0.4)",
+                        letterSpacing: "1px",
                         borderRadius: "8px",
                       }}
-                      onClick={() => addToCart(product)}
                     >
-                      Aggiungi
-                    </Button>
-                  </div>
-                </Card.Body>
-              </Card>
-            </Col>
-          ))}
-        </Row>
+                      <i className="bi bi-star-fill me-1"></i> In Evidenza
+                    </Badge>
+                    <h2
+                      className="fw-bold mb-3 text-white"
+                      style={{
+                        fontFamily: "'Roboto Serif', serif",
+                        fontSize: "2.2rem",
+                      }}
+                    >
+                      {bestseller.nome}
+                    </h2>
+                    <p
+                      className="text-light opacity-90 mb-4"
+                      style={{ fontSize: "1.1rem", lineHeight: "1.7" }}
+                    >
+                      {bestseller.descrizione}
+                    </p>
+                    <div className="d-flex align-items-center gap-4">
+                      <span
+                        className="fs-2 fw-bold"
+                        style={{ color: "#EED972" }}
+                      >
+                        € {bestseller.prezzo.toFixed(2)}
+                      </span>
+                      <Button
+                        size="lg"
+                        className="px-4 fw-semibold border-0 bestseller-btn"
+                        disabled={!bestseller.disponibile}
+                        style={{
+                          backgroundColor: "#EED972",
+                          color: "#221915",
+                          borderRadius: "12px",
+                        }}
+                        onClick={() => addToCart(bestseller)}
+                      >
+                        {bestseller.disponibile
+                          ? "Aggiungi al carrello"
+                          : "Non disponibile"}
+                      </Button>
+                    </div>
+                  </Col>
+                  <Col lg={6} className="text-center">
+                    <div
+                      style={{
+                        borderRadius: "18px",
+                        overflow: "hidden",
+                        border: "1px solid rgba(255,255,255,0.1)",
+                        boxShadow: "0 15px 40px rgba(0,0,0,0.3)",
+                      }}
+                    >
+                      <img
+                        src={bestseller.immagine || PLACEHOLDER_IMG}
+                        alt={bestseller.nome}
+                        className="img-fluid"
+                        style={{
+                          maxHeight: "320px",
+                          objectFit: "cover",
+                          width: "100%",
+                          display: "block",
+                        }}
+                      />
+                    </div>
+                  </Col>
+                </Row>
+              </div>
+            )}
+
+            {/* Filtri categoria — costruiti dinamicamente dalle categorie presenti nei prodotti */}
+            <div className="d-flex justify-content-center gap-2 gap-md-3 mb-5 flex-wrap">
+              {["TUTTI", ...new Set(prodotti.map((p) => p.categoria))].map(
+                (cat) => (
+                  <Button
+                    key={cat}
+                    variant={selectedCategory === cat ? "" : "outline-light"}
+                    className={`px-4 py-2 fw-semibold shadow-sm category-btn ${
+                      selectedCategory === cat
+                        ? "border-0"
+                        : "text-light border-opacity-25"
+                    }`}
+                    style={{
+                      borderRadius: "10px",
+                      ...(selectedCategory === cat
+                        ? { backgroundColor: "#EED972", color: "#221915" }
+                        : {}),
+                    }}
+                    onClick={() => setSelectedCategory(cat)}
+                  >
+                    {cat === "TUTTI" ? "Tutti i Prodotti" : cat}
+                  </Button>
+                ),
+              )}
+            </div>
+
+            {/* GRIGLIA PRODOTTI */}
+            <Row className="g-4 mb-5">
+              {filteredProducts.map((product) => (
+                <Col md={6} lg={4} key={product.uuid}>
+                  <Card className="h-100 border-0 text-white product-card">
+                    <div
+                      style={{
+                        height: "230px",
+                        overflow: "hidden",
+                        position: "relative",
+                      }}
+                    >
+                      <Card.Img
+                        variant="top"
+                        src={product.immagine || PLACEHOLDER_IMG}
+                        alt={product.nome}
+                        style={{ height: "100%", objectFit: "cover" }}
+                      />
+                      {!product.disponibile && (
+                        <div
+                          style={{
+                            position: "absolute",
+                            top: "12px",
+                            right: "12px",
+                            backgroundColor: "rgba(20,15,12,0.85)",
+                            color: "#f8f9fa",
+                            padding: "4px 12px",
+                            borderRadius: "8px",
+                            fontSize: "0.75rem",
+                            fontWeight: 600,
+                          }}
+                        >
+                          Esaurito
+                        </div>
+                      )}
+                      <div
+                        style={{
+                          position: "absolute",
+                          bottom: 0,
+                          left: 0,
+                          right: 0,
+                          height: "50px",
+                          background:
+                            "linear-gradient(to top, rgba(20,15,12,0.25), transparent)",
+                          pointerEvents: "none",
+                        }}
+                      />
+                    </div>
+                    <Card.Body className="d-flex flex-column p-4">
+                      <Card.Title
+                        className="fw-bold mb-2 text-white"
+                        style={{ fontSize: "1.3rem" }}
+                      >
+                        {product.nome}
+                      </Card.Title>
+                      <Card.Text className="text-light opacity-75 small mb-4 flex-grow-1">
+                        {product.descrizione}
+                      </Card.Text>
+                      <div className="d-flex align-items-center justify-content-between mt-auto pt-3 border-top border-secondary border-opacity-25">
+                        <span
+                          className="fs-5 fw-bold"
+                          style={{ color: "#EED972" }}
+                        >
+                          € {product.prezzo.toFixed(2)}
+                        </span>
+                        <Button
+                          size="sm"
+                          className="px-3 py-2 fw-semibold border-0 add-btn"
+                          disabled={!product.disponibile}
+                          style={{
+                            backgroundColor: "#EED972",
+                            color: "#221915",
+                            borderRadius: "8px",
+                          }}
+                          onClick={() => addToCart(product)}
+                        >
+                          {product.disponibile ? "Aggiungi" : "Esaurito"}
+                        </Button>
+                      </div>
+                    </Card.Body>
+                  </Card>
+                </Col>
+              ))}
+            </Row>
+
+            {filteredProducts.length === 0 && (
+              <p className="text-center text-light opacity-75 py-5">
+                Nessun prodotto trovato in questa categoria.
+              </p>
+            )}
+          </>
+        )}
       </Container>
     </div>
   );
