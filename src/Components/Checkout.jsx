@@ -10,6 +10,7 @@ import {
 } from "react-bootstrap";
 import { useNavigate, useLocation } from "react-router-dom";
 
+// TODO: allineare con API_URL usato altrove, stesso hardcode temporaneo.
 const API_URL = "http://localhost:3001/api";
 
 function Checkout() {
@@ -24,6 +25,23 @@ function Checkout() {
   const [showLoginBox, setShowLoginBox] = useState(false);
   const [loginData, setLoginData] = useState({ email: "", password: "" });
   const [loginErrore, setLoginErrore] = useState(null);
+
+  const [showRegisterBox, setShowRegisterBox] = useState(false);
+  const [registerData, setRegisterData] = useState({
+    nome: "",
+    cognome: "",
+    email: "",
+    password: "",
+    telefono: "",
+    indirizzo: "",
+    città: "",
+    cap: "",
+  });
+  const [registerErrore, setRegisterErrore] = useState(null);
+  const [registrazioneInCorso, setRegistrazioneInCorso] = useState(false);
+
+  // Se c'è già un token salvato (utente loggato in una sessione precedente),
+  // partiamo considerandolo autenticato.
   const [utenteLoggato, setUtenteLoggato] = useState(() => {
     const salvato = localStorage.getItem("utente");
     return salvato ? JSON.parse(salvato) : null;
@@ -50,23 +68,6 @@ function Checkout() {
     setLoginData({ ...loginData, [e.target.name]: e.target.value });
   };
 
-<<<<<<< Updated upstream
-  const handleCheckoutSubmit = (e) => {
-    e.preventDefault();
-    const ordineCompleto = {
-      ...shippingData,
-      prodotti: cart,
-      totale: totalPrice,
-    };
-    console.log("Invio ordine al backend:", ordineCompleto);
-    alert(
-      "Ordine completato con successo! Grazie per aver scelto Antico Forno Matillo.",
-    );
-    navigate("/");
-  };
-
-=======
->>>>>>> Stashed changes
   const handleLoginSubmit = (e) => {
     e.preventDefault();
     setLoginErrore(null);
@@ -101,10 +102,71 @@ function Checkout() {
     setUtenteLoggato(null);
   };
 
+  const handleRegisterChange = (e) => {
+    setRegisterData({ ...registerData, [e.target.name]: e.target.value });
+  };
+
+  const handleRegisterSubmit = (e) => {
+    e.preventDefault();
+    setRegisterErrore(null);
+    setRegistrazioneInCorso(true);
+
+    console.log("Payload registrazione:", registerData);
+
+    fetch(`${API_URL}/utenti`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(registerData),
+    })
+      .then((res) => {
+        if (!res.ok) {
+          return res.json().then((err) => {
+            const primoErrore = err.validationErrors
+              ? Object.values(err.validationErrors)[0]
+              : err.message;
+            throw new Error(primoErrore || "Errore durante la registrazione");
+          });
+        }
+        return res.json();
+      })
+      // Registrazione riuscita: login automatico con le stesse credenziali,
+      // così l'utente non deve reinserirle subito dopo.
+      .then(() =>
+        fetch(`${API_URL}/auth/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: registerData.email,
+            password: registerData.password,
+          }),
+        }),
+      )
+      .then((res) => res.json())
+      .then((data) => {
+        localStorage.setItem("token", data.token);
+        const utente = {
+          uuid: data.uuid,
+          nome: data.nome,
+          email: data.email,
+          ruolo: data.ruolo,
+        };
+        localStorage.setItem("utente", JSON.stringify(utente));
+        setUtenteLoggato(utente);
+        setShowRegisterBox(false);
+        setShowLoginBox(false);
+      })
+      .catch((err) => setRegisterErrore(err.message))
+      .finally(() => setRegistrazioneInCorso(false));
+  };
+
   const handleCheckoutSubmit = (e) => {
     e.preventDefault();
     setErrore(null);
     setInvioInCorso(true);
+
+    // Il carrello contiene un oggetto prodotto per ogni "Aggiungi" cliccato
+    // (anche ripetuto per lo stesso prodotto) — qui li raggruppiamo per uuid
+    // sommando le quantità, come si aspetta il backend.
     const dettagli = Object.values(
       cart.reduce((acc, item) => {
         if (!acc[item.uuid]) {
@@ -121,6 +183,9 @@ function Checkout() {
       indirizzoSpedizione: indirizzoCompleto,
       note: "",
       dettagli,
+      // Questi campi vengono ignorati dal backend se l'utente è loggato
+      // (in quel caso i dati si prendono dal token), ma sono obbligatori
+      // se stai ordinando come ospite.
       nomeCliente: shippingData.nome,
       cognomeCliente: shippingData.cognome,
       emailCliente: shippingData.email,
@@ -172,22 +237,6 @@ function Checkout() {
         </div>
 
         <Row className="g-4">
-<<<<<<< Updated upstream
-          <Col lg={7}>
-            <div
-              className="p-3 mb-4 rounded shadow-sm d-flex justify-content-between align-items-center gap-2"
-              style={{
-                backgroundColor: "rgba(45, 35, 30, 0.65)",
-                backdropFilter: "blur(10px)",
-                border: "1px solid rgba(212, 175, 55, 0.2)",
-              }}
-            >
-              <div>
-                <h6 className="mb-0 text-white fw-bold">Hai già un account?</h6>
-                <small className="checkout-text-muted">
-                  Accedi per velocizzare il pagamento.
-                </small>
-=======
           <Col lg={7} className="order-2 order-lg-1">
             {errore && <Alert variant="danger">{errore}</Alert>}
 
@@ -213,40 +262,22 @@ function Checkout() {
                     </small>
                   </>
                 )}
->>>>>>> Stashed changes
               </div>
               <Button
                 size="sm"
-<<<<<<< Updated upstream
-                className="fw-semibold px-3"
-                onClick={() => setShowLoginBox(!showLoginBox)}
-=======
                 className="checkout-btn-gold fw-semibold px-3 border-0"
                 onClick={
                   utenteLoggato
                     ? handleLogout
                     : () => setShowLoginBox(!showLoginBox)
                 }
->>>>>>> Stashed changes
               >
                 {utenteLoggato ? "Esci" : showLoginBox ? "Chiudi" : "Accedi"}
               </Button>
             </div>
 
-<<<<<<< Updated upstream
-            {showLoginBox && (
-              <Card
-                className="border-0 text-white mb-4 shadow-lg"
-                style={{
-                  backgroundColor: "rgba(34, 25, 21, 0.95)",
-                  border: "1px solid rgba(212, 175, 55, 0.4)",
-                  borderRadius: "16px",
-                }}
-              >
-=======
             {showLoginBox && !utenteLoggato && (
               <Card className="checkout-box border-0 text-white mb-4 shadow-lg">
->>>>>>> Stashed changes
                 <Card.Body className="p-4">
                   <h5 className="checkout-gold-title fw-bold mb-3">
                     Accedi al tuo profilo
@@ -284,13 +315,177 @@ function Checkout() {
                           />
                         </Form.Group>
                       </Col>
-                      <Col xs={12} className="text-end mt-3">
+                      <Col
+                        xs={12}
+                        className="d-flex justify-content-between align-items-center mt-3"
+                      >
+                        <Button
+                          variant="link"
+                          className="p-0 text-decoration-none small"
+                          style={{ color: "#EED972" }}
+                          onClick={() => {
+                            setShowRegisterBox(!showRegisterBox);
+                            setRegisterErrore(null);
+                          }}
+                        >
+                          Non hai un account? Registrati
+                        </Button>
                         <Button
                           type="submit"
                           size="sm"
                           className="checkout-btn-gold fw-semibold px-4 border-0"
                         >
                           Entra
+                        </Button>
+                      </Col>
+                    </Row>
+                  </Form>
+                </Card.Body>
+              </Card>
+            )}
+
+            {showRegisterBox && !utenteLoggato && (
+              <Card className="checkout-box border-0 text-white mb-4 shadow-lg">
+                <Card.Body className="p-4">
+                  <h5 className="checkout-gold-title fw-bold mb-3">
+                    Crea un account
+                  </h5>
+                  {registerErrore && (
+                    <Alert variant="danger">{registerErrore}</Alert>
+                  )}
+                  <Form onSubmit={handleRegisterSubmit}>
+                    <Row className="g-3">
+                      <Col md={6}>
+                        <Form.Group>
+                          <Form.Label className="small text-light">
+                            Nome
+                          </Form.Label>
+                          <Form.Control
+                            type="text"
+                            name="nome"
+                            value={registerData.nome}
+                            onChange={handleRegisterChange}
+                            required
+                            className="checkout-input"
+                          />
+                        </Form.Group>
+                      </Col>
+                      <Col md={6}>
+                        <Form.Group>
+                          <Form.Label className="small text-light">
+                            Cognome
+                          </Form.Label>
+                          <Form.Control
+                            type="text"
+                            name="cognome"
+                            value={registerData.cognome}
+                            onChange={handleRegisterChange}
+                            required
+                            className="checkout-input"
+                          />
+                        </Form.Group>
+                      </Col>
+                      <Col md={6}>
+                        <Form.Group>
+                          <Form.Label className="small text-light">
+                            Email
+                          </Form.Label>
+                          <Form.Control
+                            type="email"
+                            name="email"
+                            value={registerData.email}
+                            onChange={handleRegisterChange}
+                            required
+                            className="checkout-input"
+                          />
+                        </Form.Group>
+                      </Col>
+                      <Col md={6}>
+                        <Form.Group>
+                          <Form.Label className="small text-light">
+                            Password
+                          </Form.Label>
+                          <Form.Control
+                            type="password"
+                            name="password"
+                            value={registerData.password}
+                            onChange={handleRegisterChange}
+                            minLength={6}
+                            required
+                            className="checkout-input"
+                          />
+                        </Form.Group>
+                      </Col>
+                      <Col md={6}>
+                        <Form.Group>
+                          <Form.Label className="small text-light">
+                            Telefono
+                          </Form.Label>
+                          <Form.Control
+                            type="tel"
+                            name="telefono"
+                            value={registerData.telefono}
+                            onChange={handleRegisterChange}
+                            required
+                            className="checkout-input"
+                          />
+                        </Form.Group>
+                      </Col>
+                      <Col md={6}>
+                        <Form.Group>
+                          <Form.Label className="small text-light">
+                            Indirizzo
+                          </Form.Label>
+                          <Form.Control
+                            type="text"
+                            name="indirizzo"
+                            value={registerData.indirizzo}
+                            onChange={handleRegisterChange}
+                            required
+                            className="checkout-input"
+                          />
+                        </Form.Group>
+                      </Col>
+                      <Col md={6}>
+                        <Form.Group>
+                          <Form.Label className="small text-light">
+                            Città
+                          </Form.Label>
+                          <Form.Control
+                            type="text"
+                            name="città"
+                            value={registerData.città}
+                            onChange={handleRegisterChange}
+                            required
+                            className="checkout-input"
+                          />
+                        </Form.Group>
+                      </Col>
+                      <Col md={6}>
+                        <Form.Group>
+                          <Form.Label className="small text-light">
+                            CAP
+                          </Form.Label>
+                          <Form.Control
+                            type="text"
+                            name="cap"
+                            value={registerData.cap}
+                            onChange={handleRegisterChange}
+                            required
+                            className="checkout-input"
+                          />
+                        </Form.Group>
+                      </Col>
+                      <Col xs={12} className="text-end mt-3">
+                        <Button
+                          type="submit"
+                          size="sm"
+                          disabled={registrazioneInCorso}
+                          className="checkout-btn-gold fw-semibold px-4 border-0"
+                        >
+                          {registrazioneInCorso
+                            ? "Creazione..."
+                            : "Crea account e continua"}
                         </Button>
                       </Col>
                     </Row>
@@ -409,16 +604,8 @@ function Checkout() {
                           name="telefono"
                           value={shippingData.telefono}
                           onChange={handleShippingChange}
-<<<<<<< Updated upstream
-                          style={{
-                            backgroundColor: "#221915",
-                            color: "#fff",
-                            borderColor: "rgba(212,175,55,0.3)",
-                          }}
-=======
                           required
                           className="checkout-input"
->>>>>>> Stashed changes
                         />
                       </Form.Group>
                     </Col>
@@ -427,12 +614,8 @@ function Checkout() {
                   <Button
                     type="submit"
                     size="lg"
-<<<<<<< Updated upstream
-                    className="w-100 py-3 fw-bold text-dark shadow"
-=======
                     disabled={invioInCorso || cart.length === 0}
                     className="checkout-btn-gold w-100 py-3 fw-bold shadow border-0"
->>>>>>> Stashed changes
                   >
                     {invioInCorso ? "Invio in corso..." : "Conferma e Paga"}
                   </Button>
@@ -460,15 +643,9 @@ function Checkout() {
                         key={index}
                         className="d-flex justify-content-between align-items-center py-2 border-bottom border-secondary border-opacity-25"
                       >
-<<<<<<< Updated upstream
-                        <span className="small text-light">{item.name}</span>
-                        <span className="checkout-gold-text small fw-semibold">
-                          {item.price}
-=======
                         <span className="small text-light">{item.nome}</span>
                         <span className="checkout-gold-text small fw-semibold">
                           € {item.prezzo.toFixed(2)}
->>>>>>> Stashed changes
                         </span>
                       </div>
                     ))}
