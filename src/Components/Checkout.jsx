@@ -1,6 +1,16 @@
 import { useState } from "react";
-import { Container, Row, Col, Form, Button, Card } from "react-bootstrap";
+import {
+  Container,
+  Row,
+  Col,
+  Form,
+  Button,
+  Card,
+  Alert,
+} from "react-bootstrap";
 import { useNavigate, useLocation } from "react-router-dom";
+
+const API_URL = "http://localhost:3001/api";
 
 function Checkout() {
   const navigate = useNavigate();
@@ -13,6 +23,11 @@ function Checkout() {
 
   const [showLoginBox, setShowLoginBox] = useState(false);
   const [loginData, setLoginData] = useState({ email: "", password: "" });
+  const [loginErrore, setLoginErrore] = useState(null);
+  const [utenteLoggato, setUtenteLoggato] = useState(() => {
+    const salvato = localStorage.getItem("utente");
+    return salvato ? JSON.parse(salvato) : null;
+  });
 
   const [shippingData, setShippingData] = useState({
     nome: "",
@@ -24,6 +39,9 @@ function Checkout() {
     telefono: "",
   });
 
+  const [errore, setErrore] = useState(null);
+  const [invioInCorso, setInvioInCorso] = useState(false);
+
   const handleShippingChange = (e) => {
     setShippingData({ ...shippingData, [e.target.name]: e.target.value });
   };
@@ -32,6 +50,7 @@ function Checkout() {
     setLoginData({ ...loginData, [e.target.name]: e.target.value });
   };
 
+<<<<<<< Updated upstream
   const handleCheckoutSubmit = (e) => {
     e.preventDefault();
 
@@ -48,11 +67,99 @@ function Checkout() {
     navigate("/");
   };
 
+=======
+>>>>>>> Stashed changes
   const handleLoginSubmit = (e) => {
     e.preventDefault();
-    console.log("Tentativo di login con:", loginData);
-    alert("Login effettuato!");
-    setShowLoginBox(false);
+    setLoginErrore(null);
+
+    fetch(`${API_URL}/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(loginData),
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Email o password non corretti");
+        return res.json();
+      })
+      .then((data) => {
+        localStorage.setItem("token", data.token);
+        const utente = {
+          uuid: data.uuid,
+          nome: data.nome,
+          email: data.email,
+          ruolo: data.ruolo,
+        };
+        localStorage.setItem("utente", JSON.stringify(utente));
+        setUtenteLoggato(utente);
+        setShowLoginBox(false);
+      })
+      .catch((err) => setLoginErrore(err.message));
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("utente");
+    setUtenteLoggato(null);
+  };
+
+  const handleCheckoutSubmit = (e) => {
+    e.preventDefault();
+    setErrore(null);
+    setInvioInCorso(true);
+    const dettagli = Object.values(
+      cart.reduce((acc, item) => {
+        if (!acc[item.uuid]) {
+          acc[item.uuid] = { idProdotto: item.uuid, quantita: 0 };
+        }
+        acc[item.uuid].quantita += 1;
+        return acc;
+      }, {}),
+    );
+
+    const indirizzoCompleto = `${shippingData.indirizzo}, ${shippingData.citta} ${shippingData.cap}`;
+
+    const payload = {
+      indirizzoSpedizione: indirizzoCompleto,
+      note: "",
+      dettagli,
+      nomeCliente: shippingData.nome,
+      cognomeCliente: shippingData.cognome,
+      emailCliente: shippingData.email,
+      telefonoCliente: shippingData.telefono,
+    };
+
+    const token = localStorage.getItem("token");
+    const headers = { "Content-Type": "application/json" };
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+
+    fetch(`${API_URL}/ordini`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(payload),
+    })
+      .then((res) => {
+        if (!res.ok) {
+          return res.json().then((err) => {
+            throw new Error(
+              err.message || "Errore durante l'invio dell'ordine",
+            );
+          });
+        }
+        return res.json();
+      })
+      .then(() => {
+        navigate("/", {
+          state: {
+            messaggio:
+              "Ordine completato con successo! Grazie per aver scelto Antico Forno Matillo.",
+          },
+        });
+      })
+      .catch((err) => setErrore(err.message))
+      .finally(() => setInvioInCorso(false));
   };
 
   return (
@@ -85,6 +192,7 @@ function Checkout() {
         </div>
 
         <Row className="g-4">
+<<<<<<< Updated upstream
           <Col lg={7}>
             <div
               className="p-3 mb-4 rounded shadow-sm d-flex justify-content-between align-items-center gap-2"
@@ -99,17 +207,54 @@ function Checkout() {
                 <small className="text-light opacity-75">
                   Accedi per velocizzare il pagamento.
                 </small>
+=======
+          <Col lg={7} className="order-2 order-lg-1">
+            {errore && <Alert variant="danger">{errore}</Alert>}
+
+            <div className="checkout-box p-4 mb-4 shadow-sm d-flex justify-content-between align-items-center gap-2">
+              <div>
+                {utenteLoggato ? (
+                  <>
+                    <h6 className="mb-0 text-white fw-bold">
+                      Ciao, {utenteLoggato.nome}
+                    </h6>
+                    <small className="checkout-text-muted">
+                      Sei collegato al tuo account.
+                    </small>
+                  </>
+                ) : (
+                  <>
+                    <h6 className="mb-0 text-white fw-bold">
+                      Hai già un account?
+                    </h6>
+                    <small className="checkout-text-muted">
+                      Accedi per velocizzare il pagamento, oppure continua come
+                      ospite.
+                    </small>
+                  </>
+                )}
+>>>>>>> Stashed changes
               </div>
               <Button
                 variant="outline-warning"
                 size="sm"
+<<<<<<< Updated upstream
                 className="fw-semibold px-3"
                 onClick={() => setShowLoginBox(!showLoginBox)}
+=======
+                className="checkout-btn-gold fw-semibold px-3 border-0"
+                onClick={
+                  utenteLoggato
+                    ? handleLogout
+                    : () => setShowLoginBox(!showLoginBox)
+                }
+>>>>>>> Stashed changes
               >
-                {showLoginBox ? "Chiudi" : "Accedi"}
+                {utenteLoggato ? "Esci" : showLoginBox ? "Chiudi" : "Accedi"}
               </Button>
             </div>
 
+<<<<<<< Updated upstream
             {showLoginBox && (
               <Card
                 className="border-0 text-white mb-4 shadow-lg"
@@ -119,6 +264,10 @@ function Checkout() {
                   borderRadius: "16px",
                 }}
               >
+=======
+            {showLoginBox && !utenteLoggato && (
+              <Card className="checkout-box border-0 text-white mb-4 shadow-lg">
+>>>>>>> Stashed changes
                 <Card.Body className="p-4">
                   <h5
                     className="fw-bold mb-3 text-warning"
@@ -126,6 +275,7 @@ function Checkout() {
                   >
                     Accedi al tuo profilo
                   </h5>
+                  {loginErrore && <Alert variant="danger">{loginErrore}</Alert>}
                   <Form onSubmit={handleLoginSubmit}>
                     <Row className="g-3">
                       <Col md={6}>
@@ -320,18 +470,23 @@ function Checkout() {
                     <Col md={3}>
                       <Form.Group>
                         <Form.Label className="small text-light">
-                          Telefono
+                          Telefono *
                         </Form.Label>
                         <Form.Control
                           type="tel"
                           name="telefono"
                           value={shippingData.telefono}
                           onChange={handleShippingChange}
+<<<<<<< Updated upstream
                           style={{
                             backgroundColor: "#221915",
                             color: "#fff",
                             borderColor: "rgba(212,175,55,0.3)",
                           }}
+=======
+                          required
+                          className="checkout-input"
+>>>>>>> Stashed changes
                         />
                       </Form.Group>
                     </Col>
@@ -341,9 +496,14 @@ function Checkout() {
                     type="submit"
                     variant="warning"
                     size="lg"
+<<<<<<< Updated upstream
                     className="w-100 py-3 fw-bold text-dark shadow"
+=======
+                    disabled={invioInCorso || cart.length === 0}
+                    className="checkout-btn-gold w-100 py-3 fw-bold shadow border-0"
+>>>>>>> Stashed changes
                   >
-                    Conferma e Paga
+                    {invioInCorso ? "Invio in corso..." : "Conferma e Paga"}
                   </Button>
                 </Form>
               </Card.Body>
@@ -384,9 +544,15 @@ function Checkout() {
                         key={index}
                         className="d-flex justify-content-between align-items-center py-2 border-bottom border-secondary border-opacity-25"
                       >
+<<<<<<< Updated upstream
                         <span className="small text-light">{item.name}</span>
                         <span className="small text-warning fw-semibold">
                           {item.price}
+=======
+                        <span className="small text-light">{item.nome}</span>
+                        <span className="checkout-gold-text small fw-semibold">
+                          € {item.prezzo.toFixed(2)}
+>>>>>>> Stashed changes
                         </span>
                       </div>
                     ))}
