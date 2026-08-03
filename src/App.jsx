@@ -6,6 +6,9 @@ import MyFooter from "./Components/MyFooter";
 import MyNavbar from "./Components/MyNavbar";
 import MyShop from "./Components/MyShop";
 import Checkout from "./Components/Checkout";
+import Admin from "./ComponentGestionale/Admin";
+import RequiredAdmin from "./ComponentGestionale/RequiredAdmin";
+import Login from "./ComponentGestionale/Login";
 
 function App() {
   return (
@@ -24,6 +27,15 @@ function App() {
         />
         <Route path="/shop" element={<MyShop />} />
         <Route path="/checkout" element={<Checkout />} />
+        <Route path="/login" element={<Login />} />
+        <Route
+          path="/admin/prodotti"
+          element={
+            <RequiredAdmin>
+              <Admin />
+            </RequiredAdmin>
+          }
+        />
       </Routes>
 
       <MyFooter />

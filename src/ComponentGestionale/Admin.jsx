@@ -8,6 +8,7 @@ import Table from "react-bootstrap/Table";
 import Spinner from "react-bootstrap/Spinner";
 import Alert from "react-bootstrap/Alert";
 
+// TODO: allineare con API_URL usato in Shop.jsx quando risolvi .env ovunque.
 const API_URL = "http://localhost:3001/api";
 
 const CATEGORIE = ["PANE", "DOLCI", "PIZZE"];
@@ -24,6 +25,14 @@ const FORM_VUOTO = {
   disponibile: true,
 };
 
+// Costruisce l'header Authorization con il token salvato al login.
+// Tutte le richieste che modificano dati (POST/PUT/DELETE) ne hanno
+// bisogno, dato che il backend ora richiede ruolo ADMIN su questi endpoint.
+function getAuthHeaders() {
+  const token = localStorage.getItem("token");
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
 function Admin() {
   const [prodotti, setProdotti] = useState([]);
   const [caricamento, setCaricamento] = useState(true);
@@ -35,8 +44,8 @@ function Admin() {
   const [submitting, setSubmitting] = useState(false);
   const [messaggio, setMessaggio] = useState(null);
 
-  const caricaProdotti = () => {
-    setCaricamento(true);
+  const caricaProdotti = (mostraCaricamento = true) => {
+    if (mostraCaricamento) setCaricamento(true);
     fetch(`${API_URL}/prodotti`)
       .then((res) => {
         if (!res.ok) throw new Error("Errore nel caricamento dei prodotti");
@@ -93,16 +102,21 @@ function Admin() {
     if (!window.confirm(`Eliminare "${nome}"? L'operazione è definitiva.`)) {
       return;
     }
-    fetch(`${API_URL}/prodotti/${id}`, { method: "DELETE" })
+    fetch(`${API_URL}/prodotti/${id}`, {
+      method: "DELETE",
+      headers: getAuthHeaders(),
+    })
       .then((res) => {
-        if (!res.ok) throw new Error("Errore durante l'eliminazione");
+        if (!res.ok)
+          throw new Error(
+            "Errore durante l'eliminazione (verifica di essere loggata come admin)",
+          );
         setMessaggio(`"${nome}" eliminato.`);
         caricaProdotti();
       })
       .catch((err) => setErrore(err.message));
   };
 
-  // Carica l'immagine su un prodotto già esistente
   const caricaImmagine = (id) => {
     if (!imageFile) return Promise.resolve();
 
@@ -111,6 +125,7 @@ function Admin() {
 
     return fetch(`${API_URL}/prodotti/${id}/immagine`, {
       method: "POST",
+      headers: getAuthHeaders(),
       body: formDataImg,
     }).then((res) => {
       if (!res.ok)
@@ -136,19 +151,21 @@ function Admin() {
     const richiesta = editingId
       ? fetch(`${API_URL}/prodotti/${editingId}`, {
           method: "PUT",
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/json", ...getAuthHeaders() },
           body: JSON.stringify(payload),
         })
       : fetch(`${API_URL}/prodotti`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/json", ...getAuthHeaders() },
           body: JSON.stringify(payload),
         });
 
     richiesta
       .then((res) => {
         if (!res.ok)
-          throw new Error("Errore durante il salvataggio del prodotto");
+          throw new Error(
+            "Errore durante il salvataggio (verifica di essere loggata come admin)",
+          );
         return res.json();
       })
       .then((prodottoSalvato) => caricaImmagine(prodottoSalvato.uuid))
