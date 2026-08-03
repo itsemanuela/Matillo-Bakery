@@ -42,13 +42,15 @@ function Login() {
           }),
         );
 
-        console.log("Login riuscito:", data);
-
-        if (data.ruolo === "ADMIN") {
-          navigate("/admin/prodotti");
-        } else {
-          navigate("/");
+        if (data.ruolo !== "ADMIN") {
+          localStorage.removeItem("token");
+          localStorage.removeItem("utente");
+          setErrore("Non hai i permessi per accedere a questa sezione.");
+          return;
         }
+
+        console.log("Login riuscito:", data);
+        navigate("/admin/prodotti");
       })
       .catch((err) => {
         setErrore(err.message);
@@ -83,7 +85,7 @@ function Login() {
             className="text-white fw-bold mb-4 text-center"
             style={{ fontFamily: "'Roboto Serif', serif" }}
           >
-            Accedi
+            Accedi al gestionale
           </h2>
 
           {errore && <Alert variant="danger">{errore}</Alert>}

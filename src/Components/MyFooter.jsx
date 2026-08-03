@@ -1,6 +1,7 @@
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+import { Link } from "react-router-dom";
 
 function MyFooter() {
   return (
@@ -97,6 +98,20 @@ function MyFooter() {
             </p>
           </Col>
         </Row>
+
+        {/* Accesso gestionale*/}
+        <div
+          className="text-center mt-3 pt-3"
+          style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}
+        >
+          <Link
+            to="/login"
+            className="text-decoration-none"
+            style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.35)" }}
+          >
+            Accesso gestionale
+          </Link>
+        </div>
       </Container>
     </footer>
   );
