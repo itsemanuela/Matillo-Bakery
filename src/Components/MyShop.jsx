@@ -6,14 +6,40 @@ import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import Offcanvas from "react-bootstrap/Offcanvas";
 import Spinner from "react-bootstrap/Spinner";
+import { motion } from "framer-motion";
 import DettaglioProdotto from "./DettaglioProdotto";
 import { useNavigate } from "react-router-dom";
 
 const API_URL = "http://localhost:3001/api";
 
-// Placeholder
 const PLACEHOLDER_IMG =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%23241d18'/%3E%3Ctext x='50%25' y='50%25' font-family='sans-serif' font-size='18' fill='%23EED972' text-anchor='middle' dy='.3em'%3EFoto in arrivo%3C/text%3E%3C/svg%3E";
+
+// Varianti per l'ingresso della bestseller card al caricamento
+const bestsellerVariants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, ease: "easeOut" },
+  },
+};
+
+// Varianti per le card prodotto: entrano al scroll, con un ritardo
+// scalare in base alla posizione (le prime entrano leggermente prima).
+const cardVariants = {
+  hidden: { opacity: 0, y: 28, scale: 0.97 },
+  visible: (index) => ({
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      duration: 0.5,
+      ease: "easeOut",
+      delay: (index % 6) * 0.07, // il resto (%6) evita ritardi troppo lunghi con tante card
+    },
+  }),
+};
 
 function Shop() {
   const [selectedCategory, setSelectedCategory] = useState("TUTTI");
@@ -28,7 +54,6 @@ function Shop() {
   const handleCloseCart = () => setShowCart(false);
   const handleShowCart = () => setShowCart(true);
 
-  // Carica i prodotti reali
   useEffect(() => {
     fetch(`${API_URL}/prodotti`)
       .then((res) => {
@@ -73,23 +98,67 @@ function Shop() {
     <div
       className="bg-custom-shop"
       style={{
-        backgroundColor: "#221915",
+        background:
+          "radial-gradient(circle at 12% 8%, rgba(238,217,114,0.14) 0%, transparent 42%), radial-gradient(circle at 88% 92%, rgba(200,110,80,0.18) 0%, transparent 48%), linear-gradient(135deg, #9c6b52 0%, #834F41 40%, #6d4838 75%, #573b2e 100%)",
         color: "#f8f9fa",
         minHeight: "100vh",
         paddingTop: "130px",
         paddingBottom: "120px",
         position: "relative",
+        overflow: "hidden",
       }}
     >
+      {/* Bagliori decorativi che fluttuano lentamente, per rompere
+          la monotonia dello sfondo piatto */}
+      <motion.div
+        animate={{ y: [0, -20, 0], x: [0, 12, 0] }}
+        transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
+        style={{
+          position: "absolute",
+          top: "8%",
+          left: "5%",
+          width: "260px",
+          height: "260px",
+          borderRadius: "50%",
+          background:
+            "radial-gradient(circle, rgba(238,217,114,0.08) 0%, transparent 70%)",
+          filter: "blur(20px)",
+          pointerEvents: "none",
+          zIndex: 0,
+        }}
+      />
+      <motion.div
+        animate={{ y: [0, 25, 0], x: [0, -15, 0] }}
+        transition={{
+          duration: 11,
+          repeat: Infinity,
+          ease: "easeInOut",
+          delay: 1,
+        }}
+        style={{
+          position: "absolute",
+          bottom: "10%",
+          right: "8%",
+          width: "220px",
+          height: "220px",
+          borderRadius: "50%",
+          background:
+            "radial-gradient(circle, rgba(238,217,114,0.06) 0%, transparent 70%)",
+          filter: "blur(18px)",
+          pointerEvents: "none",
+          zIndex: 0,
+        }}
+      />
+
       <style>{`
         .product-card {
-          background-color: rgba(255, 255, 255, 0.045) !important;
+          background-color: rgba(255, 255, 255, 0.09) !important;
           backdrop-filter: blur(18px);
           -webkit-backdrop-filter: blur(18px);
           border-radius: 20px;
           overflow: hidden;
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+          border: 1px solid rgba(255, 255, 255, 0.15);
+          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
           transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
         }
         .product-card:hover {
@@ -266,7 +335,7 @@ function Shop() {
         </div>
       )}
 
-      <Container>
+      <Container style={{ position: "relative", zIndex: 1 }}>
         <div className="text-center mb-5">
           <span
             className="text-uppercase tracking-widest fw-semibold small d-block mb-2"
@@ -289,7 +358,6 @@ function Shop() {
           </p>
         </div>
 
-        {/* Stato di caricamento */}
         {caricamento && (
           <div className="text-center py-5">
             <Spinner animation="border" style={{ color: "#EED972" }} />
@@ -307,92 +375,23 @@ function Shop() {
 
         {!caricamento && !errore && (
           <>
-            {/* BESTSELLER  */}
             {bestseller && (
-              <div
-                className="p-4 p-lg-5 mb-5 position-relative overflow-hidden"
-                style={{
-                  backgroundColor: "rgba(255, 255, 255, 0.045)",
-                  backdropFilter: "blur(24px)",
-                  WebkitBackdropFilter: "blur(24px)",
-                  border: "1px solid rgba(255, 255, 255, 0.1)",
-                  borderRadius: "24px",
-                  boxShadow:
-                    "0 20px 60px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.08)",
-                }}
+              <motion.div
+                initial="hidden"
+                animate="visible"
+                variants={bestsellerVariants}
+                className="mb-5"
               >
-                <div
-                  style={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    height: "2px",
-                    background:
-                      "linear-gradient(90deg, transparent, #EED972, transparent)",
-                  }}
-                />
-                <Row className="align-items-center">
-                  <Col lg={6} className="mb-4 mb-lg-0">
-                    <span
-                      className="mb-3 px-3 py-2 fw-semibold text-uppercase d-inline-block"
-                      style={{
-                        backgroundColor: "rgba(238, 217, 114, 0.12)",
-                        color: "#EED972",
-                        border: "1px solid rgba(238, 217, 114, 0.4)",
-                        letterSpacing: "1px",
-                        borderRadius: "8px",
-                        fontSize: "0.8rem",
-                      }}
-                    >
-                      <i className="bi bi-star-fill me-1"></i> Bestseller
-                    </span>
-                    <h2
-                      className="fw-bold mb-3 text-white"
-                      style={{
-                        fontFamily: "'Roboto Serif', serif",
-                        fontSize: "2.2rem",
-                      }}
-                    >
-                      {bestseller.nome}
-                    </h2>
-                    <p
-                      className="text-light opacity-90 mb-4"
-                      style={{ fontSize: "1.1rem", lineHeight: "1.7" }}
-                    >
-                      {bestseller.descrizione}
-                    </p>
-                    <div className="d-flex align-items-center gap-4">
-                      <span
-                        className="fs-2 fw-bold"
-                        style={{ color: "#EED972" }}
-                      >
-                        € {bestseller.prezzo.toFixed(2)}
-                      </span>
-                      <Button
-                        size="lg"
-                        className="px-4 fw-semibold border-0 bestseller-btn"
-                        disabled={!bestseller.disponibile}
-                        style={{
-                          backgroundColor: "#EED972",
-                          color: "#221915",
-                          borderRadius: "12px",
-                        }}
-                        onClick={() => addToCart(bestseller)}
-                      >
-                        {bestseller.disponibile
-                          ? "Aggiungi al carrello"
-                          : "Non disponibile"}
-                      </Button>
-                    </div>
-                  </Col>
-                  <Col lg={6} className="text-center">
+                <Row className="g-4 align-items-stretch">
+                  <Col lg={5}>
                     <div
                       style={{
-                        borderRadius: "18px",
+                        borderRadius: "20px",
                         overflow: "hidden",
-                        border: "1px solid rgba(255,255,255,0.1)",
-                        boxShadow: "0 15px 40px rgba(0,0,0,0.3)",
+                        height: "100%",
+                        minHeight: "260px",
+                        border: "1px solid rgba(255,255,255,0.15)",
+                        boxShadow: "0 20px 50px rgba(0,0,0,0.4)",
                         cursor: "pointer",
                       }}
                       onClick={() => setProdottoSelezionato(bestseller)}
@@ -400,21 +399,96 @@ function Shop() {
                       <img
                         src={bestseller.immagine || PLACEHOLDER_IMG}
                         alt={bestseller.nome}
-                        className="img-fluid"
                         style={{
-                          maxHeight: "320px",
-                          objectFit: "cover",
                           width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
                           display: "block",
                         }}
                       />
                     </div>
                   </Col>
+                  <Col lg={7}>
+                    <div
+                      className="h-100 d-flex flex-column justify-content-center p-4 p-lg-5 position-relative overflow-hidden"
+                      style={{
+                        backgroundColor: "rgba(20, 15, 12, 0.55)",
+                        backdropFilter: "blur(20px)",
+                        WebkitBackdropFilter: "blur(20px)",
+                        border: "1px solid rgba(255,255,255,0.12)",
+                        borderRadius: "20px",
+                        boxShadow: "0 20px 50px rgba(0,0,0,0.35)",
+                      }}
+                    >
+                      <div
+                        style={{
+                          position: "absolute",
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          height: "2px",
+                          background:
+                            "linear-gradient(90deg, transparent, #EED972, transparent)",
+                        }}
+                      />
+                      <span
+                        className="mb-3 px-3 py-2 fw-semibold text-uppercase d-inline-block"
+                        style={{
+                          backgroundColor: "rgba(238, 217, 114, 0.15)",
+                          color: "#EED972",
+                          border: "1px solid rgba(238, 217, 114, 0.4)",
+                          letterSpacing: "1px",
+                          borderRadius: "8px",
+                          fontSize: "0.8rem",
+                          width: "fit-content",
+                        }}
+                      >
+                        <i className="bi bi-star-fill me-1"></i> Bestseller
+                      </span>
+                      <h2
+                        className="fw-bold mb-2 text-white"
+                        style={{
+                          fontFamily: "'Roboto Serif', serif",
+                          fontSize: "2rem",
+                        }}
+                      >
+                        {bestseller.nome}
+                      </h2>
+                      <p
+                        className="text-light opacity-90 mb-3"
+                        style={{ fontSize: "1rem", lineHeight: "1.6" }}
+                      >
+                        {bestseller.descrizione}
+                      </p>
+                      <div className="d-flex align-items-center gap-4">
+                        <span
+                          className="fs-2 fw-bold"
+                          style={{ color: "#EED972" }}
+                        >
+                          € {bestseller.prezzo.toFixed(2)}
+                        </span>
+                        <Button
+                          size="lg"
+                          className="px-4 fw-semibold border-0 bestseller-btn"
+                          disabled={!bestseller.disponibile}
+                          style={{
+                            backgroundColor: "#EED972",
+                            color: "#221915",
+                            borderRadius: "12px",
+                          }}
+                          onClick={() => addToCart(bestseller)}
+                        >
+                          {bestseller.disponibile
+                            ? "Aggiungi al carrello"
+                            : "Non disponibile"}
+                        </Button>
+                      </div>
+                    </div>
+                  </Col>
                 </Row>
-              </div>
+              </motion.div>
             )}
 
-            {/* Filtri categoria  */}
             <div className="d-flex justify-content-center gap-2 gap-md-3 mb-5 flex-wrap">
               {["TUTTI", ...new Set(prodotti.map((p) => p.categoria))].map(
                 (cat) => (
@@ -440,97 +514,105 @@ function Shop() {
               )}
             </div>
 
-            {/* GRIGLIA PRODOTTI */}
             <Row className="g-4 mb-5">
-              {filteredProducts.map((product) => (
+              {filteredProducts.map((product, index) => (
                 <Col md={6} lg={4} key={product.uuid}>
-                  <Card
-                    className="h-100 border-0 text-white product-card"
-                    style={{ cursor: "pointer" }}
-                    onClick={() => setProdottoSelezionato(product)}
+                  <motion.div
+                    custom={index}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, amount: 0.2 }}
+                    variants={cardVariants}
+                    className="h-100"
                   >
-                    <div
-                      className="product-card-img-wrapper"
-                      style={{
-                        height: "230px",
-                        overflow: "hidden",
-                        position: "relative",
-                      }}
+                    <Card
+                      className="h-100 border-0 text-white product-card"
+                      style={{ cursor: "pointer" }}
+                      onClick={() => setProdottoSelezionato(product)}
                     >
-                      <Card.Img
-                        variant="top"
-                        src={product.immagine || PLACEHOLDER_IMG}
-                        alt={product.nome}
-                        className="product-card-img"
-                        style={{ height: "100%", objectFit: "cover" }}
-                      />
-                      <div className="product-card-overlay"></div>
-                      {!product.disponibile && (
+                      <div
+                        className="product-card-img-wrapper"
+                        style={{
+                          height: "230px",
+                          overflow: "hidden",
+                          position: "relative",
+                        }}
+                      >
+                        <Card.Img
+                          variant="top"
+                          src={product.immagine || PLACEHOLDER_IMG}
+                          alt={product.nome}
+                          className="product-card-img"
+                          style={{ height: "100%", objectFit: "cover" }}
+                        />
+                        <div className="product-card-overlay"></div>
+                        {!product.disponibile && (
+                          <div
+                            style={{
+                              position: "absolute",
+                              top: "12px",
+                              right: "12px",
+                              backgroundColor: "rgba(20,15,12,0.85)",
+                              color: "#f8f9fa",
+                              padding: "4px 12px",
+                              borderRadius: "8px",
+                              fontSize: "0.75rem",
+                              fontWeight: 600,
+                            }}
+                          >
+                            Esaurito
+                          </div>
+                        )}
                         <div
                           style={{
                             position: "absolute",
-                            top: "12px",
-                            right: "12px",
-                            backgroundColor: "rgba(20,15,12,0.85)",
-                            color: "#f8f9fa",
-                            padding: "4px 12px",
-                            borderRadius: "8px",
-                            fontSize: "0.75rem",
-                            fontWeight: 600,
+                            bottom: 0,
+                            left: 0,
+                            right: 0,
+                            height: "50px",
+                            background:
+                              "linear-gradient(to top, rgba(20,15,12,0.25), transparent)",
+                            pointerEvents: "none",
                           }}
-                        >
-                          Esaurito
-                        </div>
-                      )}
-                      <div
-                        style={{
-                          position: "absolute",
-                          bottom: 0,
-                          left: 0,
-                          right: 0,
-                          height: "50px",
-                          background:
-                            "linear-gradient(to top, rgba(20,15,12,0.25), transparent)",
-                          pointerEvents: "none",
-                        }}
-                      />
-                    </div>
-                    <Card.Body className="d-flex flex-column p-4">
-                      <Card.Title
-                        className="fw-bold mb-2 text-white"
-                        style={{ fontSize: "1.3rem" }}
-                      >
-                        {product.nome}
-                      </Card.Title>
-                      <Card.Text className="text-light opacity-75 small mb-4 flex-grow-1">
-                        {product.descrizione}
-                      </Card.Text>
-                      <div className="d-flex align-items-center justify-content-between mt-auto pt-3 border-top border-secondary border-opacity-25">
-                        <span
-                          className="fs-5 fw-bold"
-                          style={{ color: "#EED972" }}
-                        >
-                          € {product.prezzo.toFixed(2)}
-                        </span>
-                        <Button
-                          size="sm"
-                          className="px-3 py-2 fw-semibold border-0 add-btn"
-                          disabled={!product.disponibile}
-                          style={{
-                            backgroundColor: "#EED972",
-                            color: "#221915",
-                            borderRadius: "8px",
-                          }}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            addToCart(product);
-                          }}
-                        >
-                          {product.disponibile ? "Aggiungi" : "Esaurito"}
-                        </Button>
+                        />
                       </div>
-                    </Card.Body>
-                  </Card>
+                      <Card.Body className="d-flex flex-column p-4">
+                        <Card.Title
+                          className="fw-bold mb-2 text-white"
+                          style={{ fontSize: "1.3rem" }}
+                        >
+                          {product.nome}
+                        </Card.Title>
+                        <Card.Text className="text-light opacity-75 small mb-4 flex-grow-1">
+                          {product.descrizione}
+                        </Card.Text>
+                        <div className="d-flex align-items-center justify-content-between mt-auto pt-3 border-top border-secondary border-opacity-25">
+                          <span
+                            className="fs-5 fw-bold"
+                            style={{ color: "#EED972" }}
+                          >
+                            € {product.prezzo.toFixed(2)}
+                          </span>
+                          <Button
+                            size="sm"
+                            className="px-3 py-2 fw-semibold border-0 add-btn"
+                            disabled={!product.disponibile}
+                            style={{
+                              backgroundColor: "#EED972",
+                              color: "#221915",
+                              borderRadius: "8px",
+                            }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              addToCart(product);
+                            }}
+                          >
+                            {product.disponibile ? "Aggiungi" : "Esaurito"}
+                          </Button>
+                        </div>
+                      </Card.Body>
+                    </Card>
+                  </motion.div>
                 </Col>
               ))}
             </Row>
