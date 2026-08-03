@@ -9,8 +9,8 @@ import {
   Alert,
 } from "react-bootstrap";
 import { useNavigate, useLocation } from "react-router-dom";
+import FormCity from "./FormCity";
 
-// TODO: allineare con API_URL usato altrove, stesso hardcode temporaneo.
 const API_URL = "http://localhost:3001/api";
 
 function Checkout() {
@@ -40,8 +40,6 @@ function Checkout() {
   const [registerErrore, setRegisterErrore] = useState(null);
   const [registrazioneInCorso, setRegistrazioneInCorso] = useState(false);
 
-  // Se c'è già un token salvato (utente loggato in una sessione precedente),
-  // partiamo considerandolo autenticato.
   const [utenteLoggato, setUtenteLoggato] = useState(() => {
     const salvato = localStorage.getItem("utente");
     return salvato ? JSON.parse(salvato) : null;
@@ -129,8 +127,7 @@ function Checkout() {
         }
         return res.json();
       })
-      // Registrazione riuscita: login automatico con le stesse credenziali,
-      // così l'utente non deve reinserirle subito dopo.
+
       .then(() =>
         fetch(`${API_URL}/auth/login`, {
           method: "POST",
@@ -183,9 +180,6 @@ function Checkout() {
       indirizzoSpedizione: indirizzoCompleto,
       note: "",
       dettagli,
-      // Questi campi vengono ignorati dal backend se l'utente è loggato
-      // (in quel caso i dati si prendono dal token), ma sono obbligatori
-      // se stai ordinando come ospite.
       nomeCliente: shippingData.nome,
       cognomeCliente: shippingData.cognome,
       emailCliente: shippingData.email,
@@ -451,8 +445,7 @@ function Checkout() {
                           <Form.Label className="small text-light">
                             Città
                           </Form.Label>
-                          <Form.Control
-                            type="text"
+                          <FormCity
                             name="città"
                             value={registerData.città}
                             onChange={handleRegisterChange}
@@ -569,8 +562,7 @@ function Checkout() {
                         <Form.Label className="small text-light">
                           Città *
                         </Form.Label>
-                        <Form.Control
-                          type="text"
+                        <FormCity
                           name="citta"
                           value={shippingData.citta}
                           onChange={handleShippingChange}
