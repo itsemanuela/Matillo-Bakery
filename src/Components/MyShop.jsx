@@ -26,6 +26,7 @@ function Shop() {
   const handleCloseCart = () => setShowCart(false);
   const handleShowCart = () => setShowCart(true);
 
+  // Carica i prodotti reali
   useEffect(() => {
     fetch(`${API_URL}/prodotti`)
       .then((res) => {
@@ -61,7 +62,10 @@ function Shop() {
       ? prodotti
       : prodotti.filter((p) => p.categoria === selectedCategory);
 
-  const bestseller = prodotti.find((p) => p.disponibile) || prodotti[0];
+  const bestseller =
+    prodotti.find((p) => p.bestseller) ||
+    prodotti.find((p) => p.disponibile) ||
+    prodotti[0];
 
   return (
     <div
@@ -310,19 +314,37 @@ function Shop() {
                 />
                 <Row className="align-items-center">
                   <Col lg={6} className="mb-4 mb-lg-0">
-                    <span
-                      className="mb-3 px-3 py-2 fw-semibold text-uppercase d-inline-block"
-                      style={{
-                        backgroundColor: "rgba(238, 217, 114, 0.12)",
-                        color: "#EED972",
-                        border: "1px solid rgba(238, 217, 114, 0.4)",
-                        letterSpacing: "1px",
-                        borderRadius: "8px",
-                        fontSize: "0.8rem",
-                      }}
-                    >
-                      <i className="bi bi-star-fill me-1"></i> In Evidenza
-                    </span>
+                    <div className="mb-3 d-inline-block">
+                      <div
+                        style={{
+                          width: "70px",
+                          height: "2px",
+                          background:
+                            "linear-gradient(90deg, transparent, #EED972, transparent)",
+                          marginBottom: "10px",
+                        }}
+                      />
+                      <span
+                        className="d-block text-uppercase"
+                        style={{
+                          color: "#EED972",
+                          letterSpacing: "4px",
+                          fontSize: "0.8rem",
+                          fontWeight: 600,
+                        }}
+                      >
+                        Bestseller
+                      </span>
+                      <div
+                        style={{
+                          width: "70px",
+                          height: "2px",
+                          background:
+                            "linear-gradient(90deg, transparent, #EED972, transparent)",
+                          marginTop: "10px",
+                        }}
+                      />
+                    </div>
                     <h2
                       className="fw-bold mb-3 text-white"
                       style={{

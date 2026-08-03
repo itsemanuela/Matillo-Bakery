@@ -47,6 +47,7 @@ function AdminOrdini() {
         return res.json();
       })
       .then((data) => {
+        // Più recenti prima
         const ordinati = [...data].sort(
           (a, b) => new Date(b.dataOrdine) - new Date(a.dataOrdine),
         );
@@ -190,87 +191,95 @@ function AdminOrdini() {
                   border: "1px solid rgba(255,255,255,0.08)",
                 }}
               >
-                <Table responsive variant="dark" className="mb-0 align-middle">
-                  <thead>
-                    <tr>
-                      <th>Data</th>
-                      <th>Cliente</th>
-                      <th>Email</th>
-                      <th>Indirizzo</th>
-                      <th>Totale</th>
-                      <th>Origine</th>
-                      <th>Stato</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {ordiniFiltrati.map((ordine) => (
-                      <tr key={ordine.uuid}>
-                        <td className="small">
-                          {formattaData(ordine.dataOrdine)}
-                        </td>
-                        <td>{nomeCliente(ordine)}</td>
-                        <td className="small">{emailCliente(ordine)}</td>
-                        <td className="small">{ordine.indirizzoSpedizione}</td>
-                        <td className="fw-bold" style={{ color: "#EED972" }}>
-                          € {ordine.totale.toFixed(2)}
-                        </td>
-                        <td>
-                          {ordine.utente ? (
-                            <span
-                              className="px-2 py-1 rounded-pill fw-semibold small d-inline-block"
-                              style={{
-                                backgroundColor: "rgba(238,217,114,0.18)",
-                                color: "#EED972",
-                                border: "1px solid rgba(238,217,114,0.4)",
-                              }}
-                            >
-                              Account
-                            </span>
-                          ) : (
-                            <span
-                              className="px-2 py-1 rounded-pill fw-semibold small d-inline-block"
-                              style={{
-                                backgroundColor: "rgba(143,184,209,0.18)",
-                                color: "#8fb8d1",
-                                border: "1px solid rgba(143,184,209,0.4)",
-                              }}
-                            >
-                              Ospite
-                            </span>
-                          )}
-                        </td>
-                        <td>
-                          <Form.Select
-                            size="sm"
-                            value={ordine.stato}
-                            disabled={aggiornandoId === ordine.uuid}
-                            onChange={(e) =>
-                              handleStatoChange(ordine.uuid, e.target.value)
-                            }
-                            style={{
-                              backgroundColor: `${COLORE_STATO[ordine.stato]}22`,
-                              color: COLORE_STATO[ordine.stato] || "#f8f9fa",
-                              border: `1px solid ${COLORE_STATO[ordine.stato]}66`,
-                              fontWeight: 700,
-                              borderRadius: "999px",
-                              minWidth: "170px",
-                            }}
-                          >
-                            {STATI.map((stato) => (
-                              <option
-                                key={stato}
-                                value={stato}
-                                style={{ color: "#221915" }}
-                              >
-                                {stato.replaceAll("_", " ")}
-                              </option>
-                            ))}
-                          </Form.Select>
-                        </td>
+                <div style={{ overflowX: "auto" }}>
+                  <Table
+                    responsive
+                    variant="dark"
+                    className="mb-0 align-middle"
+                  >
+                    <thead>
+                      <tr>
+                        <th>Data</th>
+                        <th>Cliente</th>
+                        <th>Email</th>
+                        <th>Indirizzo</th>
+                        <th>Totale</th>
+                        <th>Origine</th>
+                        <th>Stato</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </Table>
+                    </thead>
+                    <tbody>
+                      {ordiniFiltrati.map((ordine) => (
+                        <tr key={ordine.uuid}>
+                          <td className="small">
+                            {formattaData(ordine.dataOrdine)}
+                          </td>
+                          <td>{nomeCliente(ordine)}</td>
+                          <td className="small">{emailCliente(ordine)}</td>
+                          <td className="small">
+                            {ordine.indirizzoSpedizione}
+                          </td>
+                          <td className="fw-bold" style={{ color: "#EED972" }}>
+                            € {ordine.totale.toFixed(2)}
+                          </td>
+                          <td>
+                            {ordine.utente ? (
+                              <span
+                                className="px-2 py-1 rounded-pill fw-semibold small d-inline-block"
+                                style={{
+                                  backgroundColor: "rgba(238,217,114,0.18)",
+                                  color: "#EED972",
+                                  border: "1px solid rgba(238,217,114,0.4)",
+                                }}
+                              >
+                                Account
+                              </span>
+                            ) : (
+                              <span
+                                className="px-2 py-1 rounded-pill fw-semibold small d-inline-block"
+                                style={{
+                                  backgroundColor: "rgba(143,184,209,0.18)",
+                                  color: "#8fb8d1",
+                                  border: "1px solid rgba(143,184,209,0.4)",
+                                }}
+                              >
+                                Ospite
+                              </span>
+                            )}
+                          </td>
+                          <td>
+                            <Form.Select
+                              size="sm"
+                              value={ordine.stato}
+                              disabled={aggiornandoId === ordine.uuid}
+                              onChange={(e) =>
+                                handleStatoChange(ordine.uuid, e.target.value)
+                              }
+                              style={{
+                                backgroundColor: `${COLORE_STATO[ordine.stato]}22`,
+                                color: COLORE_STATO[ordine.stato] || "#f8f9fa",
+                                border: `1px solid ${COLORE_STATO[ordine.stato]}66`,
+                                fontWeight: 700,
+                                borderRadius: "999px",
+                                minWidth: "170px",
+                              }}
+                            >
+                              {STATI.map((stato) => (
+                                <option
+                                  key={stato}
+                                  value={stato}
+                                  style={{ color: "#221915" }}
+                                >
+                                  {stato.replaceAll("_", " ")}
+                                </option>
+                              ))}
+                            </Form.Select>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </Table>
+                </div>
               </div>
             )}
           </>

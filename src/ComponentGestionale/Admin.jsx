@@ -24,7 +24,6 @@ const FORM_VUOTO = {
   quantità: "",
   disponibile: true,
 };
-
 function getAuthHeaders() {
   const token = localStorage.getItem("token");
   return token ? { Authorization: `Bearer ${token}` } : {};
@@ -79,6 +78,20 @@ function Admin() {
     localStorage.removeItem("token");
     localStorage.removeItem("utente");
     navigate("/login");
+  };
+
+  const handleSetBestseller = (id) => {
+    fetch(`${API_URL}/prodotti/${id}/bestseller`, {
+      method: "PATCH",
+      headers: getAuthHeaders(),
+    })
+      .then((res) => {
+        if (!res.ok)
+          throw new Error("Errore durante l'impostazione del bestseller");
+        setMessaggio("Prodotto impostato come bestseller.");
+        caricaProdotti(false);
+      })
+      .catch((err) => setErrore(err.message));
   };
 
   const resetForm = () => {
@@ -192,6 +205,28 @@ function Admin() {
         paddingBottom: "80px",
       }}
     >
+      <style>{`
+        .admin-table thead th {
+          text-transform: uppercase;
+          font-size: 0.75rem;
+          letter-spacing: 1.5px;
+          color: #EED972;
+          font-weight: 700;
+          border-bottom: 2px solid rgba(238, 217, 114, 0.3) !important;
+          padding-top: 14px;
+          padding-bottom: 14px;
+        }
+        .admin-table tbody tr {
+          transition: background-color 0.15s ease;
+        }
+        .admin-table tbody tr:hover {
+          background-color: rgba(238, 217, 114, 0.05) !important;
+        }
+        .admin-table td {
+          padding-top: 14px;
+          padding-bottom: 14px;
+        }
+      `}</style>
       <Container>
         <div className="d-flex justify-content-between align-items-center mb-4">
           <h1
@@ -370,65 +405,121 @@ function Admin() {
               border: "1px solid rgba(255,255,255,0.08)",
             }}
           >
-            <Table responsive variant="dark" className="mb-0 align-middle">
-              <thead>
-                <tr>
-                  <th>Foto</th>
-                  <th>Nome</th>
-                  <th>Categoria</th>
-                  <th>Prezzo</th>
-                  <th>Stock</th>
-                  <th>Stato</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {prodotti.map((p) => (
-                  <tr key={p.uuid}>
-                    <td>
-                      <img
-                        src={p.immagine || PLACEHOLDER_IMG}
-                        alt={p.nome}
-                        style={{
-                          width: 50,
-                          height: 50,
-                          objectFit: "cover",
-                          borderRadius: 8,
-                        }}
-                      />
-                    </td>
-                    <td>{p.nome}</td>
-                    <td>{p.categoria}</td>
-                    <td>€ {p.prezzo.toFixed(2)}</td>
-                    <td>{p.quantità}</td>
-                    <td>
-                      {p.disponibile ? (
-                        <span style={{ color: "#8fd19e" }}>Disponibile</span>
-                      ) : (
-                        <span style={{ color: "#e08585" }}>Esaurito</span>
-                      )}
-                    </td>
-                    <td className="text-end">
-                      <Button
-                        size="sm"
-                        variant="outline-light"
-                        className="me-2"
-                        onClick={() => handleEdit(p)}
-                      >
-                        Modifica
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline-danger"
-                        onClick={() => handleDelete(p.uuid, p.nome)}
-                      >
-                        Elimina
-                      </Button>
-                    </td>
+            <div style={{ overflowX: "auto" }}>
+              <Table
+                responsive
+                variant="dark"
+                className="admin-table mb-0 align-middle"
+              >
+                <thead>
+                  <tr>
+                    <th>Foto</th>
+                    <th>Nome</th>
+                    <th>Categoria</th>
+                    <th>Prezzo</th>
+                    <th>Stock</th>
+                    <th>Stato</th>
+                    <th>In evidenza</th>
+                    <th></th>
                   </tr>
-                ))}
-              </tbody>
-            </Table>
+                </thead>
+                <tbody>
+                  {prodotti.map((p) => (
+                    <tr key={p.uuid}>
+                      <td>
+                        <img
+                          src={p.immagine || PLACEHOLDER_IMG}
+                          alt={p.nome}
+                          style={{
+                            width: 50,
+                            height: 50,
+                            objectFit: "cover",
+                            borderRadius: 8,
+                            border: "1px solid rgba(255,255,255,0.12)",
+                          }}
+                        />
+                      </td>
+                      <td>{p.nome}</td>
+                      <td>{p.categoria}</td>
+                      <td>€ {p.prezzo.toFixed(2)}</td>
+                      <td>{p.quantità}</td>
+                      <td>
+                        {p.disponibile ? (
+                          <span
+                            className="px-2 py-1 rounded-pill fw-semibold small d-inline-block"
+                            style={{
+                              backgroundColor: "rgba(143,209,158,0.15)",
+                              color: "#8fd19e",
+                              border: "1px solid rgba(143,209,158,0.35)",
+                            }}
+                          >
+                            Disponibile
+                          </span>
+                        ) : (
+                          <span
+                            className="px-2 py-1 rounded-pill fw-semibold small d-inline-block"
+                            style={{
+                              backgroundColor: "rgba(224,133,133,0.15)",
+                              color: "#e08585",
+                              border: "1px solid rgba(224,133,133,0.35)",
+                            }}
+                          >
+                            Esaurito
+                          </span>
+                        )}
+                      </td>
+                      <td
+                        className="text-end align-middle"
+                        style={{ whiteSpace: "nowrap" }}
+                      >
+                        {p.bestseller ? (
+                          <span
+                            className="px-2 py-1 rounded-pill fw-semibold small d-inline-block"
+                            style={{
+                              backgroundColor: "rgba(238,217,114,0.18)",
+                              color: "#EED972",
+                              border: "1px solid rgba(238,217,114,0.4)",
+                            }}
+                          >
+                            ★ Bestseller
+                          </span>
+                        ) : (
+                          <Button
+                            size="sm"
+                            variant="outline-warning"
+                            onClick={() => handleSetBestseller(p.uuid)}
+                          >
+                            Imposta
+                          </Button>
+                        )}
+                      </td>
+                      <td
+                        className="text-end align-middle"
+                        style={{ whiteSpace: "nowrap" }}
+                      >
+                        <Button
+                          size="sm"
+                          variant="outline-light"
+                          className="me-2"
+                          onClick={() => handleEdit(p)}
+                        >
+                          <i className="bi bi-pencil-fill me-1"></i>
+                          Modifica
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline-danger"
+                          onClick={() => handleDelete(p.uuid, p.nome)}
+                        >
+                          <i className="bi bi-trash-fill me-1"></i>
+                          Elimina
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+            </div>
           </div>
         )}
       </Container>
