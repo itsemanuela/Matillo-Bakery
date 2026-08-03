@@ -4,6 +4,7 @@ import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import Alert from "react-bootstrap/Alert";
 import { useNavigate } from "react-router-dom";
+
 const API_URL = "http://localhost:3001/api";
 
 function Login() {
@@ -42,7 +43,12 @@ function Login() {
         );
 
         console.log("Login riuscito:", data);
-        navigate("/");
+
+        if (data.ruolo === "ADMIN") {
+          navigate("/admin/prodotti");
+        } else {
+          navigate("/");
+        }
       })
       .catch((err) => {
         setErrore(err.message);
@@ -77,7 +83,7 @@ function Login() {
             className="text-white fw-bold mb-4 text-center"
             style={{ fontFamily: "'Roboto Serif', serif" }}
           >
-            Accedi al gestionale
+            Accedi
           </h2>
 
           {errore && <Alert variant="danger">{errore}</Alert>}
