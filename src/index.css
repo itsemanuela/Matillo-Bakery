@@ -90,8 +90,7 @@ footer, .custom-footer {
   border-top: 2px solid #EED972 !important;
 }
 
-  
-.checkout-page-wrapper {
+ .checkout-page-wrapper {
   background-color:  #834F41 !important;  
   color: #f8f9fa;
   min-height: 100vh;
@@ -132,31 +131,47 @@ footer, .custom-footer {
   color: #d9ccbc;
 }
 
- 
 .checkout-box {
-  background-color:   #AF705C !important;
+  background-color: rgba(255, 255, 255, 0.045) !important;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
   border-radius: 20px !important;
-  border: 1px solid rgba(238, 217, 114, 0.15) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25) !important;
+  position: relative;
+  overflow: hidden;
 }
 
- 
+.checkout-box::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(238, 217, 114, 0.5), transparent);
+  pointer-events: none;
+}
+
 .checkout-input {
-  background-color: #EFD7AA !important;
+  background-color: rgba(255, 255, 255, 0.06) !important;
   color: #ffffff !important;
-  border: 1px solid rgba(238, 217, 114, 0.2) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
   border-radius: 10px !important;
   padding: 0.75rem 1rem !important;
 }
 
-.checkout-input:focus {
-  background-color: #2a1f18 !important;
-  color: #ffffff !important;
-  border-color: #EED972 !important;
-  box-shadow: 0 0 0 0.2rem rgba(238, 217, 114, 0.2) !important;
+.checkout-input::placeholder {
+  color: rgba(255, 255, 255, 0.4) !important;
 }
 
- 
+.checkout-input:focus {
+  background-color: rgba(255, 255, 255, 0.09) !important;
+  color: #ffffff !important;
+  border-color: #EED972 !important;
+  box-shadow: 0 0 0 0.2rem rgba(238, 217, 114, 0.15) !important;
+}
+
 .checkout-btn-gold {
   background-color: #EED972 !important;
   color: #1a120b !important;
@@ -171,7 +186,6 @@ footer, .custom-footer {
   transform: translateY(-1px);
 }
 
- 
 .checkout-sticky {
   position: sticky;
   top: 110px;
@@ -182,7 +196,7 @@ footer, .custom-footer {
     position: static;
   }
 }
- 
+
 .checkout-cart-list {
   max-height: 300px;
   overflow-y: auto;
