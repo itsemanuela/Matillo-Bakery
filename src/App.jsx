@@ -11,6 +11,7 @@ import RequiredAdmin from "./ComponentGestionale/RequiredAdmin";
 import Login from "./ComponentGestionale/Login";
 import AdminNavbar from "./ComponentGestionale/AdminNavbar";
 import AdminOrdini from "./ComponentGestionale/AdminOrdini";
+import AdminShopPreview from "./ComponentGestionale/AdminShopPreview";
 
 function AppContent() {
   const location = useLocation();
@@ -47,6 +48,14 @@ function AppContent() {
           element={
             <RequiredAdmin>
               <AdminOrdini />
+            </RequiredAdmin>
+          }
+        />
+        <Route
+          path="/admin/shop-preview"
+          element={
+            <RequiredAdmin>
+              <AdminShopPreview />
             </RequiredAdmin>
           }
         />

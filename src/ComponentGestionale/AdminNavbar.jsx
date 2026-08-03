@@ -4,6 +4,7 @@ import Container from "react-bootstrap/Container";
 import Button from "react-bootstrap/Button";
 import { useNavigate, useLocation } from "react-router-dom";
 
+// Navbar dedicata al gestionale
 function AdminNavbar() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -57,6 +58,12 @@ function AdminNavbar() {
               style={linkStyle("/admin/ordini")}
             >
               Ordini
+            </Nav.Link>
+            <Nav.Link
+              onClick={() => navigate("/admin/shop-preview")}
+              style={linkStyle("/admin/shop-preview")}
+            >
+              Anteprima Shop
             </Nav.Link>
 
             <Button
