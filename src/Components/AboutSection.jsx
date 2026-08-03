@@ -3,6 +3,7 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Carousel from "react-bootstrap/Carousel";
 import Image from "react-bootstrap/Image";
+import { motion } from "framer-motion";
 
 import foto1 from "../assets/lavorazione/PEPP4830.jpg";
 import foto2 from "../assets/lavorazione/PEPP4856.jpg";
@@ -25,6 +26,36 @@ const laboratoriocScatti = [
   { img: foto7, text: "Il profumo autentico del pane appena fatto" },
 ];
 
+//libreria esterna framer
+const containerVariants = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.15,
+      delayChildren: 0.1,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 24 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, ease: "easeOut" },
+  },
+};
+
+const imageVariants = {
+  hidden: { opacity: 0, x: 40, scale: 0.96 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    scale: 1,
+    transition: { duration: 0.7, ease: "easeOut" },
+  },
+};
+
 function AboutSection() {
   return (
     <section
@@ -34,44 +65,70 @@ function AboutSection() {
       <Container className="py-5">
         <Row className="align-items-center g-5">
           <Col lg={6}>
-            <span className="text-uppercase tracking-wider fw-bold text-warning small d-block mb-2">
-              Tradizione Artigianale
-            </span>
-            <h2
-              className="display-5 fw-bold mb-4"
-              style={{
-                fontFamily: "'Roboto Serif', serif",
-                lineHeight: "1.2",
-                color: "#ffffff",
-              }}
+            <motion.div
+              variants={containerVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.3 }}
             >
-              L'arte del pane tramandata di generazione in generazione
-            </h2>
-            <p
-              className="lead opacity-90 mb-4"
-              style={{
-                fontSize: "1.1rem",
-                lineHeight: "1.8",
-                color: "#e3ded6",
-              }}
-            >
-              Dal 1943 l'Antico Forno Matillo è il punto di riferimento per chi
-              ama il sapore autentico delle cose fatte bene. Ogni giorno
-              selezioniamo con cura grani pregiati, lieviti naturali e
-              ingredienti genuini del territorio.
-            </p>
-            <p
-              className="mb-0"
-              style={{ color: "#d0c7bc", lineHeight: "1.7", fontSize: "1rem" }}
-            >
-              Non è solo questione di ricette, ma di rispetto per il tempo:
-              lasciamo che l'impasto lieviti naturalmente per garantire una
-              digeribilità perfetta e una mollica soffice che sa di casa.
-            </p>
+              <motion.span
+                className="text-uppercase tracking-wider fw-bold text-warning small d-block mb-2"
+                variants={itemVariants}
+              >
+                Tradizione Artigianale
+              </motion.span>
+
+              <motion.h2
+                className="display-5 fw-bold mb-4"
+                style={{
+                  fontFamily: "'Roboto Serif', serif",
+                  lineHeight: "1.2",
+                  color: "#ffffff",
+                }}
+                variants={itemVariants}
+              >
+                L'arte del pane tramandata di generazione in generazione
+              </motion.h2>
+
+              <motion.p
+                className="lead opacity-90 mb-4"
+                style={{
+                  fontSize: "1.1rem",
+                  lineHeight: "1.8",
+                  color: "#e3ded6",
+                }}
+                variants={itemVariants}
+              >
+                Dal 1943 l'Antico Forno Matillo è il punto di riferimento per
+                chi ama il sapore autentico delle cose fatte bene. Ogni giorno
+                selezioniamo con cura grani pregiati, lieviti naturali e
+                ingredienti genuini del territorio.
+              </motion.p>
+
+              <motion.p
+                className="mb-0"
+                style={{
+                  color: "#d0c7bc",
+                  lineHeight: "1.7",
+                  fontSize: "1rem",
+                }}
+                variants={itemVariants}
+              >
+                Non è solo questione di ricette, ma di rispetto per il tempo:
+                lasciamo che l'impasto lieviti naturalmente per garantire una
+                digeribilità perfetta e una mollica soffice che sa di casa.
+              </motion.p>
+            </motion.div>
           </Col>
 
           <Col lg={6}>
-            <div className="shadow-lg rounded overflow-hidden border border-warning border-opacity-25">
+            <motion.div
+              variants={imageVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.3 }}
+              className="shadow-lg rounded overflow-hidden border border-warning border-opacity-25"
+            >
               <Carousel
                 fade
                 interval={3000}
@@ -96,7 +153,7 @@ function AboutSection() {
                   </Carousel.Item>
                 ))}
               </Carousel>
-            </div>
+            </motion.div>
           </Col>
         </Row>
       </Container>
