@@ -9,9 +9,11 @@ import Checkout from "./Components/Checkout";
 import Admin from "./ComponentGestionale/Admin";
 import RequiredAdmin from "./ComponentGestionale/RequiredAdmin";
 import Login from "./ComponentGestionale/Login";
+
 import AdminNavbar from "./ComponentGestionale/AdminNavbar";
 import AdminOrdini from "./ComponentGestionale/AdminOrdini";
 import AdminShopPreview from "./ComponentGestionale/AdminShopPreview";
+import MyOrdini from "./Components/MyOrdini";
 
 function AppContent() {
   const location = useLocation();
@@ -34,6 +36,7 @@ function AppContent() {
         <Route path="/shop" element={<MyShop />} />
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/miei-ordini" element={<MyOrdini />} />
         <Route
           path="/admin/prodotti"
           element={

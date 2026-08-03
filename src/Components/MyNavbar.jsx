@@ -101,6 +101,31 @@ function MyNavbar() {
               Laboratori
             </Nav.Link>
 
+            {utente ? (
+              <Nav.Link
+                onClick={() => navigate("/miei-ordini")}
+                className="text-white fw-semibold"
+                style={{
+                  cursor: "pointer",
+                  textShadow: "0 2px 4px rgba(0,0,0,0.8)",
+                }}
+              >
+                I Miei Ordini
+              </Nav.Link>
+            ) : (
+              <Nav.Link
+                onClick={() => navigate("/miei-ordini")}
+                className="fw-semibold"
+                style={{
+                  cursor: "pointer",
+                  color: "#EED972",
+                  textShadow: "0 2px 4px rgba(0,0,0,0.8)",
+                }}
+              >
+                Accedi
+              </Nav.Link>
+            )}
+
             {isAdmin && (
               <Nav.Link
                 onClick={() => navigate("/admin/prodotti")}

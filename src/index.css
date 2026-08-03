@@ -264,4 +264,96 @@ footer, .custom-footer {
   box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.5);
 }
  
+   
+  /* ============================================
+   I MIEI ORDINI  */
  
+.my-ordini-wrapper {
+  background: radial-gradient(circle at 20% 0%, rgba(238, 217, 114, 0.08) 0%, transparent 50%),
+              linear-gradient(160deg, #8a5c4a 0%, #6d4838 100%);
+  color: #F4F1EA !important;
+  min-height: 100vh;
+  padding-top: 140px;
+  padding-bottom: 100px;
+}
+
+ 
+.titolo-ordini-linea {
+  width: 60px;
+  height: 2px;
+  margin-top: 14px;
+  background: linear-gradient(90deg, #E2D28E, transparent);
+}
+
+ 
+.riga-ordine-thumb {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid rgba(226, 210, 142, 0.25);
+  flex-shrink: 0;
+}
+
+ 
+.ordine-card {
+  position: relative;
+  overflow: hidden;
+}
+.ordine-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(226, 210, 142, 0.5), transparent);
+  pointer-events: none;
+}
+
+ 
+.box-login, .box-utente, .ordine-card, .box-vuoto {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+ 
+.login-box-filo-oro {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #E2D28E, transparent);
+}
+
+ 
+.login-box-icona {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 16px;
+  border-radius: 50%;
+  background: rgba(226, 210, 142, 0.12);
+  border: 1px solid rgba(226, 210, 142, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  color: #E2D28E;
+}
+
+ 
+.login-input-wrapper {
+  position: relative;
+}
+.login-input-icona {
+  position: absolute;
+  top: 50%;
+  left: 14px;
+  transform: translateY(-50%);
+  color: rgba(226, 210, 142, 0.6);
+  font-size: 0.9rem;
+  pointer-events: none;
+}
+.login-input-con-icona {
+  padding-left: 40px !important;
+}
