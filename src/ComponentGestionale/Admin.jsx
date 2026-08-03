@@ -14,7 +14,7 @@ const API_URL = "http://localhost:3001/api";
 const CATEGORIE = ["PANE", "DOLCI", "PIZZE"];
 
 const PLACEHOLDER_IMG =
-  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Crect width='80' height='80' fill='%23241d18'/%3E%3Ctext x='50%25' y='50%25' font-family='sans-serif' font-size='9' fill='%23EED972' text-anchor='middle' dy='.3em'%3EN/A%3C/text%3E%3C/svg%3E";
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Crect width='80' height='80' fill='%23e6ded5'/%3E%3Ctext x='50%25' y='50%25' font-family='sans-serif' font-size='9' fill='%238c6d46' text-anchor='middle' dy='.3em'%3EN/A%3C/text%3E%3C/svg%3E";
 
 const FORM_VUOTO = {
   nome: "",
@@ -24,6 +24,7 @@ const FORM_VUOTO = {
   quantità: "",
   disponibile: true,
 };
+
 function getAuthHeaders() {
   const token = localStorage.getItem("token");
   return token ? { Authorization: `Bearer ${token}` } : {};
@@ -124,10 +125,7 @@ function Admin() {
       headers: getAuthHeaders(),
     })
       .then((res) => {
-        if (!res.ok)
-          throw new Error(
-            "Errore durante l'eliminazione (verifica di essere loggata come admin)",
-          );
+        if (!res.ok) throw new Error("Errore durante l'eliminazione");
         setMessaggio(`"${nome}" eliminato.`);
         caricaProdotti();
       })
@@ -179,10 +177,7 @@ function Admin() {
 
     richiesta
       .then((res) => {
-        if (!res.ok)
-          throw new Error(
-            "Errore durante il salvataggio (verifica di essere loggata come admin)",
-          );
+        if (!res.ok) throw new Error("Errore durante il salvataggio");
         return res.json();
       })
       .then((prodottoSalvato) => caricaImmagine(prodottoSalvato.uuid))
@@ -198,55 +193,121 @@ function Admin() {
   return (
     <div
       style={{
-        backgroundColor: "#221915",
-        color: "#f8f9fa",
+        backgroundColor: "#f4f0eb",
+        backgroundImage:
+          "radial-gradient(circle at 50% 0%, #faf7f2 0%, #efe7de 70%)",
+        color: "#2c221e",
         minHeight: "100vh",
         paddingTop: "130px",
         paddingBottom: "80px",
       }}
     >
       <style>{`
+        .glass-card {
+          background: rgba(255, 255, 255, 0.75);
+          backdrop-filter: blur(20px);
+          -webkit-backdrop-filter: blur(20px);
+          border: 1px solid rgba(184, 153, 122, 0.25);
+          box-shadow: 0 16px 40px rgba(110, 85, 60, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+          border-radius: 20px;
+        }
+
+        .form-control, .form-select {
+          background-color: rgba(255, 255, 255, 0.9) !important;
+          border: 1px solid rgba(184, 153, 122, 0.35) !important;
+          color: #2c221e !important;
+          border-radius: 12px !important;
+          padding: 10px 14px;
+          transition: all 0.2s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+          background-color: #ffffff !important;
+          border-color: #c29b46 !important;
+          box-shadow: 0 0 0 4px rgba(194, 155, 70, 0.15) !important;
+        }
+
+        .form-control::file-selector-button {
+          background-color: rgba(194, 155, 70, 0.12);
+          color: #7d5e1d;
+          border: none;
+          padding: 6px 12px;
+          border-radius: 8px;
+          margin-right: 12px;
+          cursor: pointer;
+          transition: background 0.2s;
+        }
+        .form-control::file-selector-button:hover {
+          background-color: rgba(194, 155, 70, 0.22);
+        }
+
         .admin-table thead th {
           text-transform: uppercase;
           font-size: 0.75rem;
           letter-spacing: 1.5px;
-          color: #EED972;
+          color: #7d5e1d;
           font-weight: 700;
-          border-bottom: 2px solid rgba(238, 217, 114, 0.3) !important;
-          padding-top: 14px;
-          padding-bottom: 14px;
+          border-bottom: 2px solid rgba(184, 153, 122, 0.3) !important;
+          padding-top: 16px;
+          padding-bottom: 16px;
+          background: transparent !important;
         }
+
         .admin-table tbody tr {
-          transition: background-color 0.15s ease;
+          transition: background-color 0.2s ease;
         }
+
         .admin-table tbody tr:hover {
-          background-color: rgba(238, 217, 114, 0.05) !important;
+          background-color: rgba(194, 155, 70, 0.06) !important;
         }
+
         .admin-table td {
-          padding-top: 14px;
-          padding-bottom: 14px;
+          padding-top: 16px;
+          padding-bottom: 16px;
+          border-color: rgba(184, 153, 122, 0.15) !important;
+          color: #2c221e;
         }
       `}</style>
+
       <Container>
         <div className="d-flex justify-content-between align-items-center mb-4">
-          <h1
-            className="fw-bold text-white mb-0"
-            style={{ fontFamily: "'Roboto Serif', serif" }}
-          >
-            Gestione Prodotti
-          </h1>
+          <div>
+            <h1
+              className="fw-bold mb-1"
+              style={{
+                fontFamily: "'Roboto Serif', serif",
+                letterSpacing: "-0.5px",
+                color: "#2c221e",
+              }}
+            >
+              Gestione Prodotti
+            </h1>
+            <p className="text-secondary small mb-0">
+              Pannello di controllo amministrativo per il catalogo prodotti
+            </p>
+          </div>
           <Button
-            variant="outline-light"
+            variant="outline-dark"
             size="sm"
             onClick={handleLogout}
-            style={{ borderRadius: "10px" }}
+            style={{
+              borderRadius: "10px",
+              borderColor: "rgba(44,34,30,0.2)",
+              padding: "6px 16px",
+              color: "#2c221e",
+            }}
           >
             Esci
           </Button>
         </div>
 
         {errore && (
-          <Alert variant="danger" onClose={() => setErrore(null)} dismissible>
+          <Alert
+            variant="danger"
+            onClose={() => setErrore(null)}
+            dismissible
+            className="border-0 shadow-sm"
+          >
             {errore}
           </Alert>
         )}
@@ -255,38 +316,42 @@ function Admin() {
             variant="success"
             onClose={() => setMessaggio(null)}
             dismissible
+            className="border-0 shadow-sm"
           >
             {messaggio}
           </Alert>
         )}
 
-        <div
-          className="p-4 mb-5"
-          style={{
-            backgroundColor: "rgba(255, 255, 255, 0.045)",
-            backdropFilter: "blur(18px)",
-            WebkitBackdropFilter: "blur(18px)",
-            border: "1px solid rgba(255, 255, 255, 0.1)",
-            borderRadius: "18px",
-          }}
-        >
-          <h4 className="text-white mb-3">
-            {editingId ? "Modifica prodotto" : "Nuovo prodotto"}
-          </h4>
+        {/* Form Sezione Vetrata Chiara */}
+        <div className="glass-card p-4 p-md-5 mb-5">
+          <div className="d-flex align-items-center mb-4 pb-2 border-bottom border-secondary border-opacity-25">
+            <h4
+              className="mb-0 fw-semibold"
+              style={{ fontSize: "1.25rem", color: "#2c221e" }}
+            >
+              {editingId ? "Modifica prodotto" : "Aggiungi nuovo prodotto"}
+            </h4>
+          </div>
+
           <Form onSubmit={handleSubmit}>
-            <Row className="g-3">
+            <Row className="g-4">
               <Col md={6}>
-                <Form.Label className="text-light">Nome</Form.Label>
+                <Form.Label className="text-secondary small fw-bold text-uppercase tracking-wider">
+                  Nome Prodotto
+                </Form.Label>
                 <Form.Control
                   type="text"
                   name="nome"
+                  placeholder="Es. Croissant artigianale"
                   value={formData.nome}
                   onChange={handleChange}
                   required
                 />
               </Col>
               <Col md={6}>
-                <Form.Label className="text-light">Categoria</Form.Label>
+                <Form.Label className="text-secondary small fw-bold text-uppercase tracking-wider">
+                  Categoria
+                </Form.Label>
                 <Form.Select
                   name="categoria"
                   value={formData.categoria}
@@ -302,56 +367,69 @@ function Admin() {
               </Col>
 
               <Col xs={12}>
-                <Form.Label className="text-light">Descrizione</Form.Label>
+                <Form.Label className="text-secondary small fw-bold text-uppercase tracking-wider">
+                  Descrizione
+                </Form.Label>
                 <Form.Control
                   as="textarea"
-                  rows={2}
+                  rows={3}
                   name="descrizione"
+                  placeholder="Inserisci una descrizione dettagliata..."
                   value={formData.descrizione}
                   onChange={handleChange}
                 />
               </Col>
 
               <Col md={4}>
-                <Form.Label className="text-light">Prezzo (€)</Form.Label>
+                <Form.Label className="text-secondary small fw-bold text-uppercase tracking-wider">
+                  Prezzo (€)
+                </Form.Label>
                 <Form.Control
                   type="number"
                   step="0.01"
                   min="0"
                   name="prezzo"
+                  placeholder="0.00"
                   value={formData.prezzo}
                   onChange={handleChange}
                   required
                 />
               </Col>
               <Col md={4}>
-                <Form.Label className="text-light">
+                <Form.Label className="text-secondary small fw-bold text-uppercase tracking-wider">
                   Quantità in stock
                 </Form.Label>
                 <Form.Control
                   type="number"
                   min="0"
                   name="quantità"
+                  placeholder="0"
                   value={formData.quantità}
                   onChange={handleChange}
                   required
                 />
               </Col>
-              <Col md={4} className="d-flex align-items-end">
+              <Col md={4} className="d-flex align-items-center pt-md-4">
                 <Form.Check
                   type="checkbox"
                   id="disponibile"
                   name="disponibile"
-                  label="Disponibile"
+                  label="Disponibile per la vendita"
                   checked={formData.disponibile}
                   onChange={handleChange}
-                  className="text-light mb-2"
+                  className="text-dark custom-checkbox fw-medium"
+                  style={{ cursor: "pointer" }}
                 />
               </Col>
 
               <Col xs={12}>
-                <Form.Label className="text-light">
-                  Immagine {editingId && "(lascia vuoto per non modificarla)"}
+                <Form.Label className="text-secondary small fw-bold text-uppercase tracking-wider">
+                  Immagine{" "}
+                  {editingId && (
+                    <span className="text-muted fw-normal">
+                      (lascia vuoto per mantenere l'attuale)
+                    </span>
+                  )}
                 </Form.Label>
                 <Form.Control
                   type="file"
@@ -361,124 +439,123 @@ function Admin() {
               </Col>
             </Row>
 
-            <div className="d-flex gap-3 mt-4">
+            <div className="d-flex gap-3 mt-4 pt-2">
               <Button
                 type="submit"
                 disabled={submitting}
                 style={{
-                  backgroundColor: "#EED972",
-                  color: "#221915",
+                  backgroundColor: "#c29b46",
+                  color: "#ffffff",
                   border: "none",
-                  borderRadius: "10px",
+                  borderRadius: "12px",
                   fontWeight: 600,
+                  padding: "10px 24px",
+                  boxShadow: "0 4px 14px rgba(194, 155, 70, 0.3)",
                 }}
               >
                 {submitting
-                  ? "Salvataggio..."
+                  ? "Salvataggio in corso..."
                   : editingId
-                    ? "Salva modifiche"
-                    : "Crea prodotto"}
+                    ? "Salva Modifiche"
+                    : "Crea Prodotto"}
               </Button>
               {editingId && (
                 <Button
-                  variant="outline-light"
+                  variant="outline-secondary"
                   onClick={resetForm}
-                  style={{ borderRadius: "10px" }}
+                  style={{
+                    borderRadius: "12px",
+                    padding: "10px 20px",
+                  }}
                 >
-                  Annulla modifica
+                  Annulla
                 </Button>
               )}
             </div>
           </Form>
         </div>
 
+        {/* Tabella Prodotti Vetrata Chiara */}
         {caricamento ? (
           <div className="text-center py-5">
-            <Spinner animation="border" style={{ color: "#EED972" }} />
+            <Spinner animation="border" style={{ color: "#c29b46" }} />
           </div>
         ) : (
-          <div
-            style={{
-              backgroundColor: "rgba(255, 255, 255, 0.03)",
-              borderRadius: "14px",
-              overflow: "hidden",
-              border: "1px solid rgba(255,255,255,0.08)",
-            }}
-          >
+          <div className="glass-card overflow-hidden">
             <div style={{ overflowX: "auto" }}>
-              <Table
-                responsive
-                variant="dark"
-                className="admin-table mb-0 align-middle"
-              >
+              <Table responsive className="admin-table mb-0 align-middle">
                 <thead>
                   <tr>
-                    <th>Foto</th>
+                    <th className="ps-4">Foto</th>
                     <th>Nome</th>
                     <th>Categoria</th>
                     <th>Prezzo</th>
                     <th>Stock</th>
                     <th>Stato</th>
                     <th>In evidenza</th>
-                    <th></th>
+                    <th className="text-end pe-4">Azioni</th>
                   </tr>
                 </thead>
                 <tbody>
                   {prodotti.map((p) => (
                     <tr key={p.uuid}>
-                      <td>
+                      <td className="ps-4">
                         <img
                           src={p.immagine || PLACEHOLDER_IMG}
                           alt={p.nome}
                           style={{
-                            width: 50,
-                            height: 50,
+                            width: 52,
+                            height: 52,
                             objectFit: "cover",
-                            borderRadius: 8,
-                            border: "1px solid rgba(255,255,255,0.12)",
+                            borderRadius: 10,
+                            border: "1px solid rgba(184,153,122,0.3)",
+                            boxShadow: "0 4px 10px rgba(0,0,0,0.06)",
                           }}
                         />
                       </td>
-                      <td>{p.nome}</td>
-                      <td>{p.categoria}</td>
-                      <td>€ {p.prezzo.toFixed(2)}</td>
+                      <td className="fw-semibold text-dark">{p.nome}</td>
+                      <td>
+                        <span className="text-secondary small px-2 py-1 rounded bg-white bg-opacity-70 border border-secondary border-opacity-25">
+                          {p.categoria}
+                        </span>
+                      </td>
+                      <td className="fw-bold" style={{ color: "#9c7625" }}>
+                        € {p.prezzo.toFixed(2)}
+                      </td>
                       <td>{p.quantità}</td>
                       <td>
                         {p.disponibile ? (
                           <span
-                            className="px-2 py-1 rounded-pill fw-semibold small d-inline-block"
+                            className="px-2.5 py-1 rounded-pill fw-semibold small d-inline-block"
                             style={{
-                              backgroundColor: "rgba(143,209,158,0.15)",
-                              color: "#8fd19e",
-                              border: "1px solid rgba(143,209,158,0.35)",
+                              backgroundColor: "rgba(40,167,69,0.12)",
+                              color: "#1e7e34",
+                              border: "1px solid rgba(40,167,69,0.25)",
                             }}
                           >
                             Disponibile
                           </span>
                         ) : (
                           <span
-                            className="px-2 py-1 rounded-pill fw-semibold small d-inline-block"
+                            className="px-2.5 py-1 rounded-pill fw-semibold small d-inline-block"
                             style={{
-                              backgroundColor: "rgba(224,133,133,0.15)",
-                              color: "#e08585",
-                              border: "1px solid rgba(224,133,133,0.35)",
+                              backgroundColor: "rgba(220,53,69,0.12)",
+                              color: "#bd2130",
+                              border: "1px solid rgba(220,53,69,0.25)",
                             }}
                           >
                             Esaurito
                           </span>
                         )}
                       </td>
-                      <td
-                        className="text-end align-middle"
-                        style={{ whiteSpace: "nowrap" }}
-                      >
+                      <td>
                         {p.bestseller ? (
                           <span
-                            className="px-2 py-1 rounded-pill fw-semibold small d-inline-block"
+                            className="px-2.5 py-1 rounded-pill fw-semibold small d-inline-block"
                             style={{
-                              backgroundColor: "rgba(238,217,114,0.18)",
-                              color: "#EED972",
-                              border: "1px solid rgba(238,217,114,0.4)",
+                              backgroundColor: "rgba(194,155,70,0.18)",
+                              color: "#8a6616",
+                              border: "1px solid rgba(194,155,70,0.35)",
                             }}
                           >
                             ★ Bestseller
@@ -486,32 +563,34 @@ function Admin() {
                         ) : (
                           <Button
                             size="sm"
-                            variant="outline-warning"
+                            variant="outline-secondary"
                             onClick={() => handleSetBestseller(p.uuid)}
+                            style={{ fontSize: "0.8rem", borderRadius: "8px" }}
                           >
                             Imposta
                           </Button>
                         )}
                       </td>
                       <td
-                        className="text-end align-middle"
+                        className="text-end pe-4"
                         style={{ whiteSpace: "nowrap" }}
                       >
                         <Button
                           size="sm"
-                          variant="outline-light"
-                          className="me-2"
+                          variant="outline-dark"
+                          className="me-2 px-3"
                           onClick={() => handleEdit(p)}
+                          style={{ borderRadius: "8px", fontSize: "0.85rem" }}
                         >
-                          <i className="bi bi-pencil-fill me-1"></i>
                           Modifica
                         </Button>
                         <Button
                           size="sm"
                           variant="outline-danger"
+                          className="px-3"
                           onClick={() => handleDelete(p.uuid, p.nome)}
+                          style={{ borderRadius: "8px", fontSize: "0.85rem" }}
                         >
-                          <i className="bi bi-trash-fill me-1"></i>
                           Elimina
                         </Button>
                       </td>
