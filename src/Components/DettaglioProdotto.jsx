@@ -20,14 +20,14 @@ function DettaglioProdotto({ prodotto, show, onHide, onAddToCart }) {
       <div
         style={{
           position: "relative",
-          backgroundColor: "rgba(34, 25, 21, 0.92)",
+          backgroundColor: "rgba(93, 61, 51, 0.85)",
           backdropFilter: "blur(24px)",
           WebkitBackdropFilter: "blur(24px)",
           borderRadius: "24px",
           overflow: "hidden",
           border: "1px solid rgba(238, 217, 114, 0.25)",
           boxShadow:
-            "0 30px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(238,217,114,0.05)",
+            "0 30px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(238,217,114,0.05)",
         }}
       >
         <div
