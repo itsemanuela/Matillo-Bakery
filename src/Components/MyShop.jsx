@@ -4,13 +4,14 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
-
 import Offcanvas from "react-bootstrap/Offcanvas";
 import Spinner from "react-bootstrap/Spinner";
+import DettaglioProdotto from "./DettaglioProdotto";
 import { useNavigate } from "react-router-dom";
 
 const API_URL = "http://localhost:3001/api";
 
+// Placeholder
 const PLACEHOLDER_IMG =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%23241d18'/%3E%3Ctext x='50%25' y='50%25' font-family='sans-serif' font-size='18' fill='%23EED972' text-anchor='middle' dy='.3em'%3EFoto in arrivo%3C/text%3E%3C/svg%3E";
 
@@ -21,6 +22,7 @@ function Shop() {
   const [prodotti, setProdotti] = useState([]);
   const [caricamento, setCaricamento] = useState(true);
   const [errore, setErrore] = useState(null);
+  const [prodottoSelezionato, setProdottoSelezionato] = useState(null);
   const navigate = useNavigate();
 
   const handleCloseCart = () => setShowCart(false);
@@ -94,6 +96,25 @@ function Shop() {
           transform: translateY(-6px);
           box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
           border-color: rgba(238, 217, 114, 0.35);
+        }
+        .product-card-img-wrapper {
+          overflow: hidden;
+        }
+        .product-card-img {
+          transition: transform 0.5s ease;
+        }
+        .product-card:hover .product-card-img {
+          transform: scale(1.08);
+        }
+        .product-card-overlay {
+          position: absolute;
+          inset: 0;
+          background: rgba(0,0,0,0);
+          transition: background 0.3s ease;
+          pointer-events: none;
+        }
+        .product-card:hover .product-card-overlay {
+          background: rgba(0,0,0,0.05);
         }
         .category-btn { transition: transform 0.2s ease; }
         .category-btn:hover { transform: translateY(-2px); }
@@ -276,7 +297,6 @@ function Shop() {
           </div>
         )}
 
-        {/* Stato di errore */}
         {errore && (
           <div className="text-center py-5">
             <p className="text-light">
@@ -287,7 +307,7 @@ function Shop() {
 
         {!caricamento && !errore && (
           <>
-            {/* BESTSELLER — primo prodotto disponibile */}
+            {/* BESTSELLER  */}
             {bestseller && (
               <div
                 className="p-4 p-lg-5 mb-5 position-relative overflow-hidden"
@@ -314,37 +334,19 @@ function Shop() {
                 />
                 <Row className="align-items-center">
                   <Col lg={6} className="mb-4 mb-lg-0">
-                    <div className="mb-3 d-inline-block">
-                      <div
-                        style={{
-                          width: "70px",
-                          height: "2px",
-                          background:
-                            "linear-gradient(90deg, transparent, #EED972, transparent)",
-                          marginBottom: "10px",
-                        }}
-                      />
-                      <span
-                        className="d-block text-uppercase"
-                        style={{
-                          color: "#EED972",
-                          letterSpacing: "4px",
-                          fontSize: "0.8rem",
-                          fontWeight: 600,
-                        }}
-                      >
-                        Bestseller
-                      </span>
-                      <div
-                        style={{
-                          width: "70px",
-                          height: "2px",
-                          background:
-                            "linear-gradient(90deg, transparent, #EED972, transparent)",
-                          marginTop: "10px",
-                        }}
-                      />
-                    </div>
+                    <span
+                      className="mb-3 px-3 py-2 fw-semibold text-uppercase d-inline-block"
+                      style={{
+                        backgroundColor: "rgba(238, 217, 114, 0.12)",
+                        color: "#EED972",
+                        border: "1px solid rgba(238, 217, 114, 0.4)",
+                        letterSpacing: "1px",
+                        borderRadius: "8px",
+                        fontSize: "0.8rem",
+                      }}
+                    >
+                      <i className="bi bi-star-fill me-1"></i> Bestseller
+                    </span>
                     <h2
                       className="fw-bold mb-3 text-white"
                       style={{
@@ -391,7 +393,9 @@ function Shop() {
                         overflow: "hidden",
                         border: "1px solid rgba(255,255,255,0.1)",
                         boxShadow: "0 15px 40px rgba(0,0,0,0.3)",
+                        cursor: "pointer",
                       }}
+                      onClick={() => setProdottoSelezionato(bestseller)}
                     >
                       <img
                         src={bestseller.immagine || PLACEHOLDER_IMG}
@@ -410,7 +414,7 @@ function Shop() {
               </div>
             )}
 
-            {/* Filtri categoria — costruiti dinamicamente dalle categorie presenti nei prodotti */}
+            {/* Filtri categoria  */}
             <div className="d-flex justify-content-center gap-2 gap-md-3 mb-5 flex-wrap">
               {["TUTTI", ...new Set(prodotti.map((p) => p.categoria))].map(
                 (cat) => (
@@ -440,8 +444,13 @@ function Shop() {
             <Row className="g-4 mb-5">
               {filteredProducts.map((product) => (
                 <Col md={6} lg={4} key={product.uuid}>
-                  <Card className="h-100 border-0 text-white product-card">
+                  <Card
+                    className="h-100 border-0 text-white product-card"
+                    style={{ cursor: "pointer" }}
+                    onClick={() => setProdottoSelezionato(product)}
+                  >
                     <div
+                      className="product-card-img-wrapper"
                       style={{
                         height: "230px",
                         overflow: "hidden",
@@ -452,8 +461,10 @@ function Shop() {
                         variant="top"
                         src={product.immagine || PLACEHOLDER_IMG}
                         alt={product.nome}
+                        className="product-card-img"
                         style={{ height: "100%", objectFit: "cover" }}
                       />
+                      <div className="product-card-overlay"></div>
                       {!product.disponibile && (
                         <div
                           style={{
@@ -510,7 +521,10 @@ function Shop() {
                             color: "#221915",
                             borderRadius: "8px",
                           }}
-                          onClick={() => addToCart(product)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            addToCart(product);
+                          }}
                         >
                           {product.disponibile ? "Aggiungi" : "Esaurito"}
                         </Button>
@@ -529,6 +543,13 @@ function Shop() {
           </>
         )}
       </Container>
+
+      <DettaglioProdotto
+        prodotto={prodottoSelezionato}
+        show={!!prodottoSelezionato}
+        onHide={() => setProdottoSelezionato(null)}
+        onAddToCart={addToCart}
+      />
     </div>
   );
 }
