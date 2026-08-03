@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import "./App.css";
 import Hero from "./Components/Hero";
 import AboutSection from "./Components/AboutSection";
@@ -9,11 +9,16 @@ import Checkout from "./Components/Checkout";
 import Admin from "./ComponentGestionale/Admin";
 import RequiredAdmin from "./ComponentGestionale/RequiredAdmin";
 import Login from "./ComponentGestionale/Login";
+import AdminNavbar from "./ComponentGestionale/AdminNavbar";
+import AdminOrdini from "./ComponentGestionale/AdminOrdini";
 
-function App() {
+function AppContent() {
+  const location = useLocation();
+  const isAdminRoute = location.pathname.startsWith("/admin");
+
   return (
-    <BrowserRouter>
-      <MyNavbar />
+    <>
+      {isAdminRoute ? <AdminNavbar /> : <MyNavbar />}
 
       <Routes>
         <Route
@@ -36,9 +41,26 @@ function App() {
             </RequiredAdmin>
           }
         />
+
+        <Route
+          path="/admin/ordini"
+          element={
+            <RequiredAdmin>
+              <AdminOrdini />
+            </RequiredAdmin>
+          }
+        />
       </Routes>
 
-      <MyFooter />
+      {!isAdminRoute && <MyFooter />}
+    </>
+  );
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <AppContent />
     </BrowserRouter>
   );
 }

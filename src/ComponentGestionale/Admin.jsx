@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -8,7 +9,6 @@ import Table from "react-bootstrap/Table";
 import Spinner from "react-bootstrap/Spinner";
 import Alert from "react-bootstrap/Alert";
 
-// TODO: allineare con API_URL usato in Shop.jsx quando risolvi .env ovunque.
 const API_URL = "http://localhost:3001/api";
 
 const CATEGORIE = ["PANE", "DOLCI", "PIZZE"];
@@ -25,15 +25,13 @@ const FORM_VUOTO = {
   disponibile: true,
 };
 
-// Costruisce l'header Authorization con il token salvato al login.
-// Tutte le richieste che modificano dati (POST/PUT/DELETE) ne hanno
-// bisogno, dato che il backend ora richiede ruolo ADMIN su questi endpoint.
 function getAuthHeaders() {
   const token = localStorage.getItem("token");
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
 function Admin() {
+  const navigate = useNavigate();
   const [prodotti, setProdotti] = useState([]);
   const [caricamento, setCaricamento] = useState(true);
   const [errore, setErrore] = useState(null);
@@ -75,6 +73,12 @@ function Admin() {
 
   const handleFileChange = (e) => {
     setImageFile(e.target.files[0] || null);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("utente");
+    navigate("/login");
   };
 
   const resetForm = () => {
@@ -189,12 +193,22 @@ function Admin() {
       }}
     >
       <Container>
-        <h1
-          className="fw-bold mb-4 text-white"
-          style={{ fontFamily: "'Roboto Serif', serif" }}
-        >
-          Gestione Prodotti
-        </h1>
+        <div className="d-flex justify-content-between align-items-center mb-4">
+          <h1
+            className="fw-bold text-white mb-0"
+            style={{ fontFamily: "'Roboto Serif', serif" }}
+          >
+            Gestione Prodotti
+          </h1>
+          <Button
+            variant="outline-light"
+            size="sm"
+            onClick={handleLogout}
+            style={{ borderRadius: "10px" }}
+          >
+            Esci
+          </Button>
+        </div>
 
         {errore && (
           <Alert variant="danger" onClose={() => setErrore(null)} dismissible>

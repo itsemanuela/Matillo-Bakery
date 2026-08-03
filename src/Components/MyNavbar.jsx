@@ -7,6 +7,10 @@ import logoImg from "../assets/bgclear_transparent_original (2).png";
 function MyNavbar() {
   const navigate = useNavigate();
 
+  const utenteSalvato = localStorage.getItem("utente");
+  const utente = utenteSalvato ? JSON.parse(utenteSalvato) : null;
+  const isAdmin = utente?.ruolo === "ADMIN";
+
   return (
     <Navbar
       expand="lg"
@@ -96,6 +100,20 @@ function MyNavbar() {
             >
               Laboratori
             </Nav.Link>
+
+            {isAdmin && (
+              <Nav.Link
+                onClick={() => navigate("/admin/prodotti")}
+                className="fw-semibold"
+                style={{
+                  cursor: "pointer",
+                  color: "#EED972",
+                  textShadow: "0 2px 4px rgba(0,0,0,0.8)",
+                }}
+              >
+                Gestionale
+              </Nav.Link>
+            )}
           </Nav>
         </Navbar.Collapse>
       </Container>
