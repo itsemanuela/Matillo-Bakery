@@ -9,11 +9,12 @@ import Checkout from "./Components/Checkout";
 import Admin from "./ComponentGestionale/Admin";
 import RequiredAdmin from "./ComponentGestionale/RequiredAdmin";
 import Login from "./ComponentGestionale/Login";
-
+import MyOrdini from "./Components/MyOrdini";
 import AdminNavbar from "./ComponentGestionale/AdminNavbar";
 import AdminOrdini from "./ComponentGestionale/AdminOrdini";
 import AdminShopPreview from "./ComponentGestionale/AdminShopPreview";
-import MyOrdini from "./Components/MyOrdini";
+import AdminLaboratori from "./ComponentGestionale/AdminLaboratori";
+import Laboratori from "./Components/Laboratori";
 
 function AppContent() {
   const location = useLocation();
@@ -62,6 +63,15 @@ function AppContent() {
             </RequiredAdmin>
           }
         />
+        <Route
+          path="/admin/laboratori"
+          element={
+            <RequiredAdmin>
+              <AdminLaboratori />
+            </RequiredAdmin>
+          }
+        />
+        <Route path="/laboratori" element={<Laboratori />} />
       </Routes>
 
       {!isAdminRoute && <MyFooter />}

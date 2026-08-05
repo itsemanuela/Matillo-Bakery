@@ -65,6 +65,12 @@ function AdminNavbar() {
             >
               Anteprima Shop
             </Nav.Link>
+            <Nav.Link
+              onClick={() => navigate("/admin/laboratori")}
+              style={linkStyle("/admin/laboratori")}
+            >
+              Laboratori
+            </Nav.Link>
 
             <Button
               variant="outline-light"

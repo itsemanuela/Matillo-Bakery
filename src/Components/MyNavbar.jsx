@@ -71,16 +71,6 @@ function MyNavbar() {
               Shop
             </Nav.Link>
             <Nav.Link
-              onClick={() => navigate("/ricette")}
-              className="text-white fw-semibold"
-              style={{
-                cursor: "pointer",
-                textShadow: "0 2px 4px rgba(0,0,0,0.8)",
-              }}
-            >
-              Ricette
-            </Nav.Link>
-            <Nav.Link
               onClick={() => navigate("/catering")}
               className="text-white fw-semibold"
               style={{
