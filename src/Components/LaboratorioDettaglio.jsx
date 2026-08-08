@@ -7,6 +7,8 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Spinner from "react-bootstrap/Spinner";
 import Alert from "react-bootstrap/Alert";
+import Modal from "react-bootstrap/Modal";
+import Carousel from "react-bootstrap/Carousel";
 
 const API_URL = "http://localhost:3001/api";
 
@@ -51,6 +53,10 @@ function LaboratorioDettaglio() {
   const [caricamento, setCaricamento] = useState(true);
   const [errore, setErrore] = useState(null);
   const [fotoAttiva, setFotoAttiva] = useState(0);
+
+  // Stati per la gestione della modale con il carosello
+  const [showModal, setShowModal] = useState(false);
+  const [indiceModal, setIndiceModal] = useState(0);
 
   const [utenteLoggato] = useState(() => {
     const salvato = localStorage.getItem("utente");
@@ -253,7 +259,7 @@ function LaboratorioDettaglio() {
         <Container className="mt-5">
           <SezioneCard>
             <span
-              className="d-block mb-4 text-uppercase"
+              className="d-block mb-3 text-uppercase"
               style={{
                 color: "#EED972",
                 fontSize: "0.75rem",
@@ -264,18 +270,22 @@ function LaboratorioDettaglio() {
             </span>
             <Row className="g-3">
               {tutteLeFoto.map((foto, i) => (
-                <Col md={4} key={i}>
+                <Col xs={6} md={3} key={i}>
                   <div
-                    onClick={() => setFotoAttiva(i)}
+                    onClick={() => {
+                      setFotoAttiva(i);
+                      setIndiceModal(i);
+                      setShowModal(true);
+                    }}
                     style={{
-                      borderRadius: "14px",
+                      borderRadius: "12px",
                       overflow: "hidden",
                       cursor: "pointer",
                       border:
                         i === fotoAttiva
                           ? "2px solid #EED972"
                           : "1px solid rgba(255,255,255,0.15)",
-                      boxShadow: "0 15px 35px rgba(0,0,0,0.35)",
+                      boxShadow: "0 10px 25px rgba(0,0,0,0.3)",
                       transition: "transform 0.3s ease",
                     }}
                     className="galleria-foto-item"
@@ -285,7 +295,7 @@ function LaboratorioDettaglio() {
                       alt=""
                       style={{
                         width: "100%",
-                        height: "220px",
+                        height: "150px",
                         objectFit: "cover",
                         display: "block",
                       }}
@@ -297,6 +307,59 @@ function LaboratorioDettaglio() {
           </SezioneCard>
         </Container>
       )}
+
+      {/* MODALE CON CAROSELLO */}
+      <Modal
+        show={showModal}
+        onHide={() => setShowModal(false)}
+        centered
+        size="lg"
+        contentClassName="bg-transparent border-0"
+      >
+        <Modal.Body className="p-0 position-relative">
+          <Button
+            variant="dark"
+            onClick={() => setShowModal(false)}
+            style={{
+              position: "absolute",
+              top: "-40px",
+              right: "0",
+              zIndex: 10,
+              borderRadius: "50%",
+              width: "35px",
+              height: "35px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              border: "1px solid rgba(255,255,255,0.3)",
+            }}
+          >
+            <i className="bi bi-x-lg"></i>
+          </Button>
+
+          <Carousel
+            activeIndex={indiceModal}
+            onSelect={(selectedIndex) => setIndiceModal(selectedIndex)}
+            interval={null}
+            indicators={tutteLeFoto.length > 1}
+          >
+            {tutteLeFoto.map((foto, idx) => (
+              <Carousel.Item key={idx}>
+                <img
+                  className="d-block w-100 rounded-4 shadow-lg"
+                  src={foto}
+                  alt={`Slide ${idx + 1}`}
+                  style={{
+                    maxHeight: "75vh",
+                    objectFit: "contain",
+                    backgroundColor: "rgba(0, 0, 0, 0.85)",
+                  }}
+                />
+              </Carousel.Item>
+            ))}
+          </Carousel>
+        </Modal.Body>
+      </Modal>
 
       <Container className="mt-5">
         <Row className="g-5">

@@ -8,19 +8,43 @@ import Alert from "react-bootstrap/Alert";
 import Spinner from "react-bootstrap/Spinner";
 import Badge from "react-bootstrap/Badge";
 import Modal from "react-bootstrap/Modal";
+import Form from "react-bootstrap/Form";
 
 function AdminPrenotazioni() {
   const [prenotazioni, setPrenotazioni] = useState([]);
+  const [laboratori, setLaboratori] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Stati per i filtri
+  const [laboratorioFiltro, setLaboratorioFiltro] = useState("");
+  const [statoFiltro, setStatoFiltro] = useState("");
 
   const [showModal, setShowModal] = useState(false);
   const [selectedPrenotazioneUuid, setSelectedPrenotazioneUuid] =
     useState(null);
 
+  // 1. Carica la lista dei laboratori per popolare il menu a tendina del filtro
+  useEffect(() => {
+    fetch("http://localhost:3001/api/laboratori", {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => setLaboratori(data))
+      .catch((err) => console.error("Errore caricamento laboratori:", err));
+  }, []);
+
+  // 2. Funzione per recuperare le prenotazioni applicando i filtri scelti
   const fetchPrenotazioni = () => {
     setLoading(true);
-    fetch("http://localhost:3001/api/prenotazioni", {
+
+    const params = new URLSearchParams();
+    if (laboratorioFiltro) params.append("laboratorioId", laboratorioFiltro);
+    if (statoFiltro) params.append("stato", statoFiltro);
+
+    fetch(`http://localhost:3001/api/prenotazioni?${params.toString()}`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
@@ -39,9 +63,10 @@ function AdminPrenotazioni() {
       });
   };
 
+  // Ricarica automaticamente ogni volta che cambia uno dei due filtri
   useEffect(() => {
     fetchPrenotazioni();
-  }, []);
+  }, [laboratorioFiltro, statoFiltro]);
 
   const handleOpenModal = (uuid) => {
     setSelectedPrenotazioneUuid(uuid);
@@ -83,15 +108,6 @@ function AdminPrenotazioni() {
       });
   };
 
-  if (loading) {
-    return (
-      <Container className="text-center my-5">
-        <Spinner animation="border" style={{ color: "#EED972" }} />
-        <p className="mt-2 text-muted">Caricamento prenotazioni in corso...</p>
-      </Container>
-    );
-  }
-
   if (error) {
     return (
       <Container className="my-5">
@@ -128,9 +144,67 @@ function AdminPrenotazioni() {
           </Badge>
         </div>
 
-        {prenotazioni.length === 0 ? (
+        {/* SEZIONE FILTRI */}
+        <div
+          className="p-4 rounded-4 mb-4 shadow-sm"
+          style={{
+            backgroundColor: "#ffffff",
+            border: "1px solid rgba(28, 22, 19, 0.1)",
+          }}
+        >
+          <Row className="g-3">
+            <Col md={6}>
+              <Form.Group>
+                <Form.Label className="small fw-semibold text-muted">
+                  Filtra per Laboratorio
+                </Form.Label>
+                <Form.Select
+                  value={laboratorioFiltro}
+                  onChange={(e) => setLaboratorioFiltro(e.target.value)}
+                  style={{ borderRadius: "10px" }}
+                >
+                  <option value="">Tutti i laboratori</option>
+                  {laboratori.map((lab) => {
+                    const labId = lab.uuid || lab.id;
+                    return (
+                      <option key={labId} value={labId}>
+                        {lab.nome}
+                      </option>
+                    );
+                  })}
+                </Form.Select>
+              </Form.Group>
+            </Col>
+
+            <Col md={6}>
+              <Form.Group>
+                <Form.Label className="small fw-semibold text-muted">
+                  Filtra per Stato
+                </Form.Label>
+                <Form.Select
+                  value={statoFiltro}
+                  onChange={(e) => setStatoFiltro(e.target.value)}
+                  style={{ borderRadius: "10px" }}
+                >
+                  <option value="">Tutti gli stati</option>
+                  <option value="CONFERMATA">Confermate / Attive</option>
+                  <option value="CANCELLATA">Cancellate</option>
+                </Form.Select>
+              </Form.Group>
+            </Col>
+          </Row>
+        </div>
+
+        {loading ? (
+          <Container className="text-center my-5">
+            <Spinner animation="border" style={{ color: "#EED972" }} />
+            <p className="mt-2 text-muted">
+              Caricamento prenotazioni in corso...
+            </p>
+          </Container>
+        ) : prenotazioni.length === 0 ? (
           <Alert variant="info" className="text-center py-4">
-            Nessuna prenotazione registrata al momento.
+            Nessuna prenotazione trovata con i filtri selezionati.
           </Alert>
         ) : (
           <Row xs={1} md={2} lg={3} className="g-4">
