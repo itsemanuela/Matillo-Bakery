@@ -87,12 +87,23 @@ function LaboratorioDettaglio() {
     e.preventDefault();
     if (!laboratorio) return;
 
+    const token = localStorage.getItem("token");
+
+    // Blocco immediato se l'utente non è loggato
+    if (!token) {
+      setPrenotazioneErrore(
+        "Devi effettuare l'accesso per poter prenotare un laboratorio.",
+      );
+      return;
+    }
+
     setPrenotazioneErrore(null);
     setInvioInCorso(true);
 
-    const token = localStorage.getItem("token");
-    const headers = { "Content-Type": "application/json" };
-    if (token) headers["Authorization"] = `Bearer ${token}`;
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    };
 
     fetch(`${API_URL}/prenotazioni`, {
       method: "POST",
@@ -184,7 +195,6 @@ function LaboratorioDettaglio() {
         paddingBottom: "100px",
       }}
     >
-      {/* Header pulito senza immagine a tutto schermo pesante */}
       <div
         style={{
           position: "relative",
@@ -228,7 +238,6 @@ function LaboratorioDettaglio() {
       <Container className="mt-4">
         <Row className="g-5">
           <Col lg={7}>
-            {/* Sezione Galleria Fotografica Dedicata */}
             <SezioneCard>
               <span
                 className="d-block mb-3 text-uppercase"
@@ -241,7 +250,6 @@ function LaboratorioDettaglio() {
                 Galleria Fotografica
               </span>
 
-              {/* Antepresa/Foto Principale Selezionata */}
               <div
                 className="mb-3 overflow-hidden position-relative"
                 style={{
@@ -262,7 +270,6 @@ function LaboratorioDettaglio() {
                 />
               </div>
 
-              {/* Griglia delle Miniature */}
               {tutteLeFoto.length > 1 && (
                 <Row className="g-2">
                   {tutteLeFoto.map((foto, i) => (
@@ -559,7 +566,36 @@ function LaboratorioDettaglio() {
                 ) : (
                   <Form onSubmit={handlePrenota}>
                     {prenotazioneErrore && (
-                      <Alert variant="danger">{prenotazioneErrore}</Alert>
+                      <Alert
+                        variant="danger"
+                        className="d-flex flex-column gap-2"
+                      >
+                        <span>{prenotazioneErrore}</span>
+                        {!localStorage.getItem("token") && (
+                          <Button
+                            size="sm"
+                            onClick={() => navigate("/miei-ordini")}
+                            className="align-self-start fw-bold mt-2 border-0 px-3 py-2"
+                            style={{
+                              backgroundColor: "rgba(238, 217, 114, 0.15)",
+                              color: "#da9cb6",
+                              borderRadius: "8px",
+                              border: "1px solid rgba(238, 217, 114, 0.4)",
+                              transition: "all 0.2s ease-in-out",
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor =
+                                "rgba(238, 217, 114, 0.25)";
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor =
+                                "rgba(238, 217, 114, 0.15)";
+                            }}
+                          >
+                            Accedi o Registrati →
+                          </Button>
+                        )}
+                      </Alert>
                     )}
 
                     <Form.Group className="mb-3">

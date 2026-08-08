@@ -14,8 +14,10 @@ import AdminNavbar from "./ComponentGestionale/AdminNavbar";
 import AdminOrdini from "./ComponentGestionale/AdminOrdini";
 import AdminShopPreview from "./ComponentGestionale/AdminShopPreview";
 import AdminLaboratori from "./ComponentGestionale/AdminLaboratori";
+import AdminPrenotazioni from "./ComponentGestionale/AdminPrenotazioni";
 import Laboratori from "./Components/Laboratori";
 import LaboratorioDettaglio from "./Components/LaboratorioDettaglio";
+import LeMiePrenotazioni from "./Components/LeMiePrenotazioni";
 
 function AppContent() {
   const location = useLocation();
@@ -37,8 +39,16 @@ function AppContent() {
         />
         <Route path="/shop" element={<MyShop />} />
         <Route path="/checkout" element={<Checkout />} />
+
+        {/* Rotta per il login generale / clienti */}
         <Route path="/login" element={<Login />} />
+
+        {/* Rotta dedicata al login admin (opzionale se vuoi separarlo) */}
+        <Route path="/admin/login" element={<Login />} />
+
         <Route path="/miei-ordini" element={<MyOrdini />} />
+        <Route path="/miei-laboratori" element={<LeMiePrenotazioni />} />
+
         <Route
           path="/admin/prodotti"
           element={
@@ -47,7 +57,6 @@ function AppContent() {
             </RequiredAdmin>
           }
         />
-
         <Route
           path="/admin/ordini"
           element={
@@ -72,6 +81,15 @@ function AppContent() {
             </RequiredAdmin>
           }
         />
+        <Route
+          path="/admin/prenotazioni"
+          element={
+            <RequiredAdmin>
+              <AdminPrenotazioni />
+            </RequiredAdmin>
+          }
+        />
+
         <Route path="/laboratori" element={<Laboratori />} />
         <Route path="/laboratori/:id" element={<LaboratorioDettaglio />} />
       </Routes>

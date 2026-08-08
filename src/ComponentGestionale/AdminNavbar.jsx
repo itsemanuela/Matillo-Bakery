@@ -60,16 +60,22 @@ function AdminNavbar() {
               Ordini
             </Nav.Link>
             <Nav.Link
-              onClick={() => navigate("/admin/shop-preview")}
-              style={linkStyle("/admin/shop-preview")}
-            >
-              Anteprima Shop
-            </Nav.Link>
-            <Nav.Link
               onClick={() => navigate("/admin/laboratori")}
               style={linkStyle("/admin/laboratori")}
             >
               Laboratori
+            </Nav.Link>
+            <Nav.Link
+              onClick={() => navigate("/admin/prenotazioni")}
+              style={linkStyle("/admin/prenotazioni")}
+            >
+              Prenotazioni
+            </Nav.Link>
+            <Nav.Link
+              onClick={() => navigate("/admin/shop-preview")}
+              style={linkStyle("/admin/shop-preview")}
+            >
+              Anteprima Shop
             </Nav.Link>
 
             <Button

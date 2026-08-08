@@ -91,17 +91,44 @@ function MyNavbar() {
               Laboratori
             </Nav.Link>
 
-            {utente ? (
+            {/* Visibile solo se l'utente è loggato */}
+            {utente && (
               <Nav.Link
-                onClick={() => navigate("/miei-ordini")}
+                onClick={() => navigate("/miei-laboratori")}
                 className="text-white fw-semibold"
                 style={{
                   cursor: "pointer",
                   textShadow: "0 2px 4px rgba(0,0,0,0.8)",
                 }}
               >
-                I Miei Ordini
+                I Miei Laboratori
               </Nav.Link>
+            )}
+
+            {/* Link visibili se l'utente è loggato (Ordini e Prenotazioni) o link Accedi */}
+            {utente ? (
+              <>
+                <Nav.Link
+                  onClick={() => navigate("/miei-ordini")}
+                  className="text-white fw-semibold"
+                  style={{
+                    cursor: "pointer",
+                    textShadow: "0 2px 4px rgba(0,0,0,0.8)",
+                  }}
+                >
+                  I Miei Ordini
+                </Nav.Link>
+                <Nav.Link
+                  onClick={() => navigate("/miei-ordini")}
+                  className="text-white fw-semibold"
+                  style={{
+                    cursor: "pointer",
+                    textShadow: "0 2px 4px rgba(0,0,0,0.8)",
+                  }}
+                >
+                  Le Mie Prenotazioni
+                </Nav.Link>
+              </>
             ) : (
               <Nav.Link
                 onClick={() => navigate("/miei-ordini")}

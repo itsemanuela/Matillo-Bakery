@@ -29,8 +29,15 @@ function MyOrdini() {
     return salvato ? JSON.parse(salvato) : null;
   });
 
-  const [loginData, setLoginData] = useState({ email: "", password: "" });
-  const [loginErrore, setLoginErrore] = useState(null);
+  const [isRegistrazione, setIsRegistrazione] = useState(false);
+  const [authData, setAuthData] = useState({
+    nome: "",
+    cognome: "",
+    email: "",
+    password: "",
+  });
+  const [authErrore, setAuthErrore] = useState(null);
+  const [authSuccesso, setAuthSuccesso] = useState(null);
 
   const [ordini, setOrdini] = useState([]);
   const [caricamento, setCaricamento] = useState(false);
@@ -66,35 +73,62 @@ function MyOrdini() {
     caricaMieiOrdini(false);
   }, [utenteLoggato]);
 
-  const handleLoginChange = (e) => {
-    setLoginData({ ...loginData, [e.target.name]: e.target.value });
+  const handleAuthChange = (e) => {
+    setAuthData({ ...authData, [e.target.name]: e.target.value });
   };
 
-  const handleLoginSubmit = (e) => {
+  const handleAuthSubmit = (e) => {
     e.preventDefault();
-    setLoginErrore(null);
+    setAuthErrore(null);
+    setAuthSuccesso(null);
 
-    fetch(`${API_URL}/auth/login`, {
+    // Registrazione punta a /utenti (come da UserController), login a /auth/login
+    const endpoint = isRegistrazione ? "/utenti" : "/auth/login";
+
+    fetch(`${API_URL}${endpoint}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(loginData),
+      body: JSON.stringify(authData),
     })
-      .then((res) => {
-        if (!res.ok) throw new Error("Email o password non corretti");
-        return res.json();
+      .then(async (res) => {
+        const text = await res.text();
+        let data = null;
+        try {
+          data = text ? JSON.parse(text) : null;
+        } catch {
+          data = { message: text };
+        }
+
+        if (!res.ok) {
+          throw new Error(
+            data?.message ||
+              (isRegistrazione
+                ? "Errore durante la registrazione"
+                : "Email o password non corretti"),
+          );
+        }
+        return data;
       })
       .then((data) => {
-        localStorage.setItem("token", data.token);
-        const utente = {
-          uuid: data.uuid,
-          nome: data.nome,
-          email: data.email,
-          ruolo: data.ruolo,
-        };
-        localStorage.setItem("utente", JSON.stringify(utente));
-        setUtenteLoggato(utente);
+        if (isRegistrazione) {
+          setAuthSuccesso(
+            "Registrazione completata! Ora puoi effettuare l'accesso.",
+          );
+          setIsRegistrazione(false);
+          setAuthData({ nome: "", cognome: "", email: "", password: "" });
+        } else {
+          localStorage.setItem("token", data.token || data.accessToken);
+          const utente = {
+            uuid: data.uuid || data.id,
+            nome: data.nome,
+            email: data.email,
+            ruolo: data.ruolo,
+          };
+          localStorage.setItem("utente", JSON.stringify(utente));
+          setUtenteLoggato(utente);
+        }
       })
-      .catch((err) => setLoginErrore(err.message));
+      .catch((err) => setAuthErrore(err.message));
   };
 
   const handleLogout = () => {
@@ -163,13 +197,17 @@ function MyOrdini() {
               letterSpacing: "2.5px",
             }}
           >
-            Storico e Gestione
+            {utenteLoggato ? "Storico e Gestione" : "Autenticazione"}
           </span>
           <h1
             className="fw-bold text-white mt-1 display-5"
             style={{ fontFamily: "'Roboto Serif', serif" }}
           >
-            I Miei Ordini
+            {utenteLoggato
+              ? "I Miei Ordini"
+              : isRegistrazione
+                ? "Crea un Account"
+                : "Benvenuto in Matillo"}
           </h1>
           <div className="titolo-ordini-linea" />
         </div>
@@ -192,61 +230,106 @@ function MyOrdini() {
             <div className="login-box-filo-oro" />
 
             <div className="text-center mb-4">
-              <div className="login-box-icona">
-                <i className="bi bi-lock-fill"></i>
+              <div
+                className="login-box-icona mb-2"
+                style={{ color: "#D4C37E", fontSize: "24px" }}
+              >
+                <i
+                  className={
+                    isRegistrazione
+                      ? "bi bi-person-plus-fill"
+                      : "bi bi-lock-fill"
+                  }
+                ></i>
               </div>
               <h4
                 className="text-white fw-bold mb-1"
                 style={{ fontFamily: "'Roboto Serif', serif" }}
               >
-                Area Riservata
+                {isRegistrazione ? "Registrazione" : "Area Riservata"}
               </h4>
               <p className="small text-light opacity-75 mb-0">
-                Accedi per consultare i tuoi ordini
+                {isRegistrazione
+                  ? "Inserisci i tuoi dati per registrarti"
+                  : "Accedi per consultare i tuoi ordini"}
               </p>
             </div>
 
-            {loginErrore && (
+            {authErrore && (
               <Alert variant="danger" className="py-2 small">
-                {loginErrore}
+                {authErrore}
               </Alert>
             )}
-            <Form onSubmit={handleLoginSubmit}>
+            {authSuccesso && (
+              <Alert variant="success" className="py-2 small">
+                {authSuccesso}
+              </Alert>
+            )}
+
+            <Form onSubmit={handleAuthSubmit}>
+              {isRegistrazione && (
+                <>
+                  <Form.Group className="mb-3">
+                    <Form.Label className="small text-light opacity-75">
+                      Nome
+                    </Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="nome"
+                      value={authData.nome}
+                      onChange={handleAuthChange}
+                      required
+                      className="checkout-input bg-dark text-light border-secondary"
+                    />
+                  </Form.Group>
+
+                  <Form.Group className="mb-3">
+                    <Form.Label className="small text-light opacity-75">
+                      Cognome
+                    </Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="cognome"
+                      value={authData.cognome}
+                      onChange={handleAuthChange}
+                      required
+                      className="checkout-input bg-dark text-light border-secondary"
+                    />
+                  </Form.Group>
+                </>
+              )}
+
               <Form.Group className="mb-3">
                 <Form.Label className="small text-light opacity-75">
                   Email
                 </Form.Label>
-                <div className="login-input-wrapper">
-                  <i className="bi bi-envelope-fill login-input-icona"></i>
-                  <Form.Control
-                    type="email"
-                    name="email"
-                    value={loginData.email}
-                    onChange={handleLoginChange}
-                    required
-                    className="checkout-input login-input-con-icona"
-                  />
-                </div>
+                <Form.Control
+                  type="email"
+                  name="email"
+                  value={authData.email}
+                  onChange={handleAuthChange}
+                  required
+                  className="checkout-input bg-dark text-light border-secondary"
+                />
               </Form.Group>
+
               <Form.Group className="mb-4">
                 <Form.Label className="small text-light opacity-75">
                   Password
                 </Form.Label>
-                <div className="login-input-wrapper">
-                  <i className="bi bi-key-fill login-input-icona"></i>
-                  <Form.Control
-                    type="password"
-                    name="password"
-                    value={loginData.password}
-                    onChange={handleLoginChange}
-                    required
-                    className="checkout-input login-input-con-icona"
-                  />
-                </div>
+                <Form.Control
+                  type="password"
+                  name="password"
+                  value={authData.password}
+                  onChange={handleAuthChange}
+                  required
+                  className="checkout-input bg-dark text-light border-secondary"
+                />
               </Form.Group>
+
               <Button
                 type="submit"
-                className="w-100 fw-bold border-0 py-3 shadow-sm"
+                className="w-100 fw-bold border-0 py-3 shadow-sm mb-3"
                 style={{
                   backgroundColor: "#D4C37E",
                   color: "#1D1512",
@@ -254,8 +337,25 @@ function MyOrdini() {
                   transition: "all 0.2s ease",
                 }}
               >
-                Accedi ai tuoi ordini
+                {isRegistrazione ? "Registrati" : "Accedi ai tuoi ordini"}
               </Button>
+
+              <div className="text-center">
+                <button
+                  type="button"
+                  className="btn btn-link text-decoration-none small p-0"
+                  style={{ color: "#D4C37E" }}
+                  onClick={() => {
+                    setIsRegistrazione(!isRegistrazione);
+                    setAuthErrore(null);
+                    setAuthSuccesso(null);
+                  }}
+                >
+                  {isRegistrazione
+                    ? "Hai già un account? Accedi"
+                    : "Non hai un account? Registrati"}
+                </button>
+              </div>
             </Form>
           </div>
         ) : (
