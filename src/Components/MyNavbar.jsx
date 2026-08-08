@@ -1,160 +1,119 @@
-import Navbar from "react-bootstrap/Navbar";
-import Nav from "react-bootstrap/Nav";
+import { useState, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import Container from "react-bootstrap/Container";
-import { useNavigate } from "react-router-dom";
-import logoImg from "../assets/bgclear_transparent_original (2).png";
+import Nav from "react-bootstrap/Nav";
+import Navbar from "react-bootstrap/Navbar";
+import Button from "react-bootstrap/Button";
+import logoMatillo from "../assets/bgclear_transparent_original (2).png";
 
 function MyNavbar() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const [utente, setUtente] = useState(null);
 
-  const utenteSalvato = localStorage.getItem("utente");
-  const utente = utenteSalvato ? JSON.parse(utenteSalvato) : null;
-  const isAdmin = utente?.ruolo === "ADMIN";
+  useEffect(() => {
+    const utenteSalvato = localStorage.getItem("utente");
+    if (utenteSalvato) {
+      try {
+        setUtente(JSON.parse(utenteSalvato));
+      } catch (e) {
+        setUtente(null);
+      }
+    } else {
+      setUtente(null);
+    }
+  }, [location]);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("utente");
+    setUtente(null);
+    navigate("/");
+    window.location.reload();
+  };
+
+  const nomeUtente = utente?.nome
+    ? utente.nome.charAt(0).toUpperCase() + utente.nome.slice(1)
+    : "";
+  const inizialeNome = utente?.nome ? utente.nome.charAt(0).toUpperCase() : "";
 
   return (
     <Navbar
       expand="lg"
-      variant="dark"
-      style={{
-        position: "absolute",
-        top: 0,
-        left: 0,
-        width: "100%",
-        backgroundColor: "transparent",
-        zIndex: 1000,
-      }}
-      className="py-3"
+      fixed="top"
+      className="custom-navbar bg-transparent navbar-dark py-3"
     >
-      <Container className="d-flex justify-content-between align-items-center">
-        <Navbar.Brand
-          onClick={() => navigate("/")}
-          style={{ cursor: "pointer" }}
-        >
+      <Container fluid className="px-4">
+        {/* Logo a sinistra */}
+        <Navbar.Brand as={Link} to="/" className="p-0">
           <img
-            src={logoImg}
+            src={logoMatillo}
             alt="Antico Forno Matillo"
-            style={{ height: "65px" }}
+            height="45"
             className="d-inline-block align-top"
           />
         </Navbar.Brand>
 
-        <Navbar.Toggle
-          aria-controls="basic-navbar-nav"
-          className="border-0 shadow-none text-white"
-        />
+        <Navbar.Toggle aria-controls="basic-navbar-nav" />
 
-        <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
-          <Nav
-            className="align-items-lg-center gap-lg-4 text-center p-3 p-lg-0 mt-3 mt-lg-0 rounded"
-            style={{
-              backgroundColor: "transparent",
-            }}
-          >
-            <Nav.Link
-              onClick={() => navigate("/")}
-              className="text-white fw-semibold"
-              style={{
-                cursor: "pointer",
-                textShadow: "0 2px 4px rgba(0,0,0,0.8)",
-              }}
-            >
-              Home
-            </Nav.Link>
-            <Nav.Link
-              onClick={() => navigate("/shop")}
-              className="text-white fw-semibold"
-              style={{
-                cursor: "pointer",
-                textShadow: "0 2px 4px rgba(0,0,0,0.8)",
-              }}
-            >
-              Shop
-            </Nav.Link>
-            <Nav.Link
-              onClick={() => navigate("/catering")}
-              className="text-white fw-semibold"
-              style={{
-                cursor: "pointer",
-                textShadow: "0 2px 4px rgba(0,0,0,0.8)",
-              }}
-            >
-              Catering
-            </Nav.Link>
-            <Nav.Link
-              onClick={() => navigate("/laboratori")}
-              className="text-white fw-semibold"
-              style={{
-                cursor: "pointer",
-                textShadow: "0 2px 4px rgba(0,0,0,0.8)",
-              }}
-            >
-              Laboratori
-            </Nav.Link>
+        <Navbar.Collapse id="basic-navbar-nav">
+          {/* Spaziatore vuoto al centro per spingere tutto a destra */}
+          <div className="me-auto"></div>
 
-            {/* Visibile solo se l'utente è loggato */}
-            {utente && (
-              <Nav.Link
-                onClick={() => navigate("/miei-laboratori")}
-                className="text-white fw-semibold"
-                style={{
-                  cursor: "pointer",
-                  textShadow: "0 2px 4px rgba(0,0,0,0.8)",
-                }}
-              >
-                I Miei Laboratori
+          {/* Blocco unico a destra: Link di navigazione + Area Utente / Accedi */}
+          <Nav className="align-items-center gap-4">
+            <div className="d-flex align-items-center gap-3">
+              <Nav.Link as={Link} to="/">
+                Home
               </Nav.Link>
-            )}
+              <Nav.Link as={Link} to="/shop">
+                Shop
+              </Nav.Link>
+              <Nav.Link as={Link} to="/catering">
+                Catering
+              </Nav.Link>
+              <Nav.Link as={Link} to="/laboratori">
+                Laboratori
+              </Nav.Link>
+            </div>
 
-            {/* Link visibili se l'utente è loggato (Ordini e Prenotazioni) o link Accedi */}
+            <div
+              className="vr text-light opacity-50 d-none d-lg-block mx-2"
+              style={{ height: "24px" }}
+            ></div>
+
             {utente ? (
-              <>
-                <Nav.Link
-                  onClick={() => navigate("/miei-ordini")}
-                  className="text-white fw-semibold"
-                  style={{
-                    cursor: "pointer",
-                    textShadow: "0 2px 4px rgba(0,0,0,0.8)",
-                  }}
+              <div className="d-flex align-items-center gap-3">
+                {/* Profilo con cerchietto e nome */}
+                <Link
+                  to="/profilo"
+                  className="text-decoration-none d-flex align-items-center gap-2 profile-pill px-2 py-1"
                 >
-                  I Miei Ordini
-                </Nav.Link>
-                <Nav.Link
-                  onClick={() => navigate("/miei-ordini")}
-                  className="text-white fw-semibold"
-                  style={{
-                    cursor: "pointer",
-                    textShadow: "0 2px 4px rgba(0,0,0,0.8)",
-                  }}
+                  <div className="avatar-circle-original">{inizialeNome}</div>
+                  <span className="text-light small fw-medium">
+                    {nomeUtente}
+                  </span>
+                </Link>
+
+                {/* Tasto Esci */}
+                <Button
+                  variant="outline-light"
+                  size="sm"
+                  onClick={handleLogout}
+                  className="rounded-pill px-3"
                 >
-                  Le Mie Prenotazioni
-                </Nav.Link>
-              </>
+                  Esci
+                </Button>
+              </div>
             ) : (
-              <Nav.Link
-                onClick={() => navigate("/miei-ordini")}
-                className="fw-semibold"
-                style={{
-                  cursor: "pointer",
-                  color: "#EED972",
-                  textShadow: "0 2px 4px rgba(0,0,0,0.8)",
-                }}
+              /* Tasto Accedi */
+              <Link
+                to="/accedi"
+                className="btn btn-outline-light btn-sm rounded-pill px-3"
               >
                 Accedi
-              </Nav.Link>
-            )}
-
-            {isAdmin && (
-              <Nav.Link
-                onClick={() => navigate("/admin/prodotti")}
-                className="fw-semibold"
-                style={{
-                  cursor: "pointer",
-                  color: "#EED972",
-                  textShadow: "0 2px 4px rgba(0,0,0,0.8)",
-                }}
-              >
-                Gestionale
-              </Nav.Link>
+              </Link>
             )}
           </Nav>
         </Navbar.Collapse>

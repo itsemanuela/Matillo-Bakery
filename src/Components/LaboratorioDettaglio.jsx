@@ -18,10 +18,10 @@ function SezioneCard({ children, style }) {
     <div
       className="p-4 p-lg-5 mb-4 position-relative overflow-hidden"
       style={{
-        backgroundColor: "rgba(255, 255, 255, 0.06)",
+        backgroundColor: "rgba(255, 255, 255, 0.1)",
         backdropFilter: "blur(20px)",
         WebkitBackdropFilter: "blur(20px)",
-        border: "1px solid rgba(255, 255, 255, 0.12)",
+        border: "1px solid rgba(255, 255, 255, 0.15)",
         borderRadius: "20px",
         boxShadow: "0 20px 50px rgba(0,0,0,0.35)",
         ...style,
@@ -52,13 +52,12 @@ function LaboratorioDettaglio() {
   const [errore, setErrore] = useState(null);
   const [fotoAttiva, setFotoAttiva] = useState(0);
 
-  const [formData, setFormData] = useState({
-    numeroPersone: 1,
-    nomeCliente: "",
-    cognomeCliente: "",
-    emailCliente: "",
-    telefonoCliente: "",
+  const [utenteLoggato] = useState(() => {
+    const salvato = localStorage.getItem("utente");
+    return salvato ? JSON.parse(salvato) : null;
   });
+
+  const [formData, setFormData] = useState({ numeroPersone: 1 });
   const [prenotazioneErrore, setPrenotazioneErrore] = useState(null);
   const [prenotazioneSuccesso, setPrenotazioneSuccesso] = useState(false);
   const [invioInCorso, setInvioInCorso] = useState(false);
@@ -87,31 +86,20 @@ function LaboratorioDettaglio() {
     e.preventDefault();
     if (!laboratorio) return;
 
-    const token = localStorage.getItem("token");
-
-    // Blocco immediato se l'utente non è loggato
-    if (!token) {
-      setPrenotazioneErrore(
-        "Devi effettuare l'accesso per poter prenotare un laboratorio.",
-      );
-      return;
-    }
-
     setPrenotazioneErrore(null);
     setInvioInCorso(true);
 
-    const headers = {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    };
+    const token = localStorage.getItem("token");
 
     fetch(`${API_URL}/prenotazioni`, {
       method: "POST",
-      headers,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
       body: JSON.stringify({
         laboratorioId: laboratorio.uuid,
         numeroPersone: parseInt(formData.numeroPersone, 10),
-        ...formData,
       }),
     })
       .then((res) => {
@@ -189,7 +177,7 @@ function LaboratorioDettaglio() {
     <div
       style={{
         background:
-          "radial-gradient(circle at 15% 5%, rgba(238,217,114,0.1) 0%, transparent 45%), linear-gradient(160deg, #2a1e18 0%, #1c1310 100%)",
+          "radial-gradient(circle at 15% 5%, rgba(238,217,114,0.12) 0%, transparent 45%), linear-gradient(160deg, #9c6b52 0%, #834F41 40%, #6d4838 75%, #573b2e 100%)",
         color: "#f8f9fa",
         minHeight: "100vh",
         paddingBottom: "100px",
@@ -198,13 +186,39 @@ function LaboratorioDettaglio() {
       <div
         style={{
           position: "relative",
-          paddingTop: "140px",
-          paddingBottom: "40px",
-          background:
-            "linear-gradient(to bottom, rgba(28,19,16,0.9), transparent)",
+          height: "70vh",
+          minHeight: "480px",
+          marginTop: "0",
         }}
       >
-        <Container>
+        <img
+          src={tutteLeFoto[fotoAttiva]}
+          alt={laboratorio.nome}
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            display: "block",
+          }}
+        />
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background:
+              "linear-gradient(to top, rgba(28,19,16,0.98) 0%, rgba(28,19,16,0.6) 40%, rgba(28,19,16,0.15) 70%, transparent 100%)",
+          }}
+        />
+
+        <Container
+          className="position-absolute"
+          style={{
+            bottom: "40px",
+            left: "50%",
+            transform: "translateX(-50%)",
+            width: "100%",
+          }}
+        >
           <Button
             variant="link"
             onClick={() => navigate("/laboratori")}
@@ -217,14 +231,14 @@ function LaboratorioDettaglio() {
             className="fw-bold text-white mb-2 display-4"
             style={{
               fontFamily: "'Roboto Serif', serif",
-              textShadow: "0 4px 20px rgba(0,0,0,0.5)",
+              textShadow: "0 6px 30px rgba(0,0,0,0.6)",
             }}
           >
             {laboratorio.nome}
           </h1>
           <p
-            className="text-light opacity-90 mb-0 fs-5"
-            style={{ textShadow: "0 2px 10px rgba(0,0,0,0.5)" }}
+            className="text-light opacity-90 mb-0"
+            style={{ textShadow: "0 2px 10px rgba(0,0,0,0.6)" }}
           >
             <i
               className="bi bi-calendar-event me-2"
@@ -235,77 +249,58 @@ function LaboratorioDettaglio() {
         </Container>
       </div>
 
-      <Container className="mt-4">
+      {tutteLeFoto.length > 1 && (
+        <Container className="mt-5">
+          <SezioneCard>
+            <span
+              className="d-block mb-4 text-uppercase"
+              style={{
+                color: "#EED972",
+                fontSize: "0.75rem",
+                letterSpacing: "2px",
+              }}
+            >
+              La Galleria del Laboratorio
+            </span>
+            <Row className="g-3">
+              {tutteLeFoto.map((foto, i) => (
+                <Col md={4} key={i}>
+                  <div
+                    onClick={() => setFotoAttiva(i)}
+                    style={{
+                      borderRadius: "14px",
+                      overflow: "hidden",
+                      cursor: "pointer",
+                      border:
+                        i === fotoAttiva
+                          ? "2px solid #EED972"
+                          : "1px solid rgba(255,255,255,0.15)",
+                      boxShadow: "0 15px 35px rgba(0,0,0,0.35)",
+                      transition: "transform 0.3s ease",
+                    }}
+                    className="galleria-foto-item"
+                  >
+                    <img
+                      src={foto}
+                      alt=""
+                      style={{
+                        width: "100%",
+                        height: "220px",
+                        objectFit: "cover",
+                        display: "block",
+                      }}
+                    />
+                  </div>
+                </Col>
+              ))}
+            </Row>
+          </SezioneCard>
+        </Container>
+      )}
+
+      <Container className="mt-5">
         <Row className="g-5">
           <Col lg={7}>
-            <SezioneCard>
-              <span
-                className="d-block mb-3 text-uppercase"
-                style={{
-                  color: "#EED972",
-                  fontSize: "0.75rem",
-                  letterSpacing: "2px",
-                }}
-              >
-                Galleria Fotografica
-              </span>
-
-              <div
-                className="mb-3 overflow-hidden position-relative"
-                style={{
-                  borderRadius: "16px",
-                  height: "380px",
-                  border: "1px solid rgba(255,255,255,0.12)",
-                }}
-              >
-                <img
-                  src={tutteLeFoto[fotoAttiva]}
-                  alt="Laboratorio in primo piano"
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                    transition: "transform 0.4s ease",
-                  }}
-                />
-              </div>
-
-              {tutteLeFoto.length > 1 && (
-                <Row className="g-2">
-                  {tutteLeFoto.map((foto, i) => (
-                    <Col xs={4} sm={3} key={i}>
-                      <div
-                        onClick={() => setFotoAttiva(i)}
-                        style={{
-                          height: "85px",
-                          borderRadius: "12px",
-                          overflow: "hidden",
-                          cursor: "pointer",
-                          border:
-                            i === fotoAttiva
-                              ? "2px solid #EED972"
-                              : "1px solid rgba(255,255,255,0.15)",
-                          opacity: i === fotoAttiva ? 1 : 0.6,
-                          transition: "all 0.2s ease-in-out",
-                        }}
-                        className="position-relative"
-                      >
-                        <img
-                          src={foto}
-                          alt={`Miniatura ${i + 1}`}
-                          style={{
-                            width: "100%",
-                            height: "100%",
-                            objectFit: "cover",
-                          }}
-                        />
-                      </div>
-                    </Col>
-                  ))}
-                </Row>
-              )}
-            </SezioneCard>
-
             <SezioneCard>
               <p
                 className="text-light opacity-90 mb-0"
@@ -555,7 +550,25 @@ function LaboratorioDettaglio() {
                   style={{ borderTop: "1px solid rgba(238,217,114,0.2)" }}
                 />
 
-                {prenotazioneSuccesso ? (
+                {!utenteLoggato ? (
+                  <div className="text-center py-2">
+                    <p className="text-light opacity-80 mb-3">
+                      Devi accedere al tuo account per prenotare questo
+                      laboratorio.
+                    </p>
+                    <Button
+                      onClick={() => navigate("/accedi")}
+                      className="w-100 fw-bold border-0 py-3"
+                      style={{
+                        backgroundColor: "#EED972",
+                        color: "#221915",
+                        borderRadius: "12px",
+                      }}
+                    >
+                      Accedi o Registrati
+                    </Button>
+                  </div>
+                ) : prenotazioneSuccesso ? (
                   <Alert variant="success">
                     Prenotazione confermata! Ti aspettiamo al laboratorio.
                   </Alert>
@@ -566,39 +579,10 @@ function LaboratorioDettaglio() {
                 ) : (
                   <Form onSubmit={handlePrenota}>
                     {prenotazioneErrore && (
-                      <Alert
-                        variant="danger"
-                        className="d-flex flex-column gap-2"
-                      >
-                        <span>{prenotazioneErrore}</span>
-                        {!localStorage.getItem("token") && (
-                          <Button
-                            size="sm"
-                            onClick={() => navigate("/miei-ordini")}
-                            className="align-self-start fw-bold mt-2 border-0 px-3 py-2"
-                            style={{
-                              backgroundColor: "rgba(238, 217, 114, 0.15)",
-                              color: "#da9cb6",
-                              borderRadius: "8px",
-                              border: "1px solid rgba(238, 217, 114, 0.4)",
-                              transition: "all 0.2s ease-in-out",
-                            }}
-                            onMouseEnter={(e) => {
-                              e.currentTarget.style.backgroundColor =
-                                "rgba(238, 217, 114, 0.25)";
-                            }}
-                            onMouseLeave={(e) => {
-                              e.currentTarget.style.backgroundColor =
-                                "rgba(238, 217, 114, 0.15)";
-                            }}
-                          >
-                            Accedi o Registrati →
-                          </Button>
-                        )}
-                      </Alert>
+                      <Alert variant="danger">{prenotazioneErrore}</Alert>
                     )}
 
-                    <Form.Group className="mb-3">
+                    <Form.Group className="mb-4">
                       <Form.Label
                         className="small fw-semibold text-uppercase"
                         style={{
@@ -615,89 +599,6 @@ function LaboratorioDettaglio() {
                         max={laboratorio.postiDisponibili}
                         name="numeroPersone"
                         value={formData.numeroPersone}
-                        onChange={handleChange}
-                        required
-                        className="checkout-input"
-                      />
-                    </Form.Group>
-
-                    <Row className="g-3 mb-3">
-                      <Col md={6}>
-                        <Form.Label
-                          className="small fw-semibold text-uppercase"
-                          style={{
-                            color: "#EED972",
-                            fontSize: "0.7rem",
-                            letterSpacing: "1px",
-                          }}
-                        >
-                          Nome
-                        </Form.Label>
-                        <Form.Control
-                          type="text"
-                          name="nomeCliente"
-                          value={formData.nomeCliente}
-                          onChange={handleChange}
-                          required
-                          className="checkout-input"
-                        />
-                      </Col>
-                      <Col md={6}>
-                        <Form.Label
-                          className="small fw-semibold text-uppercase"
-                          style={{
-                            color: "#EED972",
-                            fontSize: "0.7rem",
-                            letterSpacing: "1px",
-                          }}
-                        >
-                          Cognome
-                        </Form.Label>
-                        <Form.Control
-                          type="text"
-                          name="cognomeCliente"
-                          value={formData.cognomeCliente}
-                          onChange={handleChange}
-                          required
-                          className="checkout-input"
-                        />
-                      </Col>
-                    </Row>
-                    <Form.Group className="mb-3">
-                      <Form.Label
-                        className="small fw-semibold text-uppercase"
-                        style={{
-                          color: "#EED972",
-                          fontSize: "0.7rem",
-                          letterSpacing: "1px",
-                        }}
-                      >
-                        Email
-                      </Form.Label>
-                      <Form.Control
-                        type="email"
-                        name="emailCliente"
-                        value={formData.emailCliente}
-                        onChange={handleChange}
-                        required
-                        className="checkout-input"
-                      />
-                    </Form.Group>
-                    <Form.Group className="mb-4">
-                      <Form.Label
-                        className="small fw-semibold text-uppercase"
-                        style={{
-                          color: "#EED972",
-                          fontSize: "0.7rem",
-                          letterSpacing: "1px",
-                        }}
-                      >
-                        Telefono
-                      </Form.Label>
-                      <Form.Control
-                        type="tel"
-                        name="telefonoCliente"
-                        value={formData.telefonoCliente}
                         onChange={handleChange}
                         required
                         className="checkout-input"

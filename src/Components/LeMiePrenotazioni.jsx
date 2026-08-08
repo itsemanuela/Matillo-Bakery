@@ -1,369 +1,220 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Container from "react-bootstrap/Container";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
 import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
-import Alert from "react-bootstrap/Alert";
 import Spinner from "react-bootstrap/Spinner";
-import Badge from "react-bootstrap/Badge";
-import Modal from "react-bootstrap/Modal";
-import Form from "react-bootstrap/Form";
+import Alert from "react-bootstrap/Alert";
+import sfondoOrdini from "../assets/20210118_MAT_Presentazione concept_page-0011.jpg";
+
+const API_URL = "http://localhost:3001/api";
+
+const COLORE_STATO = {
+  CONFERMATA: "#8fd19e",
+  CANCELLATA: "#e08585",
+};
 
 function LeMiePrenotazioni() {
-  const [prenotazioni, setPrenotazioni] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
-  // Stati per il modale di Annullamento
-  const [showCancelModal, setShowCancelModal] = useState(false);
-  const [selectedUuid, setSelectedUuid] = useState(null);
-
-  // Stati per il modale di Modifica
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [formDataEdit, setFormDataEdit] = useState({
-    numeroPersone: 1,
-    note: "",
+  const [utenteLoggato] = useState(() => {
+    const salvato = localStorage.getItem("utente");
+    return salvato ? JSON.parse(salvato) : null;
   });
-  const [errorEdit, setErrorEdit] = useState(null);
 
-  const fetchMiePrenotazioni = () => {
-    setLoading(true);
-    fetch("http://localhost:3001/api/prenotazioni/me", {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
+  const [prenotazioni, setPrenotazioni] = useState([]);
+  const [caricamento, setCaricamento] = useState(false);
+  const [errore, setErrore] = useState(null);
+
+  useEffect(() => {
+    if (!utenteLoggato) return;
+
+    setCaricamento(true);
+    const token =
+      localStorage.getItem("token") || localStorage.getItem("accessToken");
+
+    fetch(`${API_URL}/prenotazioni/me`, {
+      headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => {
         if (!res.ok)
-          throw new Error("Errore nel recupero delle tue prenotazioni");
+          throw new Error("Errore nel caricamento delle prenotazioni");
         return res.json();
       })
       .then((data) => {
-        setPrenotazioni(data);
-        setLoading(false);
+        const ordinate = [...data].sort(
+          (a, b) => new Date(b.dataPrenotazione) - new Date(a.dataPrenotazione),
+        );
+        setPrenotazioni(ordinate);
+        setCaricamento(false);
       })
       .catch((err) => {
-        setError(err.message);
-        setLoading(false);
+        setErrore(err.message);
+        setCaricamento(false);
       });
-  };
+  }, [utenteLoggato]);
 
-  useEffect(() => {
-    fetchMiePrenotazioni();
-  }, []);
-
-  // Gestione Modale Annullamento
-  const handleOpenCancelModal = (uuid) => {
-    setSelectedUuid(uuid);
-    setShowCancelModal(true);
-  };
-
-  const handleCloseCancelModal = () => {
-    setSelectedUuid(null);
-    setShowCancelModal(false);
-  };
-
-  const handleConfirmCancel = () => {
-    if (!selectedUuid) return;
-
-    fetch(`http://localhost:3001/api/prenotazioni/${selectedUuid}/cancella`, {
-      method: "PATCH",
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    })
-      .then(async (res) => {
-        if (!res.ok) {
-          const errText = await res.text();
-          throw new Error(errText || "Errore durante l'annullamento");
-        }
-        return res.text();
-      })
-      .then(() => {
-        handleCloseCancelModal();
-        fetchMiePrenotazioni();
-      })
-      .catch((err) => {
-        alert("Impossibile completare l'operazione: " + err.message);
-        handleCloseCancelModal();
-      });
-  };
-
-  // Gestione Modale Modifica
-  const handleOpenEditModal = (p) => {
-    setSelectedUuid(p.uuid);
-    setFormDataEdit({
-      numeroPersone: p.numeroPersone || 1,
-      note: p.note || "",
+  const formattaData = (isoString) => {
+    const d = new Date(isoString);
+    return d.toLocaleDateString("it-IT", {
+      weekday: "long",
+      day: "2-digit",
+      month: "long",
+      hour: "2-digit",
+      minute: "2-digit",
     });
-    setErrorEdit(null);
-    setShowEditModal(true);
   };
-
-  const handleCloseEditModal = () => {
-    setSelectedUuid(null);
-    setErrorEdit(null);
-    setShowEditModal(false);
-  };
-
-  const handleEditChange = (e) => {
-    setFormDataEdit({ ...formDataEdit, [e.target.name]: e.target.value });
-  };
-
-  const handleConfirmEdit = (e) => {
-    e.preventDefault();
-    if (!selectedUuid) return;
-    setErrorEdit(null);
-
-    fetch(`http://localhost:3001/api/prenotazioni/${selectedUuid}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-      body: JSON.stringify(formDataEdit),
-    })
-      .then(async (res) => {
-        if (!res.ok) {
-          const errText = await res.text();
-          try {
-            const parsed = JSON.parse(errText);
-            throw new Error(parsed.message || "Errore durante la modifica");
-          } catch {
-            throw new Error(errText || "Errore durante la modifica");
-          }
-        }
-        return res.json();
-      })
-      .then(() => {
-        handleCloseEditModal();
-        fetchMiePrenotazioni();
-      })
-      .catch((err) => {
-        setErrorEdit(err.message);
-      });
-  };
-
-  if (loading) {
-    return (
-      <Container className="text-center my-5" style={{ paddingTop: "120px" }}>
-        <Spinner animation="border" style={{ color: "#EED972" }} />
-        <p className="mt-2 text-muted">Caricamento delle tue prenotazioni...</p>
-      </Container>
-    );
-  }
-
-  if (error) {
-    return (
-      <Container className="my-5" style={{ paddingTop: "120px" }}>
-        <Alert variant="danger">Errore: {error}</Alert>
-      </Container>
-    );
-  }
 
   return (
     <div
       style={{
-        backgroundColor: "#fcf8f5",
-        minHeight: "88vh",
-        paddingTop: "120px", // <-- Spaziatura per evitare la sovrapposizione con la navbar
-        paddingBottom: "3rem",
+        background: `linear-gradient(90deg, transparent 0%, transparent 55%, rgba(44,34,30,0.5) 75%, rgba(44,34,30,0.75) 100%), linear-gradient(160deg, rgba(58,43,35,0.55) 0%, rgba(44,34,30,0.65) 100%), url(${sfondoOrdini}) center center / cover no-repeat`,
+        color: "#EFECE6",
+        minHeight: "100vh",
+        paddingTop: "100px",
+        paddingBottom: "100px",
       }}
     >
-      <Container className="py-4">
-        <h2
-          className="mb-4"
+      <Container style={{ maxWidth: "850px" }}>
+        {/* Tasto Freccia per tornare indietro */}
+        <Button
+          variant="outline-light"
+          size="sm"
+          onClick={() => navigate(-1)}
+          className="d-inline-flex align-items-center gap-2 mb-4 rounded-pill px-3 py-2 border-0"
           style={{
-            fontFamily: "'Roboto Serif', serif",
-            color: "#1c1613",
-            fontWeight: 700,
+            backgroundColor: "rgba(255, 255, 255, 0.08)",
+            color: "#D4C37E",
+            backdropFilter: "blur(10px)",
           }}
         >
-          Le Mie Prenotazioni ai Laboratori
-        </h2>
+          <span style={{ fontSize: "1.1rem" }}>←</span>{" "}
+          <strong>Indietro</strong>
+        </Button>
 
-        {prenotazioni.length === 0 ? (
-          <Alert variant="info" className="text-center py-4">
-            Non hai ancora effettuato alcuna prenotazione per i laboratori.
-          </Alert>
+        <div className="mb-4 text-start">
+          <span
+            className="text-uppercase fw-semibold"
+            style={{
+              color: "#D4C37E",
+              fontSize: "11px",
+              letterSpacing: "2.5px",
+            }}
+          >
+            Laboratori Matillo
+          </span>
+          <h1
+            className="fw-bold text-white mt-1 display-5"
+            style={{ fontFamily: "'Roboto Serif', serif" }}
+          >
+            Le Mie Prenotazioni
+          </h1>
+        </div>
+
+        {!utenteLoggato ? (
+          <div
+            className="p-5 text-center mx-auto"
+            style={{
+              backgroundColor: "rgba(255, 255, 255, 0.06)",
+              backdropFilter: "blur(16px)",
+              WebkitBackdropFilter: "blur(16px)",
+              border: "1px solid rgba(255, 255, 255, 0.1)",
+              borderRadius: "20px",
+              maxWidth: "440px",
+            }}
+          >
+            <p className="text-light opacity-75 mb-4">
+              Accedi per consultare le tue prenotazioni ai laboratori.
+            </p>
+            <Button
+              onClick={() => navigate("/accedi")}
+              className="w-100 fw-bold border-0 py-3"
+              style={{
+                backgroundColor: "#D4C37E",
+                color: "#1D1512",
+                borderRadius: "10px",
+              }}
+            >
+              Accedi o Registrati
+            </Button>
+          </div>
         ) : (
-          <Row xs={1} md={2} lg={3} className="g-4">
-            {prenotazioni.map((p, index) => {
-              const isCancellata = p.stato === "CANCELLATA";
-              return (
-                <Col key={p.uuid || index}>
+          <>
+            {errore && <Alert variant="danger">{errore}</Alert>}
+
+            {caricamento ? (
+              <div className="text-center py-5">
+                <Spinner animation="border" style={{ color: "#D4C37E" }} />
+              </div>
+            ) : prenotazioni.length === 0 ? (
+              <p className="text-light opacity-75">
+                Non hai ancora prenotato nessun laboratorio.
+              </p>
+            ) : (
+              <div className="d-flex flex-column gap-3">
+                {prenotazioni.map((p) => (
                   <Card
-                    className="h-100 shadow-sm border-0"
+                    key={p.uuid}
+                    className="border-0 text-white"
                     style={{
+                      backgroundColor: "rgba(255, 255, 255, 0.028)",
+                      backdropFilter: "blur(16px)",
+                      WebkitBackdropFilter: "blur(16px)",
+                      border: "1px solid rgba(255, 255, 255, 0.06)",
                       borderRadius: "16px",
-                      backgroundColor: isCancellata ? "#f8f9fa" : "#ffffff",
-                      opacity: isCancellata ? 0.75 : 1,
-                      borderLeft: isCancellata
-                        ? "5px solid #dc3545"
-                        : "5px solid #EED972",
                     }}
                   >
-                    <Card.Body className="d-flex flex-column justify-content-between p-4">
-                      <div>
-                        <div className="d-flex justify-content-between align-items-start mb-2">
-                          <span className="text-muted small text-uppercase">
-                            Laboratorio
-                          </span>
-                          <Badge bg={isCancellata ? "danger" : "success"}>
-                            {p.stato}
-                          </Badge>
-                        </div>
+                    <Card.Body className="p-4">
+                      <div className="d-flex justify-content-between align-items-start mb-2">
                         <h5
-                          className="fw-bold mb-3"
+                          className="fw-bold text-white mb-0"
+                          style={{ fontFamily: "'Roboto Serif', serif" }}
+                        >
+                          {p.laboratorio.nome}
+                        </h5>
+                        <span
+                          className="px-3 py-1 rounded-pill small fw-semibold"
                           style={{
-                            color: "#1c1613",
+                            backgroundColor: `${COLORE_STATO[p.stato] || "#D4C37E"}15`,
+                            color: COLORE_STATO[p.stato] || "#D4C37E",
+                            border: `1px solid ${COLORE_STATO[p.stato] || "#D4C37E"}35`,
+                            fontSize: "11px",
+                          }}
+                        >
+                          {p.stato}
+                        </span>
+                      </div>
+                      <p className="text-light opacity-75 small mb-3">
+                        {formattaData(p.laboratorio.dataOra)}
+                      </p>
+                      <div
+                        className="d-flex justify-content-between align-items-center pt-3"
+                        style={{
+                          borderTop: "1px solid rgba(255,255,255,0.05)",
+                        }}
+                      >
+                        <span className="text-light opacity-90 small">
+                          {p.numeroPersone}{" "}
+                          {p.numeroPersone === 1 ? "persona" : "persone"}
+                        </span>
+                        <span
+                          className="fw-bold fs-5"
+                          style={{
+                            color: "#D4C37E",
                             fontFamily: "'Roboto Serif', serif",
                           }}
                         >
-                          {p.laboratorio ? p.laboratorio.nome : "Laboratorio"}
-                        </h5>
-                        <hr className="text-muted opacity-25" />
-                        <div className="mb-3">
-                          <Badge
-                            bg="light"
-                            text="dark"
-                            className="border px-2 py-1"
-                          >
-                            👥 {p.numeroPersone}{" "}
-                            {p.numeroPersone === 1 ? "persona" : "persone"}
-                          </Badge>
-                        </div>
+                          €{" "}
+                          {(p.laboratorio.prezzo * p.numeroPersone).toFixed(2)}
+                        </span>
                       </div>
-
-                      {!isCancellata && (
-                        <div className="mt-3 pt-2 border-top d-flex gap-2">
-                          <Button
-                            variant="outline-secondary"
-                            size="sm"
-                            className="w-50 rounded-pill"
-                            onClick={() => handleOpenEditModal(p)}
-                          >
-                            Modifica
-                          </Button>
-                          <Button
-                            variant="outline-danger"
-                            size="sm"
-                            className="w-50 rounded-pill"
-                            onClick={() => handleOpenCancelModal(p.uuid)}
-                          >
-                            Annulla
-                          </Button>
-                        </div>
-                      )}
                     </Card.Body>
                   </Card>
-                </Col>
-              );
-            })}
-          </Row>
+                ))}
+              </div>
+            )}
+          </>
         )}
-
-        {/* MODALE DI CONFERMA ANNULLAMENTO */}
-        <Modal show={showCancelModal} onHide={handleCloseCancelModal} centered>
-          <Modal.Header
-            closeButton
-            style={{ backgroundColor: "#1c1613", color: "#fff" }}
-          >
-            <Modal.Title
-              style={{ fontFamily: "'Roboto Serif', serif", color: "#EED972" }}
-            >
-              Conferma Annullamento
-            </Modal.Title>
-          </Modal.Header>
-          <Modal.Body className="py-4">
-            <p className="mb-0 text-secondary">
-              Sei sicura di voler cancellare questa prenotazione? I posti
-              torneranno disponibili.
-            </p>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button
-              variant="secondary"
-              onClick={handleCloseCancelModal}
-              className="rounded-pill px-4"
-            >
-              Chiudi
-            </Button>
-            <Button
-              variant="danger"
-              onClick={handleConfirmCancel}
-              className="rounded-pill px-4"
-            >
-              Conferma Annullamento
-            </Button>
-          </Modal.Footer>
-        </Modal>
-
-        {/* MODALE DI MODIFICA PRENOTAZIONE */}
-        <Modal show={showEditModal} onHide={handleCloseEditModal} centered>
-          <Modal.Header
-            closeButton
-            style={{ backgroundColor: "#1c1613", color: "#fff" }}
-          >
-            <Modal.Title
-              style={{ fontFamily: "'Roboto Serif', serif", color: "#EED972" }}
-            >
-              Modifica Prenotazione
-            </Modal.Title>
-          </Modal.Header>
-          <Form onSubmit={handleConfirmEdit}>
-            <Modal.Body className="py-4">
-              {errorEdit && (
-                <Alert variant="danger" className="py-2 small">
-                  {errorEdit}
-                </Alert>
-              )}
-              <Form.Group className="mb-3">
-                <Form.Label className="fw-semibold text-secondary">
-                  Numero Persone
-                </Form.Label>
-                <Form.Control
-                  type="number"
-                  min="1"
-                  name="numeroPersone"
-                  value={formDataEdit.numeroPersone}
-                  onChange={handleEditChange}
-                  required
-                />
-              </Form.Group>
-              <Form.Group className="mb-3">
-                <Form.Label className="fw-semibold text-secondary">
-                  Note (opzionale)
-                </Form.Label>
-                <Form.Control
-                  as="textarea"
-                  rows={3}
-                  name="note"
-                  value={formDataEdit.note}
-                  onChange={handleEditChange}
-                />
-              </Form.Group>
-            </Modal.Body>
-            <Modal.Footer>
-              <Button
-                variant="secondary"
-                onClick={handleCloseEditModal}
-                className="rounded-pill px-4"
-              >
-                Annulla
-              </Button>
-              <Button
-                type="submit"
-                variant="dark"
-                className="rounded-pill px-4"
-                style={{ backgroundColor: "#1c1613", color: "#EED972" }}
-              >
-                Salva Modifiche
-              </Button>
-            </Modal.Footer>
-          </Form>
-        </Modal>
       </Container>
     </div>
   );
