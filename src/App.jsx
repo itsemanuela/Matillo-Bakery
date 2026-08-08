@@ -20,6 +20,7 @@ import Laboratori from "./Components/Laboratori";
 import LaboratorioDettaglio from "./Components/LaboratorioDettaglio";
 import LeMiePrenotazioni from "./Components/LeMiePrenotazioni";
 import Profilo from "./Components/Profilo";
+import Catering from "./Components/Catering"; // <-- 1. IMPORT DEL COMPONENTE CATERING
 
 function AppContent() {
   const location = useLocation();
@@ -41,14 +42,13 @@ function AppContent() {
         />
         <Route path="/shop" element={<MyShop />} />
         <Route path="/checkout" element={<Checkout />} />
-
+        <Route path="/catering" element={<Catering />} />{" "}
+        {/* <-- 2. ROTTA CATERING AGGIUNTA */}
         <Route path="/login" element={<Login />} />
         <Route path="/accedi" element={<AccessoGenerale />} />
-
         <Route path="/miei-ordini" element={<MyOrdini />} />
         <Route path="/le-mie-prenotazioni" element={<LeMiePrenotazioni />} />
         <Route path="/profilo" element={<Profilo />} />
-
         <Route
           path="/admin/prodotti"
           element={
@@ -89,7 +89,6 @@ function AppContent() {
             </RequiredAdmin>
           }
         />
-
         <Route path="/laboratori" element={<Laboratori />} />
         <Route path="/laboratori/:id" element={<LaboratorioDettaglio />} />
       </Routes>
