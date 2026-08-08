@@ -1,59 +1,44 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Container from "react-bootstrap/Container";
-import Spinner from "react-bootstrap/Spinner";
-import Alert from "react-bootstrap/Alert";
-import Button from "react-bootstrap/Button";
-import Card from "react-bootstrap/Card";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import sfondoOrdini from "../assets/20210118_MAT_Presentazione concept_page-0011.jpg";
+import Button from "react-bootstrap/Button";
+import Card from "react-bootstrap/Card";
+import Spinner from "react-bootstrap/Spinner";
+import Alert from "react-bootstrap/Alert";
+import Modal from "react-bootstrap/Modal";
 
 const API_URL = "http://localhost:3001/api";
 
-const COLORE_STATO = {
-  IN_ELABORAZIONE: "#D4C37E",
-  PAGATO: "#7EA8A1",
-  IN_PREPARAZIONE: "#829FB8",
-  SPEDITO: "#A58FB8",
-  CONSEGNATO: "#7EA885",
-  CANCELLATO: "#C28C8C",
-};
-
-const PLACEHOLDER_IMG =
-  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Crect width='60' height='60' fill='%23241d18'/%3E%3C/svg%3E";
-
 function MyOrdini() {
   const navigate = useNavigate();
-  const [utenteLoggato, setUtenteLoggato] = useState(() => {
-    const salvato = localStorage.getItem("utente");
-    return salvato ? JSON.parse(salvato) : null;
-  });
-
-  const [loginData, setLoginData] = useState({ email: "", password: "" });
-  const [loginErrore, setLoginErrore] = useState(null);
-
   const [ordini, setOrdini] = useState([]);
-  const [caricamento, setCaricamento] = useState(false);
+  const [caricamento, setCaricamento] = useState(true);
   const [errore, setErrore] = useState(null);
+  const [idEliminazioneInCorso, setIdEliminazioneInCorso] = useState(null);
+  const [messaggioFeedback, setMessaggioFeedback] = useState(null);
 
-  const caricaMieiOrdini = (mostraCaricamento = true) => {
+  // Stati per la gestione della modale di conferma
+  const [mostraModale, setMostraModale] = useState(false);
+  const [ordineSelezionatoDaEliminare, setOrdineSelezionatoDaEliminare] =
+    useState(null);
+
+  const fetchOrdini = () => {
+    setCaricamento(true);
     const token = localStorage.getItem("token");
-    if (!token) return;
 
-    if (mostraCaricamento) setCaricamento(true);
     fetch(`${API_URL}/ordini/me`, {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     })
       .then((res) => {
-        if (!res.ok) throw new Error("Errore nel caricamento dei tuoi ordini");
+        if (!res.ok) throw new Error("Impossibile recuperare i tuoi ordini.");
         return res.json();
       })
       .then((data) => {
-        const ordinati = [...data].sort(
-          (a, b) => new Date(b.dataOrdine) - new Date(a.dataOrdine),
-        );
-        setOrdini(ordinati);
+        setOrdini(data);
         setCaricamento(false);
       })
       .catch((err) => {
@@ -63,346 +48,283 @@ function MyOrdini() {
   };
 
   useEffect(() => {
-    if (!utenteLoggato) return;
-    caricaMieiOrdini(false);
-  }, [utenteLoggato]);
+    fetchOrdini();
+  }, []);
 
-  const handleLoginChange = (e) => {
-    setLoginData({ ...loginData, [e.target.name]: e.target.value });
+  // Apre la modale di conferma salvando l'id dell'ordine
+  const apriConfermaEliminazione = (id) => {
+    setOrdineSelezionatoDaEliminare(id);
+    setMostraModale(true);
   };
 
-  const handleLoginSubmit = (e) => {
-    e.preventDefault();
-    setLoginErrore(null);
+  // Chiude la modale
+  const chiudiModale = () => {
+    setMostraModale(false);
+    setOrdineSelezionatoDaEliminare(null);
+  };
 
-    fetch(`${API_URL}/auth/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(loginData),
+  // Esegue l'effettiva eliminazione tramite DELETE /api/ordini/{id} dopo la conferma
+  const confermaEliminazione = () => {
+    if (!ordineSelezionatoDaEliminare) return;
+
+    const token = localStorage.getItem("token");
+    const id = ordineSelezionatoDaEliminare;
+
+    setIdEliminazioneInCorso(id);
+    setMessaggioFeedback(null);
+    chiudiModale();
+
+    fetch(`${API_URL}/ordini/${id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     })
       .then((res) => {
-        if (!res.ok) throw new Error("Email o password non corretti");
-        return res.json();
-      })
-      .then((data) => {
-        localStorage.setItem("token", data.token);
-        const utente = {
-          uuid: data.uuid,
-          nome: data.nome,
-          email: data.email,
-          ruolo: data.ruolo,
-        };
-        localStorage.setItem("utente", JSON.stringify(utente));
-        setUtenteLoggato(utente);
-      })
-      .catch((err) => setLoginErrore(err.message));
-  };
+        if (!res.ok)
+          throw new Error("Errore durante l'eliminazione dell'ordine.");
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("utente");
-    setUtenteLoggato(null);
-    setOrdini([]);
+        setOrdini((prevOrdini) =>
+          prevOrdini.filter((ordine) => ordine.uuid !== id && ordine.id !== id),
+        );
+        setMessaggioFeedback({
+          tipo: "success",
+          testo: "Ordine eliminato con successo.",
+        });
+      })
+      .catch((err) => {
+        setMessaggioFeedback({ tipo: "danger", testo: err.message });
+      })
+      .finally(() => {
+        setIdEliminazioneInCorso(null);
+      });
   };
 
   const formattaData = (isoString) => {
+    if (!isoString) return "";
     const d = new Date(isoString);
     return d.toLocaleDateString("it-IT", {
+      weekday: "long",
       day: "2-digit",
-      month: "2-digit",
+      month: "long",
       year: "numeric",
       hour: "2-digit",
       minute: "2-digit",
     });
   };
 
+  if (caricamento) {
+    return (
+      <div
+        style={{
+          backgroundColor: "#221915",
+          minHeight: "100vh",
+          paddingTop: "160px",
+        }}
+        className="text-center"
+      >
+        <Spinner animation="border" style={{ color: "#EED972" }} />
+      </div>
+    );
+  }
+
   return (
     <div
       style={{
-        background: `linear-gradient(90deg, transparent 0%, transparent 55%, rgba(44,34,30,0.5) 75%, rgba(44,34,30,0.75) 100%), linear-gradient(160deg, rgba(58,43,35,0.55) 0%, rgba(44,34,30,0.65) 100%), url(${sfondoOrdini}) center center / cover no-repeat`,
-        color: "#EFECE6",
+        background:
+          "linear-gradient(160deg, #9c6b52 0%, #834F41 40%, #6d4838 75%, #573b2e 100%)",
+        color: "#f8f9fa",
         minHeight: "100vh",
-        paddingTop: "100px",
+        paddingTop: "120px",
         paddingBottom: "100px",
       }}
     >
-      <style>{`
-        @keyframes fadeInSlide {
-          from {
-            opacity: 0;
-            transform: translateY(15px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        .ordine-card {
-          animation: fadeInSlide 0.5s ease forwards;
-          transition: all 0.3s ease;
-        }
-        .ordine-card:hover {
-          transform: translateY(-3px);
-          border-color: rgba(212, 195, 126, 0.25) !important;
-          box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25) !important;
-        }
-        .checkout-input:focus {
-          background-color: rgba(255, 255, 255, 0.06) !important;
-          border-color: #D4C37E !important;
-          color: #fff !important;
-          box-shadow: 0 0 8px rgba(212, 195, 126, 0.15) !important;
-        }
-      `}</style>
-
-      <Container style={{ maxWidth: "850px" }}>
-        <div className="mb-4 text-start">
-          <span
-            className="text-uppercase fw-semibold"
-            style={{
-              color: "#D4C37E",
-              fontSize: "11px",
-              letterSpacing: "2.5px",
-            }}
-          >
-            Storico e Gestione
-          </span>
+      <Container>
+        <div className="d-flex justify-content-between align-items-center mb-5">
           <h1
-            className="fw-bold text-white mt-1 display-5"
-            style={{ fontFamily: "'Roboto Serif', serif" }}
+            className="fw-bold display-5"
+            style={{ fontFamily: "'Roboto Serif', serif", color: "#EED972" }}
           >
-            I Miei Ordini
+            I tuoi Ordini
           </h1>
-          <div className="titolo-ordini-linea" />
+          <Button variant="outline-light" onClick={() => navigate("/shop")}>
+            Vai allo Shop
+          </Button>
         </div>
 
-        {!utenteLoggato ? (
+        {errore && <Alert variant="danger">{errore}</Alert>}
+        {messaggioFeedback && (
+          <Alert variant={messaggioFeedback.tipo}>
+            {messaggioFeedback.testo}
+          </Alert>
+        )}
+
+        {ordini.length === 0 ? (
           <div
-            className="p-5 shadow-lg mx-auto login-box-ricca text-center"
+            className="text-center py-5"
             style={{
-              backgroundColor: "rgba(255, 255, 255, 0.06)",
-              backdropFilter: "blur(16px)",
-              WebkitBackdropFilter: "blur(16px)",
-              border: "1px solid rgba(255, 255, 255, 0.1)",
+              backgroundColor: "rgba(255,255,255,0.05)",
               borderRadius: "20px",
-              maxWidth: "440px",
-              animation: "fadeInSlide 0.4s ease",
-              position: "relative",
-              overflow: "hidden",
             }}
           >
-            <div className="login-box-filo-oro" />
-
-            <div className="login-box-icona">
-              <i className="bi bi-lock-fill"></i>
-            </div>
-            <h4
-              className="text-white fw-bold mb-1"
-              style={{ fontFamily: "'Roboto Serif', serif" }}
-            >
-              Area Riservata
-            </h4>
-            <p className="small text-light opacity-75 mb-4">
-              Accedi per consultare i tuoi ordini
+            <p className="text-light opacity-75 fs-5 mb-3">
+              Non hai ancora effettuato alcun ordine.
             </p>
-
             <Button
-              onClick={() => navigate("/accedi")}
-              className="w-100 fw-bold border-0 py-3 shadow-sm"
+              onClick={() => navigate("/shop")}
               style={{
-                backgroundColor: "#D4C37E",
-                color: "#1D1512",
-                borderRadius: "10px",
+                backgroundColor: "#EED972",
+                color: "#221915",
+                border: "none",
               }}
+              className="fw-bold px-4 py-2"
             >
-              Accedi o Registrati
+              Inizia gli acquisti
             </Button>
           </div>
         ) : (
-          <>
-            <div
-              className="d-flex justify-content-between align-items-center mb-4 p-3 px-4 rounded-4"
-              style={{
-                backgroundColor: "rgba(255, 255, 255, 0.02)",
-                border: "1px solid rgba(255, 255, 255, 0.05)",
-                animation: "fadeInSlide 0.3s ease",
-              }}
-            >
-              <span className="text-light opacity-75 d-flex align-items-center gap-2">
-                <i
-                  className="bi bi-person-fill"
-                  style={{ color: "#D4C37E", fontSize: "16px" }}
-                ></i>{" "}
-                Benvenuto/a,{" "}
-                <strong className="text-white fw-semibold">
-                  {utenteLoggato.nome}
-                </strong>
-              </span>
-              <Button
-                variant="outline-light"
-                size="sm"
-                onClick={handleLogout}
-                className="px-3 py-1 d-flex align-items-center gap-1 shadow-none"
-                style={{
-                  borderRadius: "8px",
-                  borderColor: "rgba(255,255,255,0.15)",
-                  fontSize: "13px",
-                }}
-              >
-                <i className="bi bi-box-arrow-right"></i> Esci
-              </Button>
-            </div>
-
-            {errore && <Alert variant="danger">{errore}</Alert>}
-
-            {caricamento ? (
-              <div className="text-center py-5">
-                <Spinner
-                  animation="border"
-                  style={{
-                    color: "#D4C37E",
-                    width: "2.5rem",
-                    height: "2.5rem",
-                  }}
-                />
-              </div>
-            ) : ordini.length === 0 ? (
-              <div
-                className="text-center py-5 p-4 rounded-4"
-                style={{
-                  backgroundColor: "rgba(255,255,255,0.02)",
-                  border: "1px dashed rgba(255,255,255,0.08)",
-                }}
-              >
-                <p className="text-light opacity-75 m-0">
-                  Non hai ancora effettuato ordini nel nostro forno.
-                </p>
-              </div>
-            ) : (
-              <div className="d-flex flex-column gap-3">
-                {ordini.map((ordine, index) => (
+          <Row className="g-4">
+            {ordini.map((ordine) => {
+              const ordineId = ordine.uuid || ordine.id;
+              return (
+                <Col md={6} lg={4} key={ordineId}>
                   <Card
-                    key={ordine.uuid}
-                    className="ordine-card border-0 text-white"
+                    className="h-100 border-0 shadow-lg"
                     style={{
-                      backgroundColor: "rgba(255, 255, 255, 0.028)",
-                      backdropFilter: "blur(16px)",
-                      WebkitBackdropFilter: "blur(16px)",
-                      border: "1px solid rgba(255, 255, 255, 0.06)",
+                      backgroundColor: "rgba(255, 255, 255, 0.1)",
+                      backdropFilter: "blur(15px)",
                       borderRadius: "16px",
-                      animationDelay: `${index * 0.08}s`,
+                      border: "1px solid rgba(255, 255, 255, 0.15)",
+                      color: "#f8f9fa",
                     }}
                   >
-                    <Card.Body className="p-4">
-                      <Row
-                        className="align-items-center mb-3 pb-3"
-                        style={{
-                          borderBottom: "1px solid rgba(255,255,255,0.05)",
-                        }}
-                      >
-                        <Col>
-                          <span className="small text-light opacity-70">
-                            {formattaData(ordine.dataOrdine)} ·{" "}
-                            <span style={{ color: "#D4C37E" }}>
-                              Ordine #{ordine.uuid.slice(0, 8)}
-                            </span>
-                          </span>
-                        </Col>
-                        <Col xs="auto">
+                    <Card.Body className="d-flex flex-column justify-content-between p-4">
+                      <div>
+                        <div className="d-flex justify-content-between align-items-start mb-3">
                           <span
-                            className="px-3 py-1 rounded-pill fw-semibold"
+                            className="badge"
                             style={{
-                              backgroundColor: `${COLORE_STATO[ordine.stato]}15`,
-                              color: COLORE_STATO[ordine.stato] || "#EFECE6",
-                              border: `1px solid ${COLORE_STATO[ordine.stato]}35`,
-                              fontSize: "11px",
-                              letterSpacing: "0.5px",
+                              backgroundColor: "#EED972",
+                              color: "#221915",
                             }}
                           >
-                            {ordine.stato.replaceAll("_", " ")}
+                            {ordine.stato || "IN_ATTESA"}
                           </span>
-                        </Col>
-                      </Row>
-
-                      <div className="mb-3 d-flex flex-column gap-2">
-                        {ordine.dettagli.map((d) => (
-                          <div
-                            key={d.uuid}
-                            className="d-flex justify-content-between align-items-center text-light opacity-85 py-1"
-                          >
-                            <span className="d-flex align-items-center gap-3">
-                              <img
-                                src={d.prodotto.immagine || PLACEHOLDER_IMG}
-                                alt={d.prodotto.nome}
-                                className="riga-ordine-thumb"
-                              />
-                              <span>
-                                <strong style={{ color: "#D4C37E" }}>
-                                  {d.quantita}x
-                                </strong>{" "}
-                                {d.prodotto.nome}
-                              </span>
-                            </span>
-                            <span className="text-white fw-medium">
-                              € {(d.prezzoUnitario * d.quantita).toFixed(2)}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-
-                      <div
-                        className="d-flex justify-content-between align-items-center pt-3"
-                        style={{
-                          borderTop: "1px solid rgba(255,255,255,0.05)",
-                        }}
-                      >
-                        <span className="small text-light opacity-60 fst-italic d-flex align-items-center gap-1">
-                          <i
-                            className="bi bi-geo-alt-fill"
-                            style={{ color: "#D4C37E", opacity: 0.8 }}
-                          ></i>{" "}
-                          {ordine.indirizzoSpedizione}
-                        </span>
-                        <div className="text-end">
-                          <span className="small text-light opacity-50 me-2 d-none d-sm-inline">
-                            Totale
-                          </span>
-                          <span
-                            className="fw-bold fs-5"
-                            style={{
-                              color: "#D4C37E",
-                              fontFamily: "'Roboto Serif', serif",
-                            }}
-                          >
-                            € {ordine.totale.toFixed(2)}
+                          <span className="text-light opacity-60 small">
+                            ID: {ordineId.substring(0, 8)}...
                           </span>
                         </div>
+
+                        <Card.Title
+                          className="fw-bold mb-3"
+                          style={{ fontFamily: "'Roboto Serif', serif" }}
+                        >
+                          Totale: € {ordine.totale?.toFixed(2)}
+                        </Card.Title>
+
+                        <p className="text-light opacity-90 small mb-2">
+                          <i
+                            className="bi bi-geo-alt me-2"
+                            style={{ color: "#EED972" }}
+                          ></i>
+                          Spedizione: {ordine.indirizzoSpedizione}
+                        </p>
+
+                        <div className="mb-3">
+                          <span
+                            className="d-block text-uppercase small text-warning mb-1"
+                            style={{ fontSize: "0.7rem", letterSpacing: "1px" }}
+                          >
+                            Prodotti:
+                          </span>
+                          <ul className="ps-3 mb-0 small opacity-90">
+                            {ordine.dettagli?.map((dettaglio, idx) => (
+                              <li key={idx}>
+                                {dettaglio.quantita}x{" "}
+                                {dettaglio.prodotto?.nome || "Prodotto"} (€{" "}
+                                {dettaglio.prezzoUnitario?.toFixed(2)})
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
                       </div>
+
+                      <Button
+                        variant="outline-danger"
+                        size="sm"
+                        disabled={idEliminazioneInCorso === ordineId}
+                        onClick={() => apriConfermaEliminazione(ordineId)}
+                        className="w-100 fw-bold py-2 mt-3"
+                        style={{
+                          borderRadius: "10px",
+                          borderColor: "#e08585",
+                          color: "#e08585",
+                        }}
+                      >
+                        {idEliminazioneInCorso === ordineId
+                          ? "Eliminazione..."
+                          : "Elimina Ordine"}
+                      </Button>
                     </Card.Body>
                   </Card>
-                ))}
-              </div>
-            )}
-          </>
+                </Col>
+              );
+            })}
+          </Row>
         )}
-
-        {/* Tasto Freccia per tornare indietro in basso */}
-        <div className="text-center mt-5">
-          <Button
-            variant="outline-light"
-            size="sm"
-            onClick={() => navigate(-1)}
-            className="d-inline-flex align-items-center gap-2 rounded-pill px-4 py-2 border-0 shadow-sm"
-            style={{
-              backgroundColor: "rgba(255, 255, 255, 0.08)",
-              color: "#D4C37E",
-              backdropFilter: "blur(10px)",
-            }}
-          >
-            <span style={{ fontSize: "1.1rem" }}>←</span>{" "}
-            <strong>Indietro</strong>
-          </Button>
-        </div>
       </Container>
+
+      {/* Modale di Conferma Eliminazione */}
+      <Modal show={mostraModale} onHide={chiudiModale} centered>
+        <div
+          style={{
+            backgroundColor: "#2b1e18",
+            color: "#f8f9fa",
+            border: "1px solid rgba(237, 217, 114, 0.3)",
+            borderRadius: "16px",
+          }}
+        >
+          <Modal.Header
+            closeButton
+            closeVariant="white"
+            style={{ borderBottom: "1px solid rgba(255, 255, 255, 0.1)" }}
+          >
+            <Modal.Title
+              style={{ fontFamily: "'Roboto Serif', serif", color: "#EED972" }}
+            >
+              Conferma Eliminazione
+            </Modal.Title>
+          </Modal.Header>
+          <Modal.Body className="py-4">
+            <p className="mb-0 fs-6">
+              Sei sicuro di voler eliminare questo ordine? L'operazione è
+              irreversibile.
+            </p>
+          </Modal.Body>
+          <Modal.Footer
+            style={{ borderTop: "1px solid rgba(255, 255, 255, 0.1)" }}
+          >
+            <Button
+              variant="secondary"
+              onClick={chiudiModale}
+              style={{ borderRadius: "8px" }}
+            >
+              Annulla
+            </Button>
+            <Button
+              variant="danger"
+              onClick={confermaEliminazione}
+              style={{
+                borderRadius: "8px",
+                backgroundColor: "#c0392b",
+                border: "none",
+              }}
+            >
+              Elimina definitivamente
+            </Button>
+          </Modal.Footer>
+        </div>
+      </Modal>
     </div>
   );
 }

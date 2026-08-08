@@ -37,7 +37,6 @@ export default function PrenotazioniPage() {
         return res.json();
       })
       .then((updated) => {
-        // Aggiorna lo stato locale per riflettere la cancellazione
         setPrenotazioni((prev) =>
           prev.map((p) => (p.id === id ? { ...p, stato: "CANCELLATA" } : p)),
         );

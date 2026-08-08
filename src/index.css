@@ -411,3 +411,15 @@ footer, .custom-footer {
   position: relative;
   overflow: hidden;
 }
+
+.bi {
+  display: inline-block !important;
+  font-family: bootstrap-icons !important;
+  font-style: normal;
+  font-weight: normal !important;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  vertical-align: -.125em;
+  -webkit-font-smoothing: antialiased;
+}

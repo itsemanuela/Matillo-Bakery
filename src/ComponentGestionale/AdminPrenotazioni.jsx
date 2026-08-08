@@ -259,9 +259,15 @@ function AdminPrenotazioni() {
                           <Badge
                             bg="light"
                             text="dark"
-                            className="border px-2 py-1"
+                            className="border px-2 py-1 d-inline-flex align-items-center"
                           >
-                            👥 {p.numeroPersone}{" "}
+                            <span
+                              className="me-1"
+                              style={{ fontSize: "0.9rem" }}
+                            >
+                              👥
+                            </span>
+                            {p.numeroPersone}{" "}
                             {p.numeroPersone === 1 ? "persona" : "persone"}
                           </Badge>
                         </div>

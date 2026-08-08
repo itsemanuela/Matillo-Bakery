@@ -109,8 +109,6 @@ function Checkout() {
     setRegisterErrore(null);
     setRegistrazioneInCorso(true);
 
-    console.log("Payload registrazione:", registerData);
-
     fetch(`${API_URL}/utenti`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -127,7 +125,6 @@ function Checkout() {
         }
         return res.json();
       })
-
       .then(() =>
         fetch(`${API_URL}/auth/login`, {
           method: "POST",
@@ -161,9 +158,6 @@ function Checkout() {
     setErrore(null);
     setInvioInCorso(true);
 
-    // Il carrello contiene un oggetto prodotto per ogni "Aggiungi" cliccato
-    // (anche ripetuto per lo stesso prodotto) — qui li raggruppiamo per uuid
-    // sommando le quantità, come si aspetta il backend.
     const dettagli = Object.values(
       cart.reduce((acc, item) => {
         if (!acc[item.uuid]) {
@@ -208,7 +202,8 @@ function Checkout() {
         return res.json();
       })
       .then(() => {
-        navigate("/", {
+        // Reindirizzamento alla pagina dei propri ordini dopo il pagamento
+        navigate("/miei-ordini", {
           state: {
             messaggio:
               "Ordine completato con successo! Grazie per aver scelto Antico Forno Matillo.",
