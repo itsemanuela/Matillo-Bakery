@@ -15,6 +15,7 @@ import AdminOrdini from "./ComponentGestionale/AdminOrdini";
 import AdminShopPreview from "./ComponentGestionale/AdminShopPreview";
 import AdminLaboratori from "./ComponentGestionale/AdminLaboratori";
 import Laboratori from "./Components/Laboratori";
+import LaboratorioDettaglio from "./Components/LaboratorioDettaglio";
 
 function AppContent() {
   const location = useLocation();
@@ -72,6 +73,7 @@ function AppContent() {
           }
         />
         <Route path="/laboratori" element={<Laboratori />} />
+        <Route path="/laboratori/:id" element={<LaboratorioDettaglio />} />
       </Routes>
 
       {!isAdminRoute && <MyFooter />}
