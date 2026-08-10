@@ -4,13 +4,13 @@ import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Spinner from "react-bootstrap/Spinner";
+import GalleriaEventi from "../Components/GalleriaEventi";
 
 const API_URL = "http://localhost:3001/api";
 
 const PLACEHOLDER_IMG =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%23241d18'/%3E%3Ctext x='50%25' y='50%25' font-family='sans-serif' font-size='18' fill='%23EED972' text-anchor='middle' dy='.3em'%3EFoto in arrivo%3C/text%3E%3C/svg%3E";
 
-// --- Design tokens -----------------------------------------------------
 const colors = {
   char: "#2A1A10",
   crust: "#6E3A22",
@@ -24,8 +24,6 @@ const colors = {
 const fontDisplay = "'Fraunces', 'Roboto Serif', serif";
 const fontBody = "'Work Sans', sans-serif";
 
-// Bordo smerlato riutilizzabile (firma visiva della pagina): una fila di
-// "morsi" circolari ottenuti con un radial-gradient ripetuto, niente SVG.
 const scallop = (fillColor, size = 22) => ({
   height: `${size / 2}px`,
   width: "100%",
@@ -101,7 +99,6 @@ function Catering() {
         fontFamily: fontBody,
       }}
     >
-      {/* Import font — meglio spostarlo nell'index.html se possibile */}
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;1,9..144,500&family=Work+Sans:wght@400;500&display=swap');
         .catering-recipe-card { transition: transform .35s ease, box-shadow .35s ease; }
@@ -189,7 +186,6 @@ function Catering() {
           ))}
         </Row>
 
-        {/* Divisore smerlato — la stessa "morsicatura" delle card, a piena larghezza */}
         <div style={{ marginTop: "56px" }} aria-hidden="true">
           <div style={scallop(colors.flour, 26)} />
         </div>
@@ -281,12 +277,18 @@ function Catering() {
                 ))}
               </Row>
             )}
-
             {!caricamento && pacchetti.length === 0 && (
               <p className="text-center" style={{ color: "#5B4636" }}>
                 Nessun pacchetto catering disponibile al momento.
               </p>
             )}
+
+            <div
+              className="mt-5 pt-4"
+              style={{ borderTop: `1px solid ${colors.wheat}30` }}
+            >
+              <GalleriaEventi />
+            </div>
           </Container>
         </div>
       </Container>

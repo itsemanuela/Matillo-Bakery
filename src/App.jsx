@@ -24,6 +24,7 @@ import Catering from "./Components/Catering";
 import CateringDettaglio from "./Components/CateringDettaglio";
 import AdminCatering from "./ComponentGestionale/AdminCatering";
 import AdminRichiesteCatering from "./ComponentGestionale/AdminRichiesteCatering";
+import AdminGalleriaEventi from "./ComponentGestionale/AdminGalleriaEventi";
 
 function AppContent() {
   const location = useLocation();
@@ -108,6 +109,14 @@ function AppContent() {
           element={
             <RequiredAdmin>
               <AdminRichiesteCatering />
+            </RequiredAdmin>
+          }
+        />
+        <Route
+          path="/admin/galleria-eventi"
+          element={
+            <RequiredAdmin>
+              <AdminGalleriaEventi />
             </RequiredAdmin>
           }
         />

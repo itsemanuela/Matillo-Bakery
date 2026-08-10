@@ -83,6 +83,12 @@ function AdminNavbar() {
               Richieste Catering
             </Nav.Link>
             <Nav.Link
+              onClick={() => navigate("/admin/galleria-eventi")}
+              style={linkStyle("/admin/galleria-eventi")}
+            >
+              Galleria Eventi
+            </Nav.Link>
+            <Nav.Link
               onClick={() => navigate("/admin/shop-preview")}
               style={linkStyle("/admin/shop-preview")}
             >
