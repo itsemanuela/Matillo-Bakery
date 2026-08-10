@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -68,6 +69,37 @@ function SezioneCard({ children, eyebrow }) {
   );
 }
 
+function useCountUp(value, duration = 550) {
+  const [display, setDisplay] = useState(value);
+  const prevRef = useRef(value);
+
+  useEffect(() => {
+    const start = prevRef.current;
+    const end = value;
+    if (start === end) return;
+
+    const startTime = performance.now();
+    let frame;
+
+    const tick = (now) => {
+      const progress = Math.min((now - startTime) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setDisplay(start + (end - start) * eased);
+      if (progress < 1) {
+        frame = requestAnimationFrame(tick);
+      } else {
+        prevRef.current = end;
+        setDisplay(end);
+      }
+    };
+
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [value, duration]);
+
+  return display;
+}
+
 function CateringDettaglio() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -89,6 +121,10 @@ function CateringDettaglio() {
   const [richiestaErrore, setRichiestaErrore] = useState(null);
   const [richiestaSuccesso, setRichiestaSuccesso] = useState(false);
   const [invioInCorso, setInvioInCorso] = useState(false);
+
+  const numeroPersoneInt = parseInt(formData.numeroPersone, 10) || 0;
+  const totale = (pacchetto?.prezzoPersona ?? 0) * numeroPersoneInt;
+  const totaleAnimato = useCountUp(totale);
 
   useEffect(() => {
     fetch(`${API_URL}/catering/${id}`)
@@ -117,6 +153,14 @@ function CateringDettaglio() {
   const handleRichiedi = (e) => {
     e.preventDefault();
     if (!pacchetto) return;
+
+    const persone = parseInt(formData.numeroPersone, 10);
+    if (isNaN(persone) || persone < pacchetto.numeroMinimoPersone) {
+      setRichiestaErrore(
+        `Il numero minimo di persone per questo pacchetto è ${pacchetto.numeroMinimoPersone}.`,
+      );
+      return;
+    }
 
     setRichiestaErrore(null);
     setInvioInCorso(true);
@@ -158,6 +202,19 @@ function CateringDettaglio() {
           paddingTop: "160px",
         }}
       >
+        <div
+          aria-hidden="true"
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            height: "120px",
+            background: `linear-gradient(to bottom, ${colors.char}ee, transparent)`,
+            zIndex: 1020,
+            pointerEvents: "none",
+          }}
+        />
         <div className="text-center">
           <Spinner animation="border" style={{ color: colors.wheat }} />
         </div>
@@ -175,6 +232,19 @@ function CateringDettaglio() {
           color: colors.text,
         }}
       >
+        <div
+          aria-hidden="true"
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            height: "120px",
+            background: `linear-gradient(to bottom, ${colors.char}ee, transparent)`,
+            zIndex: 1020,
+            pointerEvents: "none",
+          }}
+        />
         <Container className="text-center">
           <p>{errore || "Pacchetto non trovato."}</p>
           <Button
@@ -193,6 +263,13 @@ function CateringDettaglio() {
     : [];
   const tutteLeFoto = [pacchetto.immagine || PLACEHOLDER_IMG, ...galleriaFoto];
 
+  const totaleFormattato = totaleAnimato.toLocaleString("it-IT", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+  const sottoMinimo =
+    numeroPersoneInt > 0 && numeroPersoneInt < pacchetto.numeroMinimoPersone;
+
   return (
     <div
       style={{
@@ -203,6 +280,19 @@ function CateringDettaglio() {
         fontFamily: fontBody,
       }}
     >
+      <div
+        aria-hidden="true"
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          height: "120px",
+          background: `linear-gradient(to bottom, ${colors.char}ee, transparent)`,
+          zIndex: 1020,
+          pointerEvents: "none",
+        }}
+      />
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Work+Sans:wght@400;500&display=swap');
         .cd-thumb { transition: border-color .2s ease, opacity .2s ease; opacity: 0.7; }
@@ -457,7 +547,7 @@ function CateringDettaglio() {
                       style={inputStyle}
                     />
                   </Form.Group>
-                  <Row className="g-3 mb-3">
+                  <Row className="g-3 mb-2">
                     <Col md={6}>
                       <Form.Label
                         className="small fw-semibold text-uppercase"
@@ -495,6 +585,93 @@ function CateringDettaglio() {
                       />
                     </Col>
                   </Row>
+
+                  <div
+                    className="mb-3"
+                    style={{ position: "relative" }}
+                    aria-live="polite"
+                    aria-atomic="true"
+                  >
+                    <AnimatePresence mode="popLayout">
+                      <motion.div
+                        key={Math.round(totale * 100)}
+                        initial={{ scale: 0.94, opacity: 0.5 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{
+                          type: "spring",
+                          stiffness: 320,
+                          damping: 18,
+                        }}
+                        style={{
+                          position: "relative",
+                          overflow: "hidden",
+                          borderRadius: "10px",
+                          padding: "14px 16px",
+                          background: `linear-gradient(135deg, ${colors.char}, ${colors.crust})`,
+                        }}
+                      >
+                        <motion.div
+                          key={`shimmer-${Math.round(totale * 100)}`}
+                          initial={{ x: "-120%" }}
+                          animate={{ x: "220%" }}
+                          transition={{ duration: 0.7, ease: "easeOut" }}
+                          style={{
+                            position: "absolute",
+                            top: 0,
+                            left: 0,
+                            width: "35%",
+                            height: "100%",
+                            background: `linear-gradient(120deg, transparent, ${colors.gold}55, transparent)`,
+                            pointerEvents: "none",
+                          }}
+                        />
+                        <div
+                          className="d-flex justify-content-between align-items-center"
+                          style={{ position: "relative" }}
+                        >
+                          <div>
+                            <span
+                              className="d-block text-uppercase"
+                              style={{
+                                color: `${colors.gold}bb`,
+                                fontSize: "0.68rem",
+                                letterSpacing: "1.5px",
+                              }}
+                            >
+                              Totale stimato
+                            </span>
+                            <span
+                              className="fw-semibold"
+                              style={{
+                                fontFamily: fontDisplay,
+                                color: colors.gold,
+                                fontSize: "1.6rem",
+                              }}
+                            >
+                              € {totaleFormattato}
+                            </span>
+                          </div>
+                          <span
+                            className="small text-end"
+                            style={{ color: `${colors.flour}99` }}
+                          >
+                            € {pacchetto.prezzoPersona.toFixed(2)} ×<br />
+                            {numeroPersoneInt || 0} persone
+                          </span>
+                        </div>
+                      </motion.div>
+                    </AnimatePresence>
+                    {sottoMinimo && (
+                      <span
+                        className="d-block mt-2 small"
+                        style={{ color: colors.crust }}
+                      >
+                        Il minimo per questo pacchetto è{" "}
+                        {pacchetto.numeroMinimoPersone} persone.
+                      </span>
+                    )}
+                  </div>
+
                   <Form.Group className="mb-4">
                     <Form.Label
                       className="small fw-semibold text-uppercase"
