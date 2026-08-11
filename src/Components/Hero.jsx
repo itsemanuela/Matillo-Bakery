@@ -2,7 +2,7 @@ import { useRef } from "react";
 import { Container, Row, Col, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { motion, useScroll, useTransform } from "framer-motion";
-import heroImg from "../assets/lavorazione/hero.jpg";
+import heroImg from "../assets/lavorazione/PEPP5272.jpg";
 
 const dustParticles = [
   { left: "4%", size: 7, delay: 0, duration: 5.5 },
@@ -65,7 +65,7 @@ function Hero() {
         background:
           "radial-gradient(circle at 15% 20%, #e87722 0%, transparent 55%), linear-gradient(180deg, #1c1613 0%, #2b1f1a 45%, #b34a14 80%, #d95c14 100%)",
         paddingTop: "11rem",
-        paddingBottom: "8rem",
+        paddingBottom: "7rem",
       }}
     >
       <motion.span
@@ -133,9 +133,9 @@ function Hero() {
                   textShadow: "0 3px 6px rgba(0,0,0,0.9)",
                 }}
               >
-                Il pane si aspetta,
+                Dove il pane
                 <br />
-                non si affretta
+                diventa emozione
               </motion.h1>
 
               <motion.p
@@ -157,14 +157,29 @@ function Hero() {
                 variants={lineVariants}
                 className="d-flex gap-3 flex-wrap justify-content-center justify-content-lg-start"
               >
+                <style>{`
+                  .hero-btn-primary, .hero-btn-primary:hover, .hero-btn-primary:focus, .hero-btn-primary:active {
+                    background-color: #EED972 !important;
+                    color: #1c1613 !important;
+                    border-color: #EED972 !important;
+                  }
+                  .hero-btn-outline {
+                    background-color: transparent !important;
+                    color: #F4F1EA !important;
+                    border-color: #F4F1EA !important;
+                  }
+                  .hero-btn-outline:hover, .hero-btn-outline:focus, .hero-btn-outline:active {
+                    background-color: #F4F1EA !important;
+                    color: #1c1613 !important;
+                    border-color: #F4F1EA !important;
+                  }
+                `}</style>
                 <motion.div whileHover={{ y: -3 }} whileTap={{ scale: 0.97 }}>
                   <Button
                     size="lg"
                     onClick={() => navigate("/shop")}
-                    className="px-4 py-2 fw-semibold border-0"
+                    className="hero-btn-primary px-4 py-2 fw-semibold border-0"
                     style={{
-                      backgroundColor: "#EED972",
-                      color: "#1c1613",
                       borderRadius: "999px",
                       boxShadow: "0 10px 24px rgba(238,217,114,0.35)",
                     }}
@@ -175,16 +190,15 @@ function Hero() {
                 <motion.div whileHover={{ y: -3 }} whileTap={{ scale: 0.97 }}>
                   <Button
                     size="lg"
-                    variant="outline-light"
-                    onClick={() => navigate("/ricette")}
-                    className="px-4 py-2 fw-semibold"
+                    onClick={() => navigate("/laboratori")}
+                    className="hero-btn-outline px-4 py-2 fw-semibold"
                     style={{
                       borderRadius: "999px",
-                      borderColor: "#F4F1EA",
-                      color: "#F4F1EA",
+                      borderWidth: "1px",
+                      borderStyle: "solid",
                     }}
                   >
-                    Le Nostre Ricette
+                    I Nostri Laboratori
                   </Button>
                 </motion.div>
               </motion.div>
@@ -264,7 +278,8 @@ function Hero() {
                     height: "100%",
                     display: "block",
                     objectFit: "contain",
-                    filter: "drop-shadow(0 25px 40px rgba(0,0,0,0.5))",
+                    filter:
+                      "drop-shadow(0 25px 40px rgba(0,0,0,0.5)) sepia(0.22) saturate(1.35) hue-rotate(-8deg) contrast(1.1) brightness(0.93)",
                     WebkitMaskImage:
                       "radial-gradient(ellipse 72% 72% at 50% 50%, black 55%, transparent 100%)",
                     maskImage:
@@ -279,7 +294,7 @@ function Hero() {
                 transition={{ delay: 1.1, duration: 0.6, ease: "easeOut" }}
                 className="position-absolute d-flex align-items-center gap-2"
                 style={{
-                  bottom: "2rem",
+                  bottom: "6%",
                   left: "50%",
                   transform: "translateX(-50%)",
                   color: "#EED972",
@@ -309,6 +324,25 @@ function Hero() {
           </Col>
         </Row>
       </Container>
+
+      <div
+        className="position-absolute bottom-0 start-0 w-100"
+        style={{ height: "44px", zIndex: 1 }}
+      >
+        <div
+          className="position-absolute top-0 start-0 w-100"
+          style={{ height: "1px", backgroundColor: "rgba(238,217,114,0.4)" }}
+        />
+        <div
+          className="position-absolute bottom-0 start-0 w-100"
+          style={{
+            height: "44px",
+            background:
+              "radial-gradient(circle at 22px 44px, #d95c14 22px, transparent 23px) repeat-x",
+            backgroundSize: "44px 44px",
+          }}
+        />
+      </div>
     </div>
   );
 }

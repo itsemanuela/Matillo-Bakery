@@ -12,6 +12,8 @@ import { useNavigate, useLocation } from "react-router-dom";
 import FormCity from "./FormCity";
 
 const API_URL = "http://localhost:3001/api";
+const CODICE_SCONTO_VALIDO = "BENVENUTO10";
+const PERCENTUALE_SCONTO = 0.1;
 
 function Checkout() {
   const navigate = useNavigate();
@@ -55,8 +57,28 @@ function Checkout() {
     telefono: "",
   });
 
+  const [codiceSconto, setCodiceSconto] = useState("");
+  const [scontoApplicato, setScontoApplicato] = useState(false);
+  const [scontoErrore, setScontoErrore] = useState(null);
+
   const [errore, setErrore] = useState(null);
   const [invioInCorso, setInvioInCorso] = useState(false);
+
+  const subtotale = parseFloat(totalPrice) || 0;
+  const valoreSconto = scontoApplicato ? subtotale * PERCENTUALE_SCONTO : 0;
+  const totaleFinale = (subtotale - valoreSconto).toFixed(2);
+
+  const handleApplicaSconto = (e) => {
+    e.preventDefault();
+    setScontoErrore(null);
+
+    if (codiceSconto.trim().toUpperCase() === CODICE_SCONTO_VALIDO) {
+      setScontoApplicato(true);
+    } else {
+      setScontoApplicato(false);
+      setScontoErrore("Codice sconto non valido.");
+    }
+  };
 
   const handleShippingChange = (e) => {
     setShippingData({ ...shippingData, [e.target.name]: e.target.value });
@@ -170,9 +192,13 @@ function Checkout() {
 
     const indirizzoCompleto = `${shippingData.indirizzo}, ${shippingData.citta} ${shippingData.cap}`;
 
+    const noteConSconto = scontoApplicato
+      ? `Codice sconto applicato: ${CODICE_SCONTO_VALIDO} (-10%)`
+      : "";
+
     const payload = {
       indirizzoSpedizione: indirizzoCompleto,
-      note: "",
+      note: noteConSconto,
       dettagli,
       nomeCliente: shippingData.nome,
       cognomeCliente: shippingData.cognome,
@@ -202,7 +228,6 @@ function Checkout() {
         return res.json();
       })
       .then(() => {
-        // Reindirizzamento alla pagina dei propri ordini dopo il pagamento
         navigate("/miei-ordini", {
           state: {
             messaggio:
@@ -639,9 +664,70 @@ function Checkout() {
                   </div>
                 )}
 
-                <div className="pt-3 border-top border-secondary border-opacity-25 d-flex justify-content-between align-items-center fs-5 fw-bold">
-                  <span>Totale:</span>
-                  <span className="checkout-gold-text">€ {totalPrice}</span>
+                {cart.length > 0 && (
+                  <div className="mb-3">
+                    <Form onSubmit={handleApplicaSconto}>
+                      <Form.Label className="small text-light mb-2">
+                        Hai un codice sconto?
+                      </Form.Label>
+                      <div className="d-flex gap-2">
+                        <Form.Control
+                          type="text"
+                          value={codiceSconto}
+                          onChange={(e) => setCodiceSconto(e.target.value)}
+                          className="checkout-input"
+                          disabled={scontoApplicato}
+                        />
+                        <Button
+                          type="submit"
+                          className="checkout-btn-gold fw-semibold px-3 border-0"
+                          disabled={scontoApplicato || !codiceSconto.trim()}
+                        >
+                          {scontoApplicato ? (
+                            <i className="bi bi-check2"></i>
+                          ) : (
+                            "Applica"
+                          )}
+                        </Button>
+                      </div>
+                    </Form>
+                    {scontoErrore && (
+                      <small
+                        className="d-block mt-2"
+                        style={{ color: "#e08585" }}
+                      >
+                        {scontoErrore}
+                      </small>
+                    )}
+                    {scontoApplicato && (
+                      <small className="d-block mt-2 checkout-gold-text">
+                        <i className="bi bi-check-circle-fill me-1"></i>
+                        Sconto del 10% applicato
+                      </small>
+                    )}
+                  </div>
+                )}
+
+                <div className="pt-3 border-top border-secondary border-opacity-25">
+                  {scontoApplicato && (
+                    <>
+                      <div className="d-flex justify-content-between small text-light opacity-75 mb-1">
+                        <span>Subtotale:</span>
+                        <span>€ {subtotale.toFixed(2)}</span>
+                      </div>
+                      <div
+                        className="d-flex justify-content-between small mb-2"
+                        style={{ color: "#8fd19e" }}
+                      >
+                        <span>Sconto (10%):</span>
+                        <span>- € {valoreSconto.toFixed(2)}</span>
+                      </div>
+                    </>
+                  )}
+                  <div className="d-flex justify-content-between align-items-center fs-5 fw-bold">
+                    <span>Totale:</span>
+                    <span className="checkout-gold-text">€ {totaleFinale}</span>
+                  </div>
                 </div>
               </Card.Body>
             </Card>

@@ -8,6 +8,7 @@ import Offcanvas from "react-bootstrap/Offcanvas";
 import Spinner from "react-bootstrap/Spinner";
 import { motion } from "framer-motion";
 import DettaglioProdotto from "./DettaglioProdotto";
+import ModaleSconto from "./ModaleSconto";
 import { useNavigate } from "react-router-dom";
 
 const API_URL = "http://localhost:3001/api";
@@ -42,6 +43,7 @@ function Shop() {
   const [selectedCategory, setSelectedCategory] = useState("TUTTI");
   const [cart, setCart] = useState([]);
   const [showCart, setShowCart] = useState(false);
+  const [showSconto, setShowSconto] = useState(false);
   const [prodotti, setProdotti] = useState([]);
   const [caricamento, setCaricamento] = useState(true);
   const [errore, setErrore] = useState(null);
@@ -67,6 +69,14 @@ function Shop() {
         setErrore(err.message);
         setCaricamento(false);
       });
+  }, []);
+
+  useEffect(() => {
+    const utenteLoggato = localStorage.getItem("utente");
+    if (utenteLoggato) return;
+
+    const timer = setTimeout(() => setShowSconto(true), 1200);
+    return () => clearTimeout(timer);
   }, []);
 
   const addToCart = (product) => {
@@ -266,7 +276,7 @@ function Shop() {
       >
         <Offcanvas.Header closeButton closeVariant="white" className="pb-3">
           <Offcanvas.Title className="cart-title fw-bold">
-            Il tuo Carrello
+            Il tuo Carrello artigianale
           </Offcanvas.Title>
         </Offcanvas.Header>
         <div className="cart-header-line mx-4 mb-2" />
@@ -725,6 +735,8 @@ function Shop() {
         onHide={() => setProdottoSelezionato(null)}
         onAddToCart={addToCart}
       />
+
+      <ModaleSconto show={showSconto} onHide={() => setShowSconto(false)} />
     </div>
   );
 }
