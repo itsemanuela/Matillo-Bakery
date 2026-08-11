@@ -15,7 +15,6 @@ const API_URL = "http://localhost:3001/api";
 const PLACEHOLDER_IMG =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%23241d18'/%3E%3Ctext x='50%25' y='50%25' font-family='sans-serif' font-size='18' fill='%23EED972' text-anchor='middle' dy='.3em'%3EFoto in arrivo%3C/text%3E%3C/svg%3E";
 
-// Varianti per l'ingresso della bestseller card al caricamento
 const bestsellerVariants = {
   hidden: { opacity: 0, y: 30 },
   visible: {
@@ -25,8 +24,6 @@ const bestsellerVariants = {
   },
 };
 
-// Varianti per le card prodotto: entrano al scroll, con un ritardo
-// scalare in base alla posizione (le prime entrano leggermente prima).
 const cardVariants = {
   hidden: { opacity: 0, y: 28, scale: 0.97 },
   visible: (index) => ({
@@ -36,7 +33,7 @@ const cardVariants = {
     transition: {
       duration: 0.5,
       ease: "easeOut",
-      delay: (index % 6) * 0.07, // il resto (%6) evita ritardi troppo lunghi con tante card
+      delay: (index % 6) * 0.07,
     },
   }),
 };
@@ -99,7 +96,8 @@ function Shop() {
       className="bg-custom-shop"
       style={{
         background:
-          "radial-gradient(circle at 12% 8%, rgba(238,217,114,0.14) 0%, transparent 42%), radial-gradient(circle at 88% 92%, rgba(200,110,80,0.18) 0%, transparent 48%), linear-gradient(135deg, #9c6b52 0%, #834F41 40%, #6d4838 75%, #573b2e 100%)",
+          "radial-gradient(circle at 12% 8%, rgba(238,217,114,0.14) 0%, transparent 42%), radial-gradient(circle at 82% 10%, rgba(232,119,34,0.35) 0%, transparent 58%), linear-gradient(160deg, #e87722 0%, #d95c14 16%, #8a3e1c 45%, #2b1f1a 78%, #1c1613 100%)",
+        backgroundAttachment: "fixed",
         color: "#f8f9fa",
         minHeight: "100vh",
         paddingTop: "130px",
@@ -108,8 +106,6 @@ function Shop() {
         overflow: "hidden",
       }}
     >
-      {/* Bagliori decorativi che fluttuano lentamente, per rompere
-          la monotonia dello sfondo piatto */}
       <motion.div
         animate={{ y: [0, -20, 0], x: [0, 12, 0] }}
         transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
@@ -143,7 +139,7 @@ function Shop() {
           height: "220px",
           borderRadius: "50%",
           background:
-            "radial-gradient(circle, rgba(238,217,114,0.06) 0%, transparent 70%)",
+            "radial-gradient(circle, rgba(216,92,20,0.12) 0%, transparent 70%)",
           filter: "blur(18px)",
           pointerEvents: "none",
           zIndex: 0,
@@ -162,9 +158,9 @@ function Shop() {
           transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
         }
         .product-card:hover {
-          transform: translateY(-6px);
-          box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
-          border-color: rgba(238, 217, 114, 0.35);
+          transform: translateY(-8px);
+          box-shadow: 0 24px 55px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(238, 217, 114, 0.2);
+          border-color: rgba(238, 217, 114, 0.4);
         }
         .product-card-img-wrapper {
           overflow: hidden;
@@ -174,6 +170,30 @@ function Shop() {
         }
         .product-card:hover .product-card-img {
           transform: scale(1.08);
+        }
+        .bestseller-img-wrap { overflow: hidden; }
+        .bestseller-img {
+          transition: transform 0.6s ease;
+          filter: saturate(1.15) contrast(1.04);
+        }
+        .bestseller-img-wrap:hover .bestseller-img {
+          transform: scale(1.06);
+        }
+        .category-pill {
+          position: absolute;
+          top: 12px;
+          left: 12px;
+          background: rgba(20,15,12,0.75);
+          backdrop-filter: blur(6px);
+          color: #EED972;
+          font-size: 0.68rem;
+          font-weight: 600;
+          letter-spacing: 0.06em;
+          text-transform: uppercase;
+          padding: 4px 10px;
+          border-radius: 999px;
+          border: 1px solid rgba(238,217,114,0.3);
+          z-index: 2;
         }
         .product-card-overlay {
           position: absolute;
@@ -198,6 +218,44 @@ function Shop() {
           opacity: 0.5;
           cursor: not-allowed;
         }
+        .cart-header-line {
+          height: 1px;
+          background: linear-gradient(90deg, transparent, rgba(238,217,114,0.5), transparent);
+        }
+        .cart-item-row {
+          transition: background 0.2s ease;
+          border-radius: 10px;
+        }
+        .cart-item-row:hover {
+          background: rgba(238,217,114,0.05);
+        }
+        .cart-item-thumb {
+          width: 52px;
+          height: 52px;
+          border-radius: 10px;
+          object-fit: cover;
+          border: 1px solid rgba(238,217,114,0.2);
+          flex-shrink: 0;
+        }
+        .cart-remove-icon {
+          width: 30px;
+          height: 30px;
+          border-radius: 50%;
+          border: 1px solid rgba(224,133,133,0.35);
+          background: transparent;
+          color: #e08585;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: background 0.2s ease, transform 0.2s ease;
+        }
+        .cart-remove-icon:hover {
+          background: rgba(224,133,133,0.12);
+          transform: scale(1.06);
+        }
+        .cart-offcanvas {
+          background-image: radial-gradient(circle at 100% 0%, rgba(232,119,34,0.12) 0%, transparent 45%) !important;
+        }
       `}</style>
 
       <Offcanvas
@@ -206,15 +264,12 @@ function Shop() {
         placement="end"
         className="cart-offcanvas"
       >
-        <Offcanvas.Header
-          closeButton
-          closeVariant="white"
-          className="border-bottom border-secondary border-opacity-25"
-        >
+        <Offcanvas.Header closeButton closeVariant="white" className="pb-3">
           <Offcanvas.Title className="cart-title fw-bold">
-            Il tuo Carrello artigianale
+            Il tuo Carrello
           </Offcanvas.Title>
         </Offcanvas.Header>
+        <div className="cart-header-line mx-4 mb-2" />
         <Offcanvas.Body className="d-flex flex-column cart-body">
           {cart.length === 0 ? (
             <div className="text-center my-auto text-light opacity-75">
@@ -232,22 +287,29 @@ function Shop() {
                 {cart.map((item, index) => (
                   <div
                     key={index}
-                    className="d-flex justify-content-between align-items-center py-3 border-bottom border-secondary border-opacity-25"
+                    className="d-flex align-items-center gap-3 py-3 px-2 cart-item-row border-bottom border-secondary border-opacity-10"
                   >
-                    <div>
+                    <img
+                      src={item.immagine || PLACEHOLDER_IMG}
+                      alt={item.nome}
+                      className="cart-item-thumb"
+                    />
+                    <div className="flex-grow-1">
                       <h6 className="mb-0 fw-bold text-white">{item.nome}</h6>
                       <small className="cart-gold-text">
                         € {item.prezzo.toFixed(2)}
                       </small>
                     </div>
-                    <Button
-                      variant="outline-danger"
-                      size="sm"
+                    <button
                       onClick={() => removeFromCart(index)}
-                      className="cart-remove-btn"
+                      aria-label={`Rimuovi ${item.nome}`}
+                      className="cart-remove-icon border-0"
                     >
-                      Rimuovi
-                    </Button>
+                      <i
+                        className="bi bi-trash3"
+                        style={{ fontSize: "0.85rem" }}
+                      ></i>
+                    </button>
                   </div>
                 ))}
               </div>
@@ -380,14 +442,31 @@ function Shop() {
                 initial="hidden"
                 animate="visible"
                 variants={bestsellerVariants}
-                className="mb-5"
+                className="mb-4 position-relative"
               >
-                <Row className="g-4 align-items-stretch">
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "-15%",
+                    left: "5%",
+                    width: "45%",
+                    height: "130%",
+                    background:
+                      "radial-gradient(circle, rgba(232,119,34,0.28) 0%, transparent 70%)",
+                    filter: "blur(50px)",
+                    pointerEvents: "none",
+                    zIndex: 0,
+                  }}
+                />
+                <Row
+                  className="g-4 align-items-stretch position-relative"
+                  style={{ zIndex: 1 }}
+                >
                   <Col lg={5}>
                     <div
+                      className="bestseller-img-wrap"
                       style={{
                         borderRadius: "20px",
-                        overflow: "hidden",
                         height: "100%",
                         minHeight: "260px",
                         border: "1px solid rgba(255,255,255,0.15)",
@@ -399,6 +478,7 @@ function Shop() {
                       <img
                         src={bestseller.immagine || PLACEHOLDER_IMG}
                         alt={bestseller.nome}
+                        className="bestseller-img"
                         style={{
                           width: "100%",
                           height: "100%",
@@ -412,7 +492,7 @@ function Shop() {
                     <div
                       className="h-100 d-flex flex-column justify-content-center p-4 p-lg-5 position-relative overflow-hidden"
                       style={{
-                        backgroundColor: "rgba(20, 15, 12, 0.55)",
+                        backgroundColor: "rgba(60, 30, 14, 0.5)",
                         backdropFilter: "blur(20px)",
                         WebkitBackdropFilter: "blur(20px)",
                         border: "1px solid rgba(255,255,255,0.12)",
@@ -489,6 +569,16 @@ function Shop() {
               </motion.div>
             )}
 
+            <div
+              className="mx-auto mb-5"
+              style={{
+                maxWidth: "180px",
+                height: "1px",
+                background:
+                  "linear-gradient(90deg, transparent, rgba(238,217,114,0.5), transparent)",
+              }}
+            />
+
             <div className="d-flex justify-content-center gap-2 gap-md-3 mb-5 flex-wrap">
               {["TUTTI", ...new Set(prodotti.map((p) => p.categoria))].map(
                 (cat) => (
@@ -545,6 +635,9 @@ function Shop() {
                           className="product-card-img"
                           style={{ height: "100%", objectFit: "cover" }}
                         />
+                        <span className="category-pill">
+                          {product.categoria}
+                        </span>
                         <div className="product-card-overlay"></div>
                         {!product.disponibile && (
                           <div

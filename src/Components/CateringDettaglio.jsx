@@ -15,8 +15,8 @@ const PLACEHOLDER_IMG =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='500' viewBox='0 0 800 500'%3E%3Crect width='800' height='500' fill='%23241d18'/%3E%3Ctext x='50%25' y='50%25' font-family='sans-serif' font-size='24' fill='%23EED972' text-anchor='middle' dy='.3em'%3EFoto in arrivo%3C/text%3E%3C/svg%3E";
 
 const colors = {
-  char: "#2A1A10",
-  crust: "#6E3A22",
+  char: "#1c1613",
+  crust: "#b34a14",
   wheat: "#C98A34",
   gold: "#EED972",
   flour: "#F6EEDD",

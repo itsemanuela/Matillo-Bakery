@@ -54,7 +54,6 @@ function LaboratorioDettaglio() {
   const [errore, setErrore] = useState(null);
   const [fotoAttiva, setFotoAttiva] = useState(0);
 
-  // Stati per la gestione della modale con il carosello
   const [showModal, setShowModal] = useState(false);
   const [indiceModal, setIndiceModal] = useState(0);
 
@@ -136,7 +135,7 @@ function LaboratorioDettaglio() {
     return (
       <div
         style={{
-          backgroundColor: "#221915",
+          backgroundColor: "#1c1613",
           minHeight: "100vh",
           paddingTop: "160px",
         }}
@@ -152,7 +151,7 @@ function LaboratorioDettaglio() {
     return (
       <div
         style={{
-          backgroundColor: "#221915",
+          backgroundColor: "#1c1613",
           minHeight: "100vh",
           paddingTop: "160px",
           color: "#f8f9fa",
@@ -183,7 +182,8 @@ function LaboratorioDettaglio() {
     <div
       style={{
         background:
-          "radial-gradient(circle at 15% 5%, rgba(238,217,114,0.12) 0%, transparent 45%), linear-gradient(160deg, #9c6b52 0%, #834F41 40%, #6d4838 75%, #573b2e 100%)",
+          "radial-gradient(circle at 15% 5%, rgba(238,217,114,0.12) 0%, transparent 45%), radial-gradient(circle at 85% 8%, rgba(232,119,34,0.3) 0%, transparent 55%), linear-gradient(160deg, #e87722 0%, #d95c14 14%, #8a3e1c 42%, #2b1f1a 75%, #1c1613 100%)",
+        backgroundAttachment: "fixed",
         color: "#f8f9fa",
         minHeight: "100vh",
         paddingBottom: "100px",
@@ -308,7 +308,6 @@ function LaboratorioDettaglio() {
         </Container>
       )}
 
-      {/* MODALE CON CAROSELLO */}
       <Modal
         show={showModal}
         onHide={() => setShowModal(false)}
@@ -567,7 +566,7 @@ function LaboratorioDettaglio() {
                   width: "70%",
                   height: "160%",
                   background:
-                    "radial-gradient(circle, rgba(238,217,114,0.1) 0%, transparent 70%)",
+                    "radial-gradient(circle, rgba(232,119,34,0.15) 0%, transparent 70%)",
                   pointerEvents: "none",
                 }}
               />

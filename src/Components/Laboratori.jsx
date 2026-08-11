@@ -59,7 +59,8 @@ function Laboratori() {
     <div
       style={{
         background:
-          "radial-gradient(circle at 12% 8%, rgba(238,217,114,0.14) 0%, transparent 42%), linear-gradient(135deg, #9c6b52 0%, #834F41 40%, #6d4838 75%, #573b2e 100%)",
+          "radial-gradient(circle at 12% 8%, rgba(238,217,114,0.14) 0%, transparent 42%), radial-gradient(circle at 82% 10%, rgba(232,119,34,0.35) 0%, transparent 58%), linear-gradient(160deg, #e87722 0%, #d95c14 16%, #8a3e1c 45%, #2b1f1a 78%, #1c1613 100%)",
+        backgroundAttachment: "fixed",
         color: "#f8f9fa",
         minHeight: "100vh",
         paddingTop: "130px",

@@ -20,7 +20,7 @@ function DettaglioProdotto({ prodotto, show, onHide, onAddToCart }) {
       <div
         style={{
           position: "relative",
-          backgroundColor: "rgba(93, 61, 51, 0.85)",
+          backgroundColor: "rgba(28, 22, 19, 0.9)",
           backdropFilter: "blur(24px)",
           WebkitBackdropFilter: "blur(24px)",
           borderRadius: "24px",
@@ -51,7 +51,7 @@ function DettaglioProdotto({ prodotto, show, onHide, onAddToCart }) {
             width: "60%",
             height: "140%",
             background:
-              "radial-gradient(circle, rgba(238,217,114,0.06) 0%, transparent 70%)",
+              "radial-gradient(circle, rgba(232,119,34,0.1) 0%, transparent 70%)",
             pointerEvents: "none",
           }}
         />
@@ -110,6 +110,13 @@ function DettaglioProdotto({ prodotto, show, onHide, onAddToCart }) {
                     height: "340px",
                     objectFit: "cover",
                     display: "block",
+                    transition: "transform 0.5s ease",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = "scale(1.06)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = "scale(1)";
                   }}
                 />
               </div>

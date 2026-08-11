@@ -26,64 +26,83 @@ const laboratoriocScatti = [
   { img: foto7, text: "Il profumo autentico del pane appena fatto" },
 ];
 
-//libreria esterna framer
 const containerVariants = {
   hidden: {},
   visible: {
     transition: {
-      staggerChildren: 0.15,
-      delayChildren: 0.1,
+      staggerChildren: 0.1,
+      delayChildren: 0.05,
     },
   },
 };
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 24 },
+  hidden: { opacity: 0, y: 46, scale: 0.98 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.6, ease: "easeOut" },
+    scale: 1,
+    transition: { type: "spring", stiffness: 120, damping: 15 },
   },
 };
 
 const imageVariants = {
-  hidden: { opacity: 0, x: 40, scale: 0.96 },
+  hidden: { opacity: 0, x: 70, scale: 0.88, rotate: -3 },
   visible: {
     opacity: 1,
     x: 0,
     scale: 1,
-    transition: { duration: 0.7, ease: "easeOut" },
+    rotate: 0,
+    transition: { type: "spring", stiffness: 90, damping: 14 },
   },
 };
 
 function AboutSection() {
   return (
     <section
-      className="py-5"
-      style={{ backgroundColor: "#834F41", color: "#3d2c24" }}
+      style={{
+        backgroundImage:
+          "linear-gradient(180deg, #d95c14 0%, #b34a14 28%, #2b1f1a 72%, #1c1613 100%)",
+        color: "#3d2c24",
+        paddingTop: "2.5rem",
+        paddingBottom: "5rem",
+      }}
     >
-      <Container className="py-5">
+      <Container>
         <Row className="align-items-center g-5">
           <Col lg={6}>
             <motion.div
               variants={containerVariants}
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true, amount: 0.3 }}
+              viewport={{ once: true, amount: 0.15 }}
             >
-              <motion.span
-                className="text-uppercase tracking-wider fw-bold text-warning small d-block mb-2"
-                variants={itemVariants}
-              >
-                Tradizione Artigianale
-              </motion.span>
+              <motion.div variants={itemVariants} className="mb-2">
+                <span
+                  className="text-uppercase fw-bold small d-inline-block"
+                  style={{ color: "#EED972", letterSpacing: "0.1em" }}
+                >
+                  Tradizione Artigianale
+                </span>
+                <span
+                  className="d-block"
+                  style={{
+                    width: "48px",
+                    height: "2px",
+                    backgroundColor: "#EED972",
+                    marginTop: "8px",
+                  }}
+                />
+              </motion.div>
 
               <motion.h2
                 className="display-5 fw-bold mb-4"
                 style={{
                   fontFamily: "'Roboto Serif', serif",
                   lineHeight: "1.2",
-                  color: "#ffffff",
+                  color: "#F4F1EA",
+                  marginTop: "1.25rem",
+                  textShadow: "0 3px 6px rgba(0,0,0,0.6)",
                 }}
                 variants={itemVariants}
               >
@@ -91,11 +110,11 @@ function AboutSection() {
               </motion.h2>
 
               <motion.p
-                className="lead opacity-90 mb-4"
+                className="lead mb-4"
                 style={{
                   fontSize: "1.1rem",
                   lineHeight: "1.8",
-                  color: "#e3ded6",
+                  color: "#f5ebd8",
                 }}
                 variants={itemVariants}
               >
@@ -108,7 +127,7 @@ function AboutSection() {
               <motion.p
                 className="mb-0"
                 style={{
-                  color: "#d0c7bc",
+                  color: "#d9ccbc",
                   lineHeight: "1.7",
                   fontSize: "1rem",
                 }}
@@ -126,8 +145,14 @@ function AboutSection() {
               variants={imageVariants}
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true, amount: 0.3 }}
-              className="shadow-lg rounded overflow-hidden border border-warning border-opacity-25"
+              viewport={{ once: true, amount: 0.15 }}
+              className="overflow-hidden position-relative mt-lg-n5"
+              style={{
+                borderRadius: "6px",
+                border: "1px solid rgba(238,217,114,0.4)",
+                boxShadow: "0 30px 60px rgba(0,0,0,0.5)",
+                zIndex: 3,
+              }}
             >
               <Carousel
                 fade
@@ -147,8 +172,16 @@ function AboutSection() {
                         alt={`Lavorazione Antico Forno Matillo ${index + 1}`}
                       />
                     </div>
-                    <Carousel.Caption className="bg-dark bg-opacity-75 rounded p-2 mb-2">
-                      <p className="m-0 small text-light">{item.text}</p>
+                    <Carousel.Caption
+                      className="rounded p-2 mb-2"
+                      style={{
+                        backgroundColor: "rgba(28,22,19,0.8)",
+                        fontFamily: "'Roboto Serif', serif",
+                      }}
+                    >
+                      <p className="m-0 small" style={{ color: "#F4F1EA" }}>
+                        {item.text}
+                      </p>
                     </Carousel.Caption>
                   </Carousel.Item>
                 ))}
