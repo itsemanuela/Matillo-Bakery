@@ -25,6 +25,7 @@ import CateringDettaglio from "./Components/CateringDettaglio";
 import AdminCatering from "./ComponentGestionale/AdminCatering";
 import AdminRichiesteCatering from "./ComponentGestionale/AdminRichiesteCatering";
 import AdminGalleriaEventi from "./ComponentGestionale/AdminGalleriaEventi";
+import ChatWidget from "./Components/ChatWidget";
 
 function AppContent() {
   const location = useLocation();
@@ -126,6 +127,7 @@ function AppContent() {
       </Routes>
 
       {!isAdminRoute && <MyFooter />}
+      {!isAdminRoute && <ChatWidget />}
     </>
   );
 }

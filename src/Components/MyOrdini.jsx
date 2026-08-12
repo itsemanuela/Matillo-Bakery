@@ -19,7 +19,6 @@ function MyOrdini() {
   const [idEliminazioneInCorso, setIdEliminazioneInCorso] = useState(null);
   const [messaggioFeedback, setMessaggioFeedback] = useState(null);
 
-  // Stati per la gestione della modale di conferma
   const [mostraModale, setMostraModale] = useState(false);
   const [ordineSelezionatoDaEliminare, setOrdineSelezionatoDaEliminare] =
     useState(null);
@@ -51,19 +50,16 @@ function MyOrdini() {
     fetchOrdini();
   }, []);
 
-  // Apre la modale di conferma salvando l'id dell'ordine
   const apriConfermaEliminazione = (id) => {
     setOrdineSelezionatoDaEliminare(id);
     setMostraModale(true);
   };
 
-  // Chiude la modale
   const chiudiModale = () => {
     setMostraModale(false);
     setOrdineSelezionatoDaEliminare(null);
   };
 
-  // Esegue l'effettiva eliminazione tramite DELETE /api/ordini/{id} dopo la conferma
   const confermaEliminazione = () => {
     if (!ordineSelezionatoDaEliminare) return;
 
@@ -117,7 +113,7 @@ function MyOrdini() {
     return (
       <div
         style={{
-          backgroundColor: "#221915",
+          backgroundColor: "#1c1613",
           minHeight: "100vh",
           paddingTop: "160px",
         }}
@@ -132,7 +128,8 @@ function MyOrdini() {
     <div
       style={{
         background:
-          "linear-gradient(160deg, #9c6b52 0%, #834F41 40%, #6d4838 75%, #573b2e 100%)",
+          "radial-gradient(circle at 15% 5%, rgba(238,217,114,0.12) 0%, transparent 45%), radial-gradient(circle at 85% 8%, rgba(232,119,34,0.3) 0%, transparent 55%), linear-gradient(160deg, #e87722 0%, #d95c14 14%, #8a3e1c 42%, #2b1f1a 75%, #1c1613 100%)",
+        backgroundAttachment: "fixed",
         color: "#f8f9fa",
         minHeight: "100vh",
         paddingTop: "120px",
@@ -232,8 +229,12 @@ function MyOrdini() {
 
                         <div className="mb-3">
                           <span
-                            className="d-block text-uppercase small text-warning mb-1"
-                            style={{ fontSize: "0.7rem", letterSpacing: "1px" }}
+                            className="d-block text-uppercase small mb-1"
+                            style={{
+                              fontSize: "0.7rem",
+                              letterSpacing: "1px",
+                              color: "#EED972",
+                            }}
                           >
                             Prodotti:
                           </span>
@@ -274,13 +275,12 @@ function MyOrdini() {
         )}
       </Container>
 
-      {/* Modale di Conferma Eliminazione */}
       <Modal show={mostraModale} onHide={chiudiModale} centered>
         <div
           style={{
-            backgroundColor: "#2b1e18",
+            backgroundColor: "rgba(28, 22, 19, 0.96)",
             color: "#f8f9fa",
-            border: "1px solid rgba(237, 217, 114, 0.3)",
+            border: "1px solid rgba(238, 217, 114, 0.25)",
             borderRadius: "16px",
           }}
         >
@@ -305,7 +305,7 @@ function MyOrdini() {
             style={{ borderTop: "1px solid rgba(255, 255, 255, 0.1)" }}
           >
             <Button
-              variant="secondary"
+              variant="outline-light"
               onClick={chiudiModale}
               style={{ borderRadius: "8px" }}
             >
