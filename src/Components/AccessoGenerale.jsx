@@ -39,6 +39,11 @@ const inputControlStyle = {
 function AccessoGenerale() {
   const navigate = useNavigate();
   const [modalitaRegistrazione, setModalitaRegistrazione] = useState(false);
+  const [modalitaReset, setModalitaReset] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
+  const [resetInviato, setResetInviato] = useState(false);
+  const [resetErrore, setResetErrore] = useState(null);
+  const [resetInCorso, setResetInCorso] = useState(false);
 
   const [loginData, setLoginData] = useState({ email: "", password: "" });
   const [loginErrore, setLoginErrore] = useState(null);
@@ -95,6 +100,25 @@ function AccessoGenerale() {
 
   const handleRegisterChange = (e) => {
     setRegisterData({ ...registerData, [e.target.name]: e.target.value });
+  };
+
+  const handleRichiediReset = (e) => {
+    e.preventDefault();
+    setResetErrore(null);
+    setResetInCorso(true);
+
+    fetch(`${API_URL}/auth/richiedi-reset`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: resetEmail }),
+    })
+      .then((res) => {
+        if (!res.ok)
+          throw new Error("Si è verificato un errore, riprova più tardi.");
+        setResetInviato(true);
+      })
+      .catch((err) => setResetErrore(err.message))
+      .finally(() => setResetInCorso(false));
   };
 
   const handleRegisterSubmit = (e) => {
@@ -300,55 +324,57 @@ function AccessoGenerale() {
               }}
             />
 
-            <div
-              className="d-flex mx-auto mb-4"
-              style={{
-                width: "fit-content",
-                backgroundColor: "rgba(255,255,255,0.06)",
-                border: "1px solid rgba(238,217,114,0.25)",
-                borderRadius: "999px",
-                padding: "4px",
-              }}
-            >
-              <button
-                type="button"
-                onClick={() => {
-                  setModalitaRegistrazione(false);
-                  setLoginErrore(null);
-                }}
-                className="border-0 fw-semibold px-4 py-2"
+            {!modalitaReset && (
+              <div
+                className="d-flex mx-auto mb-4"
                 style={{
+                  width: "fit-content",
+                  backgroundColor: "rgba(255,255,255,0.06)",
+                  border: "1px solid rgba(238,217,114,0.25)",
                   borderRadius: "999px",
-                  fontSize: "0.85rem",
-                  backgroundColor: !modalitaRegistrazione
-                    ? "#EED972"
-                    : "transparent",
-                  color: !modalitaRegistrazione ? "#1c1613" : "#d9ccbc",
-                  transition: "all 0.2s ease",
+                  padding: "4px",
                 }}
               >
-                Accedi
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setModalitaRegistrazione(true);
-                  setRegisterErrore(null);
-                }}
-                className="border-0 fw-semibold px-4 py-2"
-                style={{
-                  borderRadius: "999px",
-                  fontSize: "0.85rem",
-                  backgroundColor: modalitaRegistrazione
-                    ? "#EED972"
-                    : "transparent",
-                  color: modalitaRegistrazione ? "#1c1613" : "#d9ccbc",
-                  transition: "all 0.2s ease",
-                }}
-              >
-                Registrati
-              </button>
-            </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setModalitaRegistrazione(false);
+                    setLoginErrore(null);
+                  }}
+                  className="border-0 fw-semibold px-4 py-2"
+                  style={{
+                    borderRadius: "999px",
+                    fontSize: "0.85rem",
+                    backgroundColor: !modalitaRegistrazione
+                      ? "#EED972"
+                      : "transparent",
+                    color: !modalitaRegistrazione ? "#1c1613" : "#d9ccbc",
+                    transition: "all 0.2s ease",
+                  }}
+                >
+                  Accedi
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setModalitaRegistrazione(true);
+                    setRegisterErrore(null);
+                  }}
+                  className="border-0 fw-semibold px-4 py-2"
+                  style={{
+                    borderRadius: "999px",
+                    fontSize: "0.85rem",
+                    backgroundColor: modalitaRegistrazione
+                      ? "#EED972"
+                      : "transparent",
+                    color: modalitaRegistrazione ? "#1c1613" : "#d9ccbc",
+                    transition: "all 0.2s ease",
+                  }}
+                >
+                  Registrati
+                </button>
+              </div>
+            )}
 
             <h2
               className="fw-bold mb-1 text-center"
@@ -357,143 +383,109 @@ function AccessoGenerale() {
                 color: "#F4F1EA",
               }}
             >
-              {modalitaRegistrazione ? "Crea il tuo account" : "Bentornato"}
+              {modalitaReset
+                ? "Reimposta la password"
+                : modalitaRegistrazione
+                  ? "Crea il tuo account"
+                  : "Bentornato"}
             </h2>
             <p
               className="opacity-75 small text-center mb-4"
               style={{ color: "#d9ccbc" }}
             >
-              {modalitaRegistrazione
-                ? "Registrati per ordinare e prenotare i nostri laboratori"
-                : "Accedi per consultare i tuoi ordini e le tue prenotazioni"}
+              {modalitaReset
+                ? "Inserisci l'email del tuo account: riceverai un link per scegliere una nuova password."
+                : modalitaRegistrazione
+                  ? "Registrati per ordinare e prenotare i nostri laboratori"
+                  : "Accedi per consultare i tuoi ordini e le tue prenotazioni"}
             </p>
 
-            <AnimatePresence mode="wait">
-              {!modalitaRegistrazione ? (
-                <motion.div
-                  key="login"
-                  initial={{ opacity: 0, x: -12 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 12 }}
-                  transition={{ duration: 0.25 }}
-                >
-                  {loginErrore && <Alert variant="danger">{loginErrore}</Alert>}
-                  <Form onSubmit={handleLoginSubmit}>
-                    <Form.Group className="mb-3">
-                      <Form.Label
-                        className="small fw-semibold"
-                        style={{ color: "#F4F1EA" }}
-                      >
-                        Email
-                      </Form.Label>
-                      <InputGroup>
-                        <InputGroup.Text style={groupTextStyle}>
-                          <i className="bi bi-envelope-fill"></i>
-                        </InputGroup.Text>
-                        <Form.Control
-                          type="email"
-                          name="email"
-                          value={loginData.email}
-                          onChange={handleLoginChange}
-                          required
-                          style={inputControlStyle}
-                        />
-                      </InputGroup>
-                    </Form.Group>
-
-                    <Form.Group className="mb-4">
-                      <Form.Label
-                        className="small fw-semibold"
-                        style={{ color: "#F4F1EA" }}
-                      >
-                        Password
-                      </Form.Label>
-                      <InputGroup>
-                        <InputGroup.Text style={groupTextStyle}>
-                          <i className="bi bi-key-fill"></i>
-                        </InputGroup.Text>
-                        <Form.Control
-                          type="password"
-                          name="password"
-                          value={loginData.password}
-                          onChange={handleLoginChange}
-                          required
-                          style={inputControlStyle}
-                        />
-                      </InputGroup>
-                    </Form.Group>
-
-                    <Button
-                      type="submit"
-                      className="w-100 fw-bold py-2 border-0 shadow"
-                      style={{
-                        backgroundColor: "#EED972",
-                        color: "#1c1613",
-                        borderRadius: "10px",
-                      }}
-                    >
-                      Accedi
-                    </Button>
-                  </Form>
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="register"
-                  initial={{ opacity: 0, x: 12 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -12 }}
-                  transition={{ duration: 0.25 }}
-                >
-                  {registerErrore && (
-                    <Alert variant="danger">{registerErrore}</Alert>
-                  )}
-                  <Form onSubmit={handleRegisterSubmit}>
-                    <Row className="g-3">
-                      <Col md={6}>
+            {modalitaReset ? (
+              <motion.div
+                key="reset"
+                initial={{ opacity: 0, x: -12 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.25 }}
+              >
+                {resetInviato ? (
+                  <Alert variant="success">
+                    Se l'email è registrata, riceverai a breve un link per
+                    reimpostare la password.
+                  </Alert>
+                ) : (
+                  <>
+                    {resetErrore && (
+                      <Alert variant="danger">{resetErrore}</Alert>
+                    )}
+                    <Form onSubmit={handleRichiediReset}>
+                      <Form.Group className="mb-4">
                         <Form.Label
                           className="small fw-semibold"
                           style={{ color: "#F4F1EA" }}
                         >
-                          Nome
+                          Email
                         </Form.Label>
                         <InputGroup>
                           <InputGroup.Text style={groupTextStyle}>
-                            <i className="bi bi-person-fill"></i>
+                            <i className="bi bi-envelope-fill"></i>
                           </InputGroup.Text>
                           <Form.Control
-                            type="text"
-                            name="nome"
-                            value={registerData.nome}
-                            onChange={handleRegisterChange}
+                            type="email"
+                            value={resetEmail}
+                            onChange={(e) => setResetEmail(e.target.value)}
                             required
                             style={inputControlStyle}
                           />
                         </InputGroup>
-                      </Col>
-
-                      <Col md={6}>
-                        <Form.Label
-                          className="small fw-semibold"
-                          style={{ color: "#F4F1EA" }}
-                        >
-                          Cognome
-                        </Form.Label>
-                        <InputGroup>
-                          <InputGroup.Text style={groupTextStyle}>
-                            <i className="bi bi-person-badge-fill"></i>
-                          </InputGroup.Text>
-                          <Form.Control
-                            type="text"
-                            name="cognome"
-                            value={registerData.cognome}
-                            onChange={handleRegisterChange}
-                            required
-                            style={inputControlStyle}
-                          />
-                        </InputGroup>
-                      </Col>
-
-                      <Col md={6}>
+                      </Form.Group>
+                      <Button
+                        type="submit"
+                        disabled={resetInCorso}
+                        className="w-100 fw-bold py-2 border-0 shadow"
+                        style={{
+                          backgroundColor: "#EED972",
+                          color: "#1c1613",
+                          borderRadius: "10px",
+                        }}
+                      >
+                        {resetInCorso
+                          ? "Invio in corso..."
+                          : "Invia link di reset"}
+                      </Button>
+                    </Form>
+                  </>
+                )}
+                <div className="text-center mt-3">
+                  <Button
+                    variant="link"
+                    className="text-decoration-none small text-white fw-semibold"
+                    style={{ textShadow: "0 1px 2px rgba(0,0,0,0.2)" }}
+                    onClick={() => {
+                      setModalitaReset(false);
+                      setResetInviato(false);
+                      setResetErrore(null);
+                      setResetEmail("");
+                    }}
+                  >
+                    <span style={{ color: "#EED972" }}>← Torna al login</span>
+                  </Button>
+                </div>
+              </motion.div>
+            ) : (
+              <AnimatePresence mode="wait">
+                {!modalitaRegistrazione ? (
+                  <motion.div
+                    key="login"
+                    initial={{ opacity: 0, x: -12 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 12 }}
+                    transition={{ duration: 0.25 }}
+                  >
+                    {loginErrore && (
+                      <Alert variant="danger">{loginErrore}</Alert>
+                    )}
+                    <Form onSubmit={handleLoginSubmit}>
+                      <Form.Group className="mb-3">
                         <Form.Label
                           className="small fw-semibold"
                           style={{ color: "#F4F1EA" }}
@@ -507,15 +499,15 @@ function AccessoGenerale() {
                           <Form.Control
                             type="email"
                             name="email"
-                            value={registerData.email}
-                            onChange={handleRegisterChange}
+                            value={loginData.email}
+                            onChange={handleLoginChange}
                             required
                             style={inputControlStyle}
                           />
                         </InputGroup>
-                      </Col>
+                      </Form.Group>
 
-                      <Col md={6}>
+                      <Form.Group className="mb-2">
                         <Form.Label
                           className="small fw-semibold"
                           style={{ color: "#F4F1EA" }}
@@ -529,124 +521,253 @@ function AccessoGenerale() {
                           <Form.Control
                             type="password"
                             name="password"
-                            value={registerData.password}
-                            onChange={handleRegisterChange}
-                            minLength={6}
+                            value={loginData.password}
+                            onChange={handleLoginChange}
                             required
                             style={inputControlStyle}
                           />
                         </InputGroup>
-                      </Col>
+                      </Form.Group>
 
-                      <Col md={6}>
-                        <Form.Label
-                          className="small fw-semibold"
-                          style={{ color: "#F4F1EA" }}
-                        >
-                          Telefono
-                        </Form.Label>
-                        <InputGroup>
-                          <InputGroup.Text style={groupTextStyle}>
-                            <i className="bi bi-telephone-fill"></i>
-                          </InputGroup.Text>
-                          <Form.Control
-                            type="tel"
-                            name="telefono"
-                            value={registerData.telefono}
-                            onChange={handleRegisterChange}
-                            required
-                            style={inputControlStyle}
-                          />
-                        </InputGroup>
-                      </Col>
-
-                      <Col md={6}>
-                        <Form.Label
-                          className="small fw-semibold"
-                          style={{ color: "#F4F1EA" }}
-                        >
-                          Indirizzo
-                        </Form.Label>
-                        <InputGroup>
-                          <InputGroup.Text style={groupTextStyle}>
-                            <i className="bi bi-geo-alt-fill"></i>
-                          </InputGroup.Text>
-                          <Form.Control
-                            type="text"
-                            name="indirizzo"
-                            value={registerData.indirizzo}
-                            onChange={handleRegisterChange}
-                            required
-                            style={inputControlStyle}
-                          />
-                        </InputGroup>
-                      </Col>
-
-                      <Col md={6}>
-                        <Form.Label
-                          className="small fw-semibold"
-                          style={{ color: "#F4F1EA" }}
-                        >
-                          Città
-                        </Form.Label>
-                        <InputGroup>
-                          <InputGroup.Text style={groupTextStyle}>
-                            <i className="bi bi-building-fill"></i>
-                          </InputGroup.Text>
-                          <Form.Control
-                            type="text"
-                            name="città"
-                            value={registerData.città}
-                            onChange={handleRegisterChange}
-                            required
-                            style={inputControlStyle}
-                          />
-                        </InputGroup>
-                      </Col>
-
-                      <Col md={6}>
-                        <Form.Label
-                          className="small fw-semibold"
-                          style={{ color: "#F4F1EA" }}
-                        >
-                          CAP
-                        </Form.Label>
-                        <InputGroup>
-                          <InputGroup.Text style={groupTextStyle}>
-                            <i className="bi bi-mailbox-fill"></i>
-                          </InputGroup.Text>
-                          <Form.Control
-                            type="text"
-                            name="cap"
-                            value={registerData.cap}
-                            onChange={handleRegisterChange}
-                            required
-                            style={inputControlStyle}
-                          />
-                        </InputGroup>
-                      </Col>
-
-                      <Col xs={12} className="mt-3">
+                      <div className="text-end mb-4">
                         <Button
-                          type="submit"
-                          disabled={registrazioneInCorso}
-                          className="w-100 fw-bold py-2 border-0 shadow"
-                          style={{
-                            backgroundColor: "#EED972",
-                            color: "#1c1613",
-                            borderRadius: "10px",
+                          variant="link"
+                          className="text-decoration-none small p-0"
+                          onClick={() => {
+                            setModalitaReset(true);
+                            setLoginErrore(null);
                           }}
+                          style={{ color: "#d9ccbc" }}
                         >
-                          {registrazioneInCorso
-                            ? "Creazione..."
-                            : "Crea account e continua"}
+                          Password dimenticata?
                         </Button>
-                      </Col>
-                    </Row>
-                  </Form>
-                </motion.div>
-              )}
-            </AnimatePresence>
+                      </div>
+
+                      <Button
+                        type="submit"
+                        className="w-100 fw-bold py-2 border-0 shadow"
+                        style={{
+                          backgroundColor: "#EED972",
+                          color: "#1c1613",
+                          borderRadius: "10px",
+                        }}
+                      >
+                        Accedi
+                      </Button>
+                    </Form>
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="register"
+                    initial={{ opacity: 0, x: 12 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -12 }}
+                    transition={{ duration: 0.25 }}
+                  >
+                    {registerErrore && (
+                      <Alert variant="danger">{registerErrore}</Alert>
+                    )}
+                    <Form onSubmit={handleRegisterSubmit}>
+                      <Row className="g-3">
+                        <Col md={6}>
+                          <Form.Label
+                            className="small fw-semibold"
+                            style={{ color: "#F4F1EA" }}
+                          >
+                            Nome
+                          </Form.Label>
+                          <InputGroup>
+                            <InputGroup.Text style={groupTextStyle}>
+                              <i className="bi bi-person-fill"></i>
+                            </InputGroup.Text>
+                            <Form.Control
+                              type="text"
+                              name="nome"
+                              value={registerData.nome}
+                              onChange={handleRegisterChange}
+                              required
+                              style={inputControlStyle}
+                            />
+                          </InputGroup>
+                        </Col>
+
+                        <Col md={6}>
+                          <Form.Label
+                            className="small fw-semibold"
+                            style={{ color: "#F4F1EA" }}
+                          >
+                            Cognome
+                          </Form.Label>
+                          <InputGroup>
+                            <InputGroup.Text style={groupTextStyle}>
+                              <i className="bi bi-person-badge-fill"></i>
+                            </InputGroup.Text>
+                            <Form.Control
+                              type="text"
+                              name="cognome"
+                              value={registerData.cognome}
+                              onChange={handleRegisterChange}
+                              required
+                              style={inputControlStyle}
+                            />
+                          </InputGroup>
+                        </Col>
+
+                        <Col md={6}>
+                          <Form.Label
+                            className="small fw-semibold"
+                            style={{ color: "#F4F1EA" }}
+                          >
+                            Email
+                          </Form.Label>
+                          <InputGroup>
+                            <InputGroup.Text style={groupTextStyle}>
+                              <i className="bi bi-envelope-fill"></i>
+                            </InputGroup.Text>
+                            <Form.Control
+                              type="email"
+                              name="email"
+                              value={registerData.email}
+                              onChange={handleRegisterChange}
+                              required
+                              style={inputControlStyle}
+                            />
+                          </InputGroup>
+                        </Col>
+
+                        <Col md={6}>
+                          <Form.Label
+                            className="small fw-semibold"
+                            style={{ color: "#F4F1EA" }}
+                          >
+                            Password
+                          </Form.Label>
+                          <InputGroup>
+                            <InputGroup.Text style={groupTextStyle}>
+                              <i className="bi bi-key-fill"></i>
+                            </InputGroup.Text>
+                            <Form.Control
+                              type="password"
+                              name="password"
+                              value={registerData.password}
+                              onChange={handleRegisterChange}
+                              minLength={6}
+                              required
+                              style={inputControlStyle}
+                            />
+                          </InputGroup>
+                        </Col>
+
+                        <Col md={6}>
+                          <Form.Label
+                            className="small fw-semibold"
+                            style={{ color: "#F4F1EA" }}
+                          >
+                            Telefono
+                          </Form.Label>
+                          <InputGroup>
+                            <InputGroup.Text style={groupTextStyle}>
+                              <i className="bi bi-telephone-fill"></i>
+                            </InputGroup.Text>
+                            <Form.Control
+                              type="tel"
+                              name="telefono"
+                              value={registerData.telefono}
+                              onChange={handleRegisterChange}
+                              required
+                              style={inputControlStyle}
+                            />
+                          </InputGroup>
+                        </Col>
+
+                        <Col md={6}>
+                          <Form.Label
+                            className="small fw-semibold"
+                            style={{ color: "#F4F1EA" }}
+                          >
+                            Indirizzo
+                          </Form.Label>
+                          <InputGroup>
+                            <InputGroup.Text style={groupTextStyle}>
+                              <i className="bi bi-geo-alt-fill"></i>
+                            </InputGroup.Text>
+                            <Form.Control
+                              type="text"
+                              name="indirizzo"
+                              value={registerData.indirizzo}
+                              onChange={handleRegisterChange}
+                              required
+                              style={inputControlStyle}
+                            />
+                          </InputGroup>
+                        </Col>
+
+                        <Col md={6}>
+                          <Form.Label
+                            className="small fw-semibold"
+                            style={{ color: "#F4F1EA" }}
+                          >
+                            Città
+                          </Form.Label>
+                          <InputGroup>
+                            <InputGroup.Text style={groupTextStyle}>
+                              <i className="bi bi-building-fill"></i>
+                            </InputGroup.Text>
+                            <Form.Control
+                              type="text"
+                              name="città"
+                              value={registerData.città}
+                              onChange={handleRegisterChange}
+                              required
+                              style={inputControlStyle}
+                            />
+                          </InputGroup>
+                        </Col>
+
+                        <Col md={6}>
+                          <Form.Label
+                            className="small fw-semibold"
+                            style={{ color: "#F4F1EA" }}
+                          >
+                            CAP
+                          </Form.Label>
+                          <InputGroup>
+                            <InputGroup.Text style={groupTextStyle}>
+                              <i className="bi bi-mailbox-fill"></i>
+                            </InputGroup.Text>
+                            <Form.Control
+                              type="text"
+                              name="cap"
+                              value={registerData.cap}
+                              onChange={handleRegisterChange}
+                              required
+                              style={inputControlStyle}
+                            />
+                          </InputGroup>
+                        </Col>
+
+                        <Col xs={12} className="mt-3">
+                          <Button
+                            type="submit"
+                            disabled={registrazioneInCorso}
+                            className="w-100 fw-bold py-2 border-0 shadow"
+                            style={{
+                              backgroundColor: "#EED972",
+                              color: "#1c1613",
+                              borderRadius: "10px",
+                            }}
+                          >
+                            {registrazioneInCorso
+                              ? "Creazione..."
+                              : "Crea account e continua"}
+                          </Button>
+                        </Col>
+                      </Row>
+                    </Form>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            )}
           </div>
         </motion.div>
       </div>

@@ -26,6 +26,7 @@ import AdminCatering from "./ComponentGestionale/AdminCatering";
 import AdminRichiesteCatering from "./ComponentGestionale/AdminRichiesteCatering";
 import AdminGalleriaEventi from "./ComponentGestionale/AdminGalleriaEventi";
 import ChatWidget from "./Components/ChatWidget";
+import ResetPassword from "./Components/ResetPassword";
 
 function AppContent() {
   const location = useLocation();
@@ -53,6 +54,7 @@ function AppContent() {
 
         <Route path="/login" element={<Login />} />
         <Route path="/accedi" element={<AccessoGenerale />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/miei-ordini" element={<MyOrdini />} />
         <Route path="/le-mie-prenotazioni" element={<LeMiePrenotazioni />} />
         <Route path="/profilo" element={<Profilo />} />
