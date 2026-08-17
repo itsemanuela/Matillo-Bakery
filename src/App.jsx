@@ -37,98 +37,111 @@ function AppContent() {
     <>
       {isAdminRoute ? <AdminNavbar /> : <MyNavbar />}
 
-      <Routes>
-        <Route
-          path="/"
-          element={
-            <>
-              <Hero />
-              <AboutSection />
-            </>
+      <style>{`
+        @media (min-width: 992px) {
+          .app-content-area.admin-shifted {
+            margin-left: calc(var(--admin-sidebar-width, 264px) + 32px);
+            transition: margin-left 0.25s cubic-bezier(0.22, 1, 0.36, 1);
           }
-        />
-        <Route path="/shop" element={<MyShop />} />
-        <Route path="/checkout" element={<Checkout />} />
-        <Route path="/checkout/successo" element={<CheckoutSuccesso />} />
+        }
+      `}</style>
 
-        <Route path="/catering" element={<Catering />} />
-        <Route path="/catering/:id" element={<CateringDettaglio />} />
+      <div
+        className={`app-content-area ${isAdminRoute ? "admin-shifted" : ""}`}
+      >
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <>
+                <Hero />
+                <AboutSection />
+              </>
+            }
+          />
+          <Route path="/shop" element={<MyShop />} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/checkout/successo" element={<CheckoutSuccesso />} />
 
-        <Route path="/login" element={<Login />} />
-        <Route path="/accedi" element={<AccessoGenerale />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/miei-ordini" element={<MyOrdini />} />
-        <Route path="/le-mie-prenotazioni" element={<LeMiePrenotazioni />} />
-        <Route path="/profilo" element={<Profilo />} />
+          <Route path="/catering" element={<Catering />} />
+          <Route path="/catering/:id" element={<CateringDettaglio />} />
 
-        <Route
-          path="/admin/prodotti"
-          element={
-            <RequiredAdmin>
-              <Admin />
-            </RequiredAdmin>
-          }
-        />
-        <Route
-          path="/admin/ordini"
-          element={
-            <RequiredAdmin>
-              <AdminOrdini />
-            </RequiredAdmin>
-          }
-        />
-        <Route
-          path="/admin/shop-preview"
-          element={
-            <RequiredAdmin>
-              <AdminShopPreview />
-            </RequiredAdmin>
-          }
-        />
-        <Route
-          path="/admin/laboratori"
-          element={
-            <RequiredAdmin>
-              <AdminLaboratori />
-            </RequiredAdmin>
-          }
-        />
-        <Route
-          path="/admin/prenotazioni"
-          element={
-            <RequiredAdmin>
-              <AdminPrenotazioni />
-            </RequiredAdmin>
-          }
-        />
-        <Route
-          path="/admin/catering"
-          element={
-            <RequiredAdmin>
-              <AdminCatering />
-            </RequiredAdmin>
-          }
-        />
-        <Route
-          path="/admin/richieste-catering"
-          element={
-            <RequiredAdmin>
-              <AdminRichiesteCatering />
-            </RequiredAdmin>
-          }
-        />
-        <Route
-          path="/admin/galleria-eventi"
-          element={
-            <RequiredAdmin>
-              <AdminGalleriaEventi />
-            </RequiredAdmin>
-          }
-        />
+          <Route path="/login" element={<Login />} />
+          <Route path="/accedi" element={<AccessoGenerale />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/miei-ordini" element={<MyOrdini />} />
+          <Route path="/le-mie-prenotazioni" element={<LeMiePrenotazioni />} />
+          <Route path="/profilo" element={<Profilo />} />
 
-        <Route path="/laboratori" element={<Laboratori />} />
-        <Route path="/laboratori/:id" element={<LaboratorioDettaglio />} />
-      </Routes>
+          <Route
+            path="/admin/prodotti"
+            element={
+              <RequiredAdmin>
+                <Admin />
+              </RequiredAdmin>
+            }
+          />
+          <Route
+            path="/admin/ordini"
+            element={
+              <RequiredAdmin>
+                <AdminOrdini />
+              </RequiredAdmin>
+            }
+          />
+          <Route
+            path="/admin/shop-preview"
+            element={
+              <RequiredAdmin>
+                <AdminShopPreview />
+              </RequiredAdmin>
+            }
+          />
+          <Route
+            path="/admin/laboratori"
+            element={
+              <RequiredAdmin>
+                <AdminLaboratori />
+              </RequiredAdmin>
+            }
+          />
+          <Route
+            path="/admin/prenotazioni"
+            element={
+              <RequiredAdmin>
+                <AdminPrenotazioni />
+              </RequiredAdmin>
+            }
+          />
+          <Route
+            path="/admin/catering"
+            element={
+              <RequiredAdmin>
+                <AdminCatering />
+              </RequiredAdmin>
+            }
+          />
+          <Route
+            path="/admin/richieste-catering"
+            element={
+              <RequiredAdmin>
+                <AdminRichiesteCatering />
+              </RequiredAdmin>
+            }
+          />
+          <Route
+            path="/admin/galleria-eventi"
+            element={
+              <RequiredAdmin>
+                <AdminGalleriaEventi />
+              </RequiredAdmin>
+            }
+          />
+
+          <Route path="/laboratori" element={<Laboratori />} />
+          <Route path="/laboratori/:id" element={<LaboratorioDettaglio />} />
+        </Routes>
+      </div>
 
       {!isAdminRoute && <MyFooter />}
       {!isAdminRoute && <ChatWidget />}
