@@ -209,8 +209,6 @@ function Checkout() {
         proseguiConInvio(true);
       })
       .catch(() => {
-        // Se il controllo fallisce per un problema di rete, procediamo
-        // comunque senza sconto invece di bloccare l'intero checkout.
         setScontoApplicato(false);
         proseguiConInvio(false);
       });
@@ -264,20 +262,26 @@ function Checkout() {
         }
         return res.json();
       })
-      .then(() => {
-        if (token) {
-          navigate("/miei-ordini", {
-            state: {
-              messaggio:
-                "Ordine completato con successo! Grazie per aver scelto Antico Forno Matillo.",
-            },
+      .then((ordineCreato) => {
+        return fetch(
+          `${API_URL}/pagamenti/crea-sessione/${ordineCreato.uuid}`,
+          {
+            method: "POST",
+          },
+        )
+          .then((res) => {
+            if (!res.ok)
+              throw new Error("Impossibile aprire il pagamento, riprova.");
+            return res.json();
+          })
+          .then((sessione) => {
+            window.location.href = sessione.url;
           });
-        } else {
-          setOrdineCompletato(true);
-        }
       })
-      .catch((err) => setErrore(err.message))
-      .finally(() => setInvioInCorso(false));
+      .catch((err) => {
+        setErrore(err.message);
+        setInvioInCorso(false);
+      });
   };
 
   return (
@@ -744,89 +748,91 @@ function Checkout() {
                       prodotti.
                     </p>
                   ) : (
-                    <div className="checkout-cart-list mb-3">
-                      {cart.map((item, index) => (
-                        <div
-                          key={index}
-                          className="d-flex justify-content-between align-items-center py-2 border-bottom border-secondary border-opacity-25"
-                        >
-                          <span className="small text-light">{item.nome}</span>
-                          <span className="checkout-gold-text small fw-semibold">
-                            € {item.prezzo.toFixed(2)}
+                    <>
+                      <div className="checkout-cart-list mb-3">
+                        {cart.map((item, index) => (
+                          <div
+                            key={index}
+                            className="d-flex justify-content-between align-items-center py-2 border-bottom border-secondary border-opacity-25"
+                          >
+                            <span className="small text-light">
+                              {item.nome}
+                            </span>
+                            <span className="checkout-gold-text small fw-semibold">
+                              € {item.prezzo.toFixed(2)}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="pt-3 border-top border-secondary">
+                        <div className="d-flex justify-content-between mb-2">
+                          <span className="text-light small">Subtotale</span>
+                          <span className="small">
+                            € {subtotale.toFixed(2)}
                           </span>
                         </div>
-                      ))}
-                    </div>
-                  )}
 
-                  {cart.length > 0 && !utenteLoggato && (
-                    <div className="mb-3">
-                      <Form onSubmit={handleApplicaSconto}>
-                        <Form.Label className="small text-light mb-2">
-                          Hai un codice sconto?
-                        </Form.Label>
-                        <div className="d-flex gap-2">
-                          <Form.Control
-                            type="text"
-                            placeholder="Es. BENVENUTO10"
-                            value={codiceSconto}
-                            onChange={(e) => setCodiceSconto(e.target.value)}
-                            className="checkout-input"
-                            disabled={scontoApplicato}
-                          />
-                          <Button
-                            type="submit"
-                            className="checkout-btn-gold fw-semibold px-3 border-0"
-                            disabled={scontoApplicato || !codiceSconto.trim()}
-                          >
-                            {scontoApplicato ? (
-                              <i className="bi bi-check2"></i>
-                            ) : (
-                              "Applica"
-                            )}
-                          </Button>
-                        </div>
-                      </Form>
-                      {scontoErrore && (
-                        <small
-                          className="d-block mt-2"
-                          style={{ color: "#e08585" }}
-                        >
-                          {scontoErrore}
-                        </small>
-                      )}
-                      {scontoApplicato && (
-                        <small className="d-block mt-2 checkout-gold-text">
-                          <i className="bi bi-check-circle-fill me-1"></i>
-                          Sconto del 10% applicato
-                        </small>
-                      )}
-                    </div>
-                  )}
+                        {scontoApplicato && (
+                          <div className="d-flex justify-content-between mb-2 text-success">
+                            <span className="small">
+                              Sconto Benvenuto (-10%)
+                            </span>
+                            <span className="small">
+                              - € {valoreSconto.toFixed(2)}
+                            </span>
+                          </div>
+                        )}
 
-                  <div className="pt-3 border-top border-secondary border-opacity-25">
-                    {scontoApplicato && (
-                      <>
-                        <div className="d-flex justify-content-between small text-light opacity-75 mb-1">
-                          <span>Subtotale:</span>
-                          <span>€ {subtotale.toFixed(2)}</span>
+                        <div className="d-flex justify-content-between mb-4 fw-bold fs-5">
+                          <span>Totale</span>
+                          <span className="checkout-gold-text">
+                            € {totaleFinale}
+                          </span>
                         </div>
-                        <div
-                          className="d-flex justify-content-between small mb-2"
-                          style={{ color: "#8fd19e" }}
-                        >
-                          <span>Sconto (10%):</span>
-                          <span>- € {valoreSconto.toFixed(2)}</span>
-                        </div>
-                      </>
-                    )}
-                    <div className="d-flex justify-content-between align-items-center fs-5 fw-bold">
-                      <span>Totale:</span>
-                      <span className="checkout-gold-text">
-                        € {totaleFinale}
-                      </span>
-                    </div>
-                  </div>
+                      </div>
+
+                      {/* Sezione Codice Sconto */}
+                      {!utenteLoggato && (
+                        <Form onSubmit={handleApplicaSconto} className="mt-3">
+                          <Form.Group className="mb-2">
+                            <Form.Label className="small text-light">
+                              Hai un codice sconto?
+                            </Form.Label>
+                            <div className="d-flex gap-2">
+                              <Form.Control
+                                type="text"
+                                placeholder="es. BENVENUTO10"
+                                value={codiceSconto}
+                                onChange={(e) =>
+                                  setCodiceSconto(e.target.value)
+                                }
+                                className="checkout-input form-control-sm"
+                              />
+                              <Button
+                                type="submit"
+                                variant="outline-light"
+                                size="sm"
+                                className="fw-semibold"
+                              >
+                                Applica
+                              </Button>
+                            </div>
+                          </Form.Group>
+                          {scontoErrore && (
+                            <small className="text-danger d-block mt-1">
+                              {scontoErrore}
+                            </small>
+                          )}
+                          {scontoApplicato && (
+                            <small className="text-success d-block mt-1">
+                              Codice applicato con successo!
+                            </small>
+                          )}
+                        </Form>
+                      )}
+                    </>
+                  )}
                 </Card.Body>
               </Card>
             </Col>

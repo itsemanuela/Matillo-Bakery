@@ -27,6 +27,7 @@ import AdminRichiesteCatering from "./ComponentGestionale/AdminRichiesteCatering
 import AdminGalleriaEventi from "./ComponentGestionale/AdminGalleriaEventi";
 import ChatWidget from "./Components/ChatWidget";
 import ResetPassword from "./Components/ResetPassword";
+import CheckoutSuccesso from "./Components/CheckoutSuccesso";
 
 function AppContent() {
   const location = useLocation();
@@ -48,6 +49,7 @@ function AppContent() {
         />
         <Route path="/shop" element={<MyShop />} />
         <Route path="/checkout" element={<Checkout />} />
+        <Route path="/checkout/successo" element={<CheckoutSuccesso />} />
 
         <Route path="/catering" element={<Catering />} />
         <Route path="/catering/:id" element={<CateringDettaglio />} />
