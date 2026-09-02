@@ -6,7 +6,7 @@ import Button from "react-bootstrap/Button";
 import Alert from "react-bootstrap/Alert";
 import InputGroup from "react-bootstrap/InputGroup";
 
-const API_URL = "http://localhost:3001/api";
+const API_URL = "https://matillo-digital-bakery-experience-be.onrender.com/api";
 
 const groupTextStyle = {
   backgroundColor: "rgba(255, 255, 255, 0.1)",
