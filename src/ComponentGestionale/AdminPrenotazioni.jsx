@@ -24,31 +24,34 @@ function AdminPrenotazioni() {
   const [selectedPrenotazioneUuid, setSelectedPrenotazioneUuid] =
     useState(null);
 
-  // 1. Carica la lista dei laboratori per popolare il menu a tendina del filtro
   useEffect(() => {
-    fetch("http://localhost:3001/api/laboratori", {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+    fetch(
+      "https://matillo-digital-bakery-experience-be.onrender.com/api/laboratori",
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
       },
-    })
+    )
       .then((res) => res.json())
       .then((data) => setLaboratori(data))
       .catch((err) => console.error("Errore caricamento laboratori:", err));
   }, []);
 
-  // 2. Funzione per recuperare le prenotazioni applicando i filtri scelti
   const fetchPrenotazioni = () => {
     setLoading(true);
 
     const params = new URLSearchParams();
     if (laboratorioFiltro) params.append("laboratorioId", laboratorioFiltro);
     if (statoFiltro) params.append("stato", statoFiltro);
-
-    fetch(`http://localhost:3001/api/prenotazioni?${params.toString()}`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+    fetch(
+      `https://matillo-digital-bakery-experience-be.onrender.com/api/prenotazioni?${params.toString()}`,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
       },
-    })
+    )
       .then((res) => {
         if (!res.ok) throw new Error("Errore nel recupero delle prenotazioni");
         return res.json();
@@ -63,7 +66,6 @@ function AdminPrenotazioni() {
       });
   };
 
-  // Ricarica automaticamente ogni volta che cambia uno dei due filtri
   useEffect(() => {
     fetchPrenotazioni();
   }, [laboratorioFiltro, statoFiltro]);
@@ -82,7 +84,7 @@ function AdminPrenotazioni() {
     if (!selectedPrenotazioneUuid) return;
 
     fetch(
-      `http://localhost:3001/api/prenotazioni/${selectedPrenotazioneUuid}/cancella`,
+      `https://matillo-digital-bakery-experience-be.onrender.com/api/prenotazioni/${selectedPrenotazioneUuid}/cancella`,
       {
         method: "PATCH",
         headers: {

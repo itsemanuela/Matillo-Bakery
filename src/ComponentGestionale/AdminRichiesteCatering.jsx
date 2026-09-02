@@ -5,7 +5,7 @@ import Spinner from "react-bootstrap/Spinner";
 import Alert from "react-bootstrap/Alert";
 import Form from "react-bootstrap/Form";
 
-const API_URL = "http://localhost:3001/api";
+const API_URL = "https://matillo-digital-bakery-experience-be.onrender.com/api";
 
 const COLORE_STATO = {
   IN_ATTESA: "#b89728",

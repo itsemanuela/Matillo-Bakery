@@ -9,7 +9,7 @@ import Table from "react-bootstrap/Table";
 import Spinner from "react-bootstrap/Spinner";
 import Alert from "react-bootstrap/Alert";
 
-const API_URL = "http://localhost:3001/api";
+const API_URL = "https://matillo-digital-bakery-experience-be.onrender.com/api";
 
 const CATEGORIE = ["PANE", "DOLCI", "PIZZE"];
 

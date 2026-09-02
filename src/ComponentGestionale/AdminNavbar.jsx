@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import Button from "react-bootstrap/Button";
 import { useNavigate, useLocation } from "react-router-dom";
 
-const API_URL = "http://localhost:3001/api";
+const API_URL = "https://matillo-digital-bakery-experience-be.onrender.com/api";
 
 const GRUPPI = [
   {

@@ -6,11 +6,14 @@ export default function PrenotazioniPage() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch("http://localhost:3001/api/prenotazioni", {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+    fetch(
+      "https://matillo-digital-bakery-experience-be.onrender.com/api/prenotazioni",
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
       },
-    })
+    )
       .then((res) => {
         if (!res.ok) throw new Error("Errore nel recupero delle prenotazioni");
         return res.json();
@@ -26,12 +29,15 @@ export default function PrenotazioniPage() {
   }, []);
 
   const handleCancella = (id) => {
-    fetch(`http://localhost:3001/api/prenotazioni/${id}/cancella`, {
-      method: "PATCH",
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+    fetch(
+      `https://matillo-digital-bakery-experience-be.onrender.com/api/prenotazioni/${id}/cancella`,
+      {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
       },
-    })
+    )
       .then((res) => {
         if (!res.ok) throw new Error("Errore durante la cancellazione");
         return res.json();
