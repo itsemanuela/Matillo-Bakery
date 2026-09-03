@@ -71,11 +71,11 @@ La sezione `AccessoGenerale` gestisce le funzionalità di login e registrazione,
 
 ---
 
-## 5. Pannello amministrativo (gestionale)
+## 4. Pannello amministrativo (gestionale)
 
 È stato realizzato un pannello di amministrazione, raggiungibile alla rotta `/admin/prodotti`, dedicato alla gestione del catalogo prodotti. Il pannello consente le operazioni di creazione, modifica e gestione delle referenze presenti nel database. Dal punto di vista architetturale, il gestionale è organizzato in una cartella frontend dedicata (`ComponentGestionale`), separata dai componenti del sito pubblico.
 
-### 5.1 Gestione richieste catering
+### 4.1 Gestione richieste catering
 
 Il gestionale include una sezione dedicata alle Richieste Catering, che presenta in una tabella tutte le richieste di preventivo ricevute dal sito pubblico: data della richiesta, dati del cliente, pacchetto scelto, data dell'evento, numero di persone e contatti (email e telefono).
 
@@ -90,7 +90,7 @@ Ciascuno stato è associato a un colore identificativo per una lettura rapida de
 
 ---
 
-## 7. Dati chiave del progetto
+## 5. Dati chiave del progetto
 
 - Oltre 40 prodotti reali censiti a catalogo, ciascuno con fotografia caricata su Cloudinary.
 - Autenticazione basata su JWT con due ruoli distinti: `CLIENTE` e `ADMIN`.
