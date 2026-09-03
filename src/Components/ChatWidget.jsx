@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-const API_BASE = "http://localhost:3001/api/ordini";
+const API_URL = "http://localhost:3001/api/ordini";
 
 const ETICHETTE_STATO = {
   IN_ELABORAZIONE: "In elaborazione",
@@ -92,8 +92,9 @@ function ChatWidget() {
     };
 
     try {
+      const codicePulito = codiceOrdine.trim().replace(/^#/, "");
       const res = await fetch(
-        `${API_BASE}/stato?numeroOrdine=${encodeURIComponent(codiceOrdine)}&email=${encodeURIComponent(email)}`,
+        `${API_URL}/stato?numeroOrdine=${encodeURIComponent(codicePulito)}&email=${encodeURIComponent(email)}`,
       );
 
       if (!res.ok) {

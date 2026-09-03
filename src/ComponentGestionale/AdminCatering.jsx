@@ -8,7 +8,7 @@ import Table from "react-bootstrap/Table";
 import Alert from "react-bootstrap/Alert";
 import Modal from "react-bootstrap/Modal";
 
-const API_URL = "https://matillo-digital-bakery-experience-be.onrender.com/api";
+const API_URL = "http://localhost:3001/api";
 const PLACEHOLDER_IMG =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Crect width='80' height='80' fill='%23f1f3f5'/%3E%3Ctext x='50%25' y='50%25' font-family='sans-serif' font-size='9' fill='%23868e96' text-anchor='middle' dy='.3em'%3EN/A%3C/text%3E%3C/svg%3E";
 const FORM_VUOTO = {

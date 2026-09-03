@@ -8,7 +8,7 @@ import Alert from "react-bootstrap/Alert";
 import Spinner from "react-bootstrap/Spinner";
 import { useNavigate } from "react-router-dom";
 
-const API_URL = "https://matillo-digital-bakery-experience-be.onrender.com/api";
+const API_URL = "http://localhost:3001/api";
 
 function Login() {
   const [email, setEmail] = useState("");

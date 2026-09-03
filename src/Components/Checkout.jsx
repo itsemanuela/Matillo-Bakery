@@ -11,7 +11,7 @@ import {
 import { useNavigate, useLocation } from "react-router-dom";
 import FormCity from "./FormCity";
 
-const API_URL = "https://matillo-digital-bakery-experience-be.onrender.com/api";
+const API_URL = "http://localhost:3001/api";
 const CODICE_SCONTO_VALIDO = "BENVENUTO10";
 const PERCENTUALE_SCONTO = 0.1;
 

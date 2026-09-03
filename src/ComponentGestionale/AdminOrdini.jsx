@@ -7,7 +7,7 @@ import Alert from "react-bootstrap/Alert";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 
-const API_URL = "https://matillo-digital-bakery-experience-be.onrender.com/api";
+const API_URL = "http://localhost:3001/api";
 
 const STATI = [
   "IN_ELABORAZIONE",

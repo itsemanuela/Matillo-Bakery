@@ -10,7 +10,7 @@ import Spinner from "react-bootstrap/Spinner";
 import Alert from "react-bootstrap/Alert";
 import sfondoOrdini from "../assets/20210118_MAT_Presentazione concept_page-0011.jpg";
 
-const API_URL = "https://matillo-digital-bakery-experience-be.onrender.com/api";
+const API_URL = "http://localhost:3001/api";
 
 function LeMiePrenotazioni() {
   const navigate = useNavigate();

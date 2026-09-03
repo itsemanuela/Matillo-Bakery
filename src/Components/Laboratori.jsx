@@ -8,7 +8,7 @@ import Button from "react-bootstrap/Button";
 import Spinner from "react-bootstrap/Spinner";
 import { motion } from "framer-motion";
 
-const API_URL = "https://matillo-digital-bakery-experience-be.onrender.com/api";
+const API_URL = "http://localhost:3001/api/laboratori";
 
 const PLACEHOLDER_IMG =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%23241d18'/%3E%3Ctext x='50%25' y='50%25' font-family='sans-serif' font-size='18' fill='%23EED972' text-anchor='middle' dy='.3em'%3EFoto in arrivo%3C/text%3E%3C/svg%3E";
@@ -29,7 +29,7 @@ function Laboratori() {
   const [errore, setErrore] = useState(null);
 
   useEffect(() => {
-    fetch(`${API_URL}/laboratori`)
+    fetch(API_URL)
       .then((res) => {
         if (!res.ok) throw new Error("Errore nel caricamento dei laboratori");
         return res.json();

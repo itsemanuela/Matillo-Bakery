@@ -1,9 +1,13 @@
  @import url('https://fonts.googleapis.com/css2?family=Roboto+Serif:ital,opsz,wght@0,8..144,100..900;1,8..144,100..900&display=swap');
- @import url('https://fonts.googleapis.com/css2?family=Allura&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Allura&display=swap');
 
- body {
+html, body {
+  width: 100%;
+  max-width: 100%;
   margin: 0;
   padding: 0;
+  overflow-x: hidden !important;
+  position: relative;
 }
 
 .hero-section {
@@ -16,13 +20,11 @@
   background: linear-gradient(90deg, rgba(28, 22, 19, 0.3) 0%, rgba(28, 22, 19, 0.85) 45%, rgba(28, 22, 19, 0.95) 100%), var(--hero-bg) -25% -15% / cover no-repeat;
 }
 
-
 @media (max-width: 991.98px) {
   .hero-section {
     background: linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)), var(--hero-bg) center center / cover no-repeat !important;
   }
 }
-
 
 .hero-container-z {
   z-index: 2;
@@ -38,8 +40,7 @@
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9);
 }
 
-
-  .hero-bottom-gradient {
+.hero-bottom-gradient {
   position: absolute;
   bottom: 0;
   left: 0;
@@ -57,27 +58,26 @@
   pointer-events: none;
 }
 
- .navbar {
+.navbar {
   background-color: rgba(255, 255, 255, 0.15);  
-  backdrop-filter: blur(8px);                  
-  position: absolute;                           
+  backdrop-filter: blur(8px);                
+  position: absolute;                         
   top: 0;
   left: 0;
   width: 100%;
   z-index: 1000;
 }
+
 .navbar-nav .nav-link {
   font-family: 'Roboto Serif', serif;
-
 }
 
-#bestseller{
- font-style:italic;
-  font-size:23px;
+#bestseller {
+  font-style: italic;
+  font-size: 23px;
   background-color: #EED972 !important;
   color: #221915 !important;
 }
-
 
 .bg-custom-shop {
   color: #ffffff !important;
@@ -88,7 +88,7 @@ footer, .custom-footer {
   border-top: 2px solid #EED972 !important;
 }
 
- .checkout-page-wrapper {
+.checkout-page-wrapper {
   background:
     radial-gradient(circle at 15% 10%, rgba(232,119,34,0.25) 0%, transparent 55%),
     linear-gradient(160deg, #b34a14 0%, #4a2a19 35%, #241a15 75%, #1c1613 100%) !important;
@@ -203,7 +203,7 @@ footer, .custom-footer {
   padding-right: 5px;
 }
 
-/*carrello*/
+/* CARRELLO */
 
 .cart-offcanvas {
   background-color: #241a15 !important;
@@ -235,7 +235,6 @@ footer, .custom-footer {
   padding: 2px 8px;
 }
 
-
 .cart-btn-gold {
   background-color: #EED972 !important;
   color: #241a15 !important;
@@ -248,25 +247,24 @@ footer, .custom-footer {
   color: #241a15 !important;
 }
 
- .cart-sticky-bar {
+.cart-sticky-bar {
   position: fixed;
   bottom: 0;
   left: 0;
-  right: 0;
+  width: 100%;
   background-color: rgba(26, 18, 11, 0.95);
   backdrop-filter: blur(10px);
   border-top: 1px solid rgba(238, 217, 114, 0.4);
-  padding: 15px 30px;
+  padding: 15px 20px;
   z-index: 1000;
   display: flex;
   justify-content: space-between;
   align-items: center;
   box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.5);
+  box-sizing: border-box;
 }
 
-  
-  /* ============================================
-   I MIEI ORDINI  */
+/* I MIEI ORDINI */
 
 .my-ordini-wrapper {
   background: radial-gradient(circle at 20% 0%, rgba(238, 217, 114, 0.1) 0%, transparent 50%),
@@ -277,14 +275,12 @@ footer, .custom-footer {
   padding-bottom: 100px;
 }
 
-
 .titolo-ordini-linea {
   width: 60px;
   height: 2px;
   margin-top: 14px;
   background: linear-gradient(90deg, #EED972, transparent);
 }
-
 
 .riga-ordine-thumb {
   width: 48px;
@@ -295,11 +291,11 @@ footer, .custom-footer {
   flex-shrink: 0;
 }
 
-
 .ordine-card {
   position: relative;
   overflow: hidden;
 }
+
 .ordine-card::before {
   content: "";
   position: absolute;
@@ -311,11 +307,9 @@ footer, .custom-footer {
   pointer-events: none;
 }
 
-
 .box-login, .box-utente, .ordine-card, .box-vuoto {
   background-color: rgba(255, 255, 255, 0.08) !important;
 }
-
 
 .login-box-filo-oro {
   position: absolute;
@@ -325,7 +319,6 @@ footer, .custom-footer {
   height: 2px;
   background: linear-gradient(90deg, transparent, #EED972, transparent);
 }
-
 
 .login-box-icona {
   width: 56px;
@@ -341,10 +334,10 @@ footer, .custom-footer {
   color: #EED972;
 }
 
-
 .login-input-wrapper {
   position: relative;
 }
+
 .login-input-icona {
   position: absolute;
   top: 50%;
@@ -354,12 +347,12 @@ footer, .custom-footer {
   font-size: 0.9rem;
   pointer-events: none;
 }
+
 .login-input-con-icona {
   padding-left: 40px !important;
 }
- /* ============================================
-   MODALE E PRENOTAZIONI - MATILLO BAKERY
-  ============================================ */
+
+/* MODALE E PRENOTAZIONI - MATILLO BAKERY */
 
 @keyframes fadeInSlide {
   from {
@@ -398,7 +391,6 @@ footer, .custom-footer {
   box-shadow: 0 0 10px rgba(238, 217, 114, 0.2) !important;
 }
 
-
 .modal-content {
   background-color: transparent !important;
   border: none !important;
@@ -424,8 +416,9 @@ footer, .custom-footer {
   -webkit-font-smoothing: antialiased;
 }
 
-/*chat*/
-  .chat-widget-container {
+/* CHAT */
+
+.chat-widget-container {
   position: fixed;
   bottom: 24px;
   right: 24px;
@@ -635,4 +628,3 @@ footer, .custom-footer {
   opacity: 0.6;
   cursor: not-allowed;
 }
-
