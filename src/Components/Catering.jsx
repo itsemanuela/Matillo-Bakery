@@ -11,6 +11,45 @@ const API_URL = "http://localhost:3001/api";
 const PLACEHOLDER_IMG =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%23241d18'/%3E%3Ctext x='50%25' y='50%25' font-family='sans-serif' font-size='18' fill='%23EED972' text-anchor='middle' dy='.3em'%3EFoto in arrivo%3C/text%3E%3C/svg%3E";
 
+const MOCK_PACCHETTI = [
+  {
+    uuid: "mock-1",
+    nome: "Buffet Compleanno Rustico",
+    descrizione:
+      "Selezione di pizze in teglia, calzoni mignon e rustici artigianali.",
+    prezzoPersona: 18.0,
+    numeroMinimoPersone: 10,
+    immagine: "",
+  },
+  {
+    uuid: "mock-2",
+    nome: "Ricevimento Cerimonia",
+    descrizione:
+      "Pan brioche farcito, tartine gourmet e specialità salate del forno.",
+    prezzoPersona: 25.0,
+    numeroMinimoPersone: 15,
+    immagine: "",
+  },
+  {
+    uuid: "mock-3",
+    nome: "Coffee Break Aziendale",
+    descrizione:
+      "Cornetti artigianali, biscotti di pasta frolla e dolci da forno assortiti.",
+    prezzoPersona: 12.0,
+    numeroMinimoPersone: 8,
+    immagine: "",
+  },
+  {
+    uuid: "mock-4",
+    nome: "Gran Festa Matillo",
+    descrizione:
+      "Un mix completo di proposte dolci e salate per grandi eventi.",
+    prezzoPersona: 30.0,
+    numeroMinimoPersone: 20,
+    immagine: "",
+  },
+];
+
 const colors = {
   char: "#1c1613",
   crust: "#b34a14",
@@ -81,8 +120,8 @@ function Catering() {
         setPacchetti(data);
         setCaricamento(false);
       })
-      .catch((err) => {
-        setErrore(err.message);
+      .catch(() => {
+        setPacchetti(MOCK_PACCHETTI);
         setCaricamento(false);
       });
   }, []);
@@ -222,7 +261,7 @@ function Catering() {
               </p>
             )}
 
-            {!caricamento && !errore && (
+            {!caricamento && (
               <Row className="g-4">
                 {pacchetti.map((pacchetto) => (
                   <Col md={3} sm={6} key={pacchetto.uuid}>

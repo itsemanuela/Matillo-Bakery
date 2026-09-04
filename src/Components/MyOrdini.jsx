@@ -41,7 +41,12 @@ function MyOrdini() {
         setCaricamento(false);
       })
       .catch((err) => {
-        setErrore(err.message);
+        console.error(err);
+        setErrore(
+          err.message === "Failed to fetch"
+            ? "Impossibile contattare il server. Controlla la connessione e riprova."
+            : err.message,
+        );
         setCaricamento(false);
       });
   };

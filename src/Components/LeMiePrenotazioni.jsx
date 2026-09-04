@@ -26,7 +26,6 @@ function LeMiePrenotazioni() {
   // Stati per la gestione del Modale di Eliminazione Personalizzato
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [idDaEliminare, setIdDaEliminare] = useState(null);
-
   const fetchPrenotazioni = () => {
     const token =
       localStorage.getItem("token") || localStorage.getItem("accessToken");
@@ -50,7 +49,8 @@ function LeMiePrenotazioni() {
         setCaricamento(false);
       })
       .catch((err) => {
-        setErrore(err.message);
+        console.error(err);
+        setErrore(messaggioErrore(err));
         setCaricamento(false);
       });
   };

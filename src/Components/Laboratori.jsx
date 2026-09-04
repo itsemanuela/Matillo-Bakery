@@ -6,6 +6,7 @@ import Col from "react-bootstrap/Col";
 import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
 import Spinner from "react-bootstrap/Spinner";
+import Alert from "react-bootstrap/Alert";
 import { motion } from "framer-motion";
 
 const API_URL = "http://localhost:3001/api/laboratori";
@@ -30,8 +31,19 @@ function Laboratori() {
 
   useEffect(() => {
     fetch(API_URL)
-      .then((res) => {
-        if (!res.ok) throw new Error("Errore nel caricamento dei laboratori");
+      .then(async (res) => {
+        if (!res.ok) {
+          let messaggioErrore = "Errore durante il caricamento dei laboratori.";
+          try {
+            const errorData = await res.json();
+            if (errorData && errorData.message) {
+              messaggioErrore = errorData.message;
+            }
+          } catch {
+            // Se la risposta non è in formato JSON
+          }
+          throw new Error(messaggioErrore);
+        }
         return res.json();
       })
       .then((data) => {
@@ -39,7 +51,13 @@ function Laboratori() {
         setCaricamento(false);
       })
       .catch((err) => {
-        setErrore(err.message);
+        if (err.message === "Failed to fetch") {
+          setErrore(
+            "Forno temporaneamente spento! Impossibile connettersi al server Matillo. Controlla che sia attivo.",
+          );
+        } else {
+          setErrore(err.message);
+        }
         setCaricamento(false);
       });
   }, []);
@@ -95,7 +113,29 @@ function Laboratori() {
             <Spinner animation="border" style={{ color: "#EED972" }} />
           </div>
         )}
-        {errore && <p className="text-center text-light">{errore}</p>}
+
+        {errore && (
+          <div className="text-center py-4">
+            <Alert
+              variant="warning"
+              className="d-inline-block px-4 py-3 border-0 text-white"
+              style={{
+                backgroundColor: "rgba(232, 119, 34, 0.25)",
+                backdropFilter: "blur(12px)",
+                borderRadius: "15px",
+                border: "1px solid rgba(238, 217, 114, 0.3)",
+              }}
+            >
+              <span
+                style={{ color: "#EED972" }}
+                className="fw-semibold d-block mb-1"
+              >
+                Attenzione
+              </span>
+              {errore}
+            </Alert>
+          </div>
+        )}
 
         {!caricamento && !errore && (
           <Row className="g-4">
@@ -181,7 +221,7 @@ function Laboratori() {
           </Row>
         )}
 
-        {!caricamento && laboratori.length === 0 && (
+        {!caricamento && laboratori.length === 0 && !errore && (
           <p className="text-center text-light opacity-75">
             Nessun laboratorio disponibile al momento.
           </p>

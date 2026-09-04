@@ -69,8 +69,19 @@ function LaboratorioDettaglio() {
 
   useEffect(() => {
     fetch(`${API_URL}/laboratori/${id}`)
-      .then((res) => {
-        if (!res.ok) throw new Error("Laboratorio non trovato");
+      .then(async (res) => {
+        if (!res.ok) {
+          let messaggioErrore = "Laboratorio non trovato";
+          try {
+            const errorData = await res.json();
+            if (errorData && errorData.message) {
+              messaggioErrore = errorData.message;
+            }
+          } catch {
+            // Se la risposta non è in formato JSON
+          }
+          throw new Error(messaggioErrore);
+        }
         return res.json();
       })
       .then((data) => {
@@ -78,7 +89,13 @@ function LaboratorioDettaglio() {
         setCaricamento(false);
       })
       .catch((err) => {
-        setErrore(err.message);
+        if (err.message === "Failed to fetch") {
+          setErrore(
+            "Impossibile connettersi al server. Verifica che sia attivo.",
+          );
+        } else {
+          setErrore(err.message);
+        }
         setCaricamento(false);
       });
   }, [id]);
@@ -107,16 +124,31 @@ function LaboratorioDettaglio() {
         numeroPersone: parseInt(formData.numeroPersone, 10),
       }),
     })
-      .then((res) => {
+      .then(async (res) => {
         if (!res.ok) {
-          return res.json().then((err) => {
-            throw new Error(err.message || "Errore durante la prenotazione");
-          });
+          let messaggioErrore = "Errore durante la prenotazione";
+          try {
+            const errData = await res.json();
+            if (errData && errData.message) {
+              messaggioErrore = errData.message;
+            }
+          } catch {
+            // Se la risposta non è in formato JSON
+          }
+          throw new Error(messaggioErrore);
         }
         return res.json();
       })
       .then(() => setPrenotazioneSuccesso(true))
-      .catch((err) => setPrenotazioneErrore(err.message))
+      .catch((err) => {
+        if (err.message === "Failed to fetch") {
+          setPrenotazioneErrore(
+            "Impossibile connettersi al server. Verifica che sia attivo.",
+          );
+        } else {
+          setPrenotazioneErrore(err.message);
+        }
+      })
       .finally(() => setInvioInCorso(false));
   };
 

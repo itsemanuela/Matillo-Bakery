@@ -6,7 +6,7 @@ import Button from "react-bootstrap/Button";
 import Alert from "react-bootstrap/Alert";
 import InputGroup from "react-bootstrap/InputGroup";
 
-const API_URL = "https://matillo-digital-bakery-experience-be.onrender.com/api";
+const API_URL = "http://localhost:3001/api";
 
 const groupTextStyle = {
   backgroundColor: "rgba(255, 255, 255, 0.1)",
@@ -69,7 +69,13 @@ function ResetPassword() {
         }
         setSuccesso(true);
       })
-      .catch((err) => setErrore(err.message))
+      .catch((err) =>
+        setErrore(
+          err.message === "Failed to fetch"
+            ? "Impossibile contattare il server. Controlla la connessione e riprova."
+            : err.message,
+        ),
+      )
       .finally(() => setInvioInCorso(false));
   };
 

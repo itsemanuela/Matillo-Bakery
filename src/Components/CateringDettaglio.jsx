@@ -162,6 +162,12 @@ function CateringDettaglio() {
       return;
     }
 
+    const oggi = new Date().toISOString().split("T")[0];
+    if (formData.dataEvento < oggi) {
+      setRichiestaErrore("La data dell'evento non può essere nel passato.");
+      return;
+    }
+
     setRichiestaErrore(null);
     setInvioInCorso(true);
 
@@ -179,6 +185,12 @@ function CateringDettaglio() {
       }),
     })
       .then((res) => {
+        if (res.status === 401 || res.status === 403) {
+          localStorage.removeItem("token");
+          throw new Error(
+            "Sessione scaduta o non autorizzata. Effettua nuovamente il login.",
+          );
+        }
         if (!res.ok) {
           return res.json().then((err) => {
             throw new Error(

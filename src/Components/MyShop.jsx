@@ -52,7 +52,6 @@ function Shop() {
 
   const handleCloseCart = () => setShowCart(false);
   const handleShowCart = () => setShowCart(true);
-
   useEffect(() => {
     fetch(`${API_URL}/prodotti`)
       .then((res) => {
@@ -66,7 +65,12 @@ function Shop() {
         setCaricamento(false);
       })
       .catch((err) => {
-        setErrore(err.message);
+        console.error(err);
+        setErrore(
+          err.message === "Failed to fetch"
+            ? "Impossibile caricare i prodotti al momento. Riprova più tardi."
+            : err.message,
+        );
         setCaricamento(false);
       });
   }, []);
